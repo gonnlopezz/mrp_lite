@@ -1,0 +1,55 @@
+@startuml
+
+class Producto{
+  -String nombre
+}
+class Taller{
+  -String codigo
+}
+class TipoEquipo{
+  -String nombre
+}
+class Tarea{
+  -String nombre
+  -int orden
+  -int tiempo
+}
+class Equipo{
+  -String codigo
+  -int capacidad
+}
+class PedidoFabricacion{
+  -Date fecha_pedido
+  -Date fecha_entrega
+  -int cantidad
+}
+class OrdenTrabajo{
+  -int numero
+}
+class Planificacion{
+  -Time inicio
+}
+class Estado<<Enumeration>>{
+  -"Pendiente"
+  -"Planificado"
+  -"No planificable"
+  -"Finalizado"
+}
+class Cliente{
+  -String razonSocial
+  -long cuit
+}
+
+Producto "1" <-- "*" PedidoFabricacion
+Equipo "*" <-- "1" Taller
+Producto "1" --> "*" Tarea
+OrdenTrabajo "1" <--> "*" Planificacion
+Planificacion "*"<--> Equipo
+TipoEquipo "1" <-- "*" Equipo
+Tarea "*" --> "1" TipoEquipo
+Tarea "1" <-- "*" Planificacion
+PedidoFabricacion "1" --> "*" OrdenTrabajo
+PedidoFabricacion "*" --> "1" Estado
+Cliente "1" <-- "*" PedidoFabricacion
+
+@enduml
