@@ -5,6 +5,7 @@ class Producto{
 }
 class Taller{
   -String codigo
+  -String nombre
 }
 class TipoEquipo{
   -String nombre
