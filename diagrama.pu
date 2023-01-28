@@ -29,6 +29,7 @@ class OrdenTrabajo{
 }
 class Planificacion{
   -Time inicio
+  -Time fin
 }
 class Estado<<Enumeration>>{
   -"Pendiente"
