@@ -1,0 +1,1048 @@
+{
+    "ejemplos_planificaciones": [
+        {
+            "pedido": {
+                "cantidad": 1,
+                "producto": "mesa 1.80x0.70"
+            },
+            "taller": "este",
+            "método": "pronta entrega",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-01-01T00: 00: 00-03: 00",
+                    "fin": "2023-01-01T00: 10: 00-03: 00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00: 10: 00-03: 00",
+                    "fin": "2023-01-01T00:25:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 15,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00:25:00-03:00",
+                    "fin": "2023-01-01T00:32:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 7,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00:32:00-03:00",
+                    "fin": "2023-01-01T00:57:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 25,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00:57:00-03:00",
+                    "fin": "2023-01-01T01:12:00-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 45,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T01:12:00-03:00",
+                    "fin": "2023-01-01T01:23:30-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 35,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "pedido": {
+                "cantidad": 1,
+                "producto": "mesa 2x1"
+            },
+            "taller": "este",
+            "método": "pronta entrega",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-01-01T00: 00: 00-03: 00",
+                    "fin": "2023-01-01T00:12:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 12,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00:12:00-03:00",
+                    "fin": "2023-01-01T00:31:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 19,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00:31:00-03:00",
+                    "fin": "2023-01-01T00:41:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T00:41:00-03:00",
+                    "fin": "2023-01-01T01:10:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 29,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T01:10:00-03:00",
+                    "fin": "2023-01-01T01:26:40-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 52,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-01T01:26:40-03:00",
+                    "fin": "2023-01-01T01:37:20-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 41,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "pedido": {
+                "cantidad": 1,
+                "producto": "mesa 1.80x0.70"
+            },
+            "taller": "este",
+            "método": "EDF",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-01-31T22:35:10-03:00",
+                    "fin": "2023-01-31T22:45:10-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T22:45:10-03:00",
+                    "fin": "2023-01-31T23:00:10-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 15,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T23:00:10-03:00",
+                    "fin": "2023-01-31T23:07:10-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 7,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T23:07:10-03:00",
+                    "fin": "2023-01-31T23:32:10-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 25,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T23:32:10-03:00",
+                    "fin": "2023-01-31T23:47:10-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 45,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T23:47:10-03:00",
+                    "fin": "2023-01-31T23:59:00-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 35,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "pedido": {
+                "cantidad": 1,
+                "producto": "mesa 2x1"
+            },
+            "taller": "este",
+            "método": "EDF",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-01-31T22:19:20-03:00",
+                    "fin": "2023-01-31T22:31:20-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 12,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T22:31:20-03:00",
+                    "fin": "2023-01-31T22:40:20-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 19,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T22:40:20-03:00",
+                    "fin": "2023-01-31T22:50:20-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T22:50:20-03:00",
+                    "fin": "2023-01-31T23:19:20-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 29,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T23:19:20-03:00",
+                    "fin": "2023-01-31T23:25:20-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 52,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-01-31T23:25:20-03:00",
+                    "fin": "2023-01-31T01:23:59:00-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 41,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "pedido": {
+                "cuit": "1000000001",
+                "fechaPedido": "2023-05-04",
+                "fechaEntrega": "2023-05-29",
+                "cantidad": 10,
+                "producto": "mesa 1.80x0.70"
+            },
+            "taller": "este",
+            "método": "pronta entrega",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-05-05T00:00:00-03:00",
+                    "fin": "2023-05-05T01:40:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-05T01:40:00-03:00",
+                    "fin": "2023-05-05T04:10:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 15,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-05T04:10:00-03:00",
+                    "fin": "2023-05-05T05:20:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 7,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-05T05:20:00-03:00",
+                    "fin": "2023-05-05T09:30:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 25,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-05T09:30:00-03:00",
+                    "fin": "2023-05-05T12:00:00-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 45,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-05T12:00:00-03:00",
+                    "fin": "2023-05-05T13:56:40-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 35,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "pedido": {
+                "cuit": "2000000002",
+                "fechaPedido": "2023-05-04",
+                "fechaEntrega": "2023-05-30",
+                "cantidad": 70,
+                "producto": "mesa 2x1"
+            },
+            "taller": "este",
+            "método": "pronta entrega",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-05-05T00:00:00-03:00",
+                    "fin": "2023-05-05T14:00:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 12,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-05T14:00:00-03:00",
+                    "fin": "2023-05-06T12:10:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 19,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-06T12:10:00-03:00",
+                    "fin": "2023-05-06T23:50:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-06T23:50:00-03:00",
+                    "fin": "2023-05-08T09:40:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 29,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-08T09:40:00-03:00",
+                    "fin": "2023-05-09T05:53:20-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 52,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-09T05:53:20-03:00",
+                    "fin": "2023-05-09T21:50:00-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 41,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {
+            "pedido": {
+                "cuit": "1000000001",
+                "fechaPedido": "2023-05-04",
+                "fechaEntrega": "2023-05-29",
+                "cantidad": 10,
+                "producto": "mesa 1.80x0.70"
+            },
+            "taller": "este",
+            "método": "EDF",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-05-29T10:02:20-03:00",
+                    "fin": "2023-05-29T11:42:20-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-29T11:42:20-03:00",
+                    "fin": "2023-05-29T14:12:20-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 15,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-29T14:12:20-03:00",
+                    "fin": "2023-05-29T15:22:20-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 7,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-29T15:22:20-03:00",
+                    "fin": "2023-05-29T19:32:20-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 25,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-29T19:32:20-03:00",
+                    "fin": "2023-05-29T22:02:20-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 45,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-29T22:02:20-03:00",
+                    "fin": "2023-05-29T23:59:00-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 35,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "pedido": {
+                "cuit": "2000000002",
+                "fechaPedido": "2023-05-04",
+                "fechaEntrega": "2023-05-30",
+                "cantidad": 70,
+                "producto": "mesa 2x1"
+            },
+            "taller": "este",
+            "método": "EDF",
+            "OrdenTrabajo": [
+                {
+                    "inicio": "2023-05-26T02:09:00-03:00",
+                    "fin": "2023-05-26T16:09:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar patas",
+                        "orden": 1,
+                        "tiempo": 12,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-26T16:09:00-03:00",
+                    "fin": "2023-05-27T14:19:00-03:00",
+                    "tarea": {
+                        "nombre": "cortar tapa",
+                        "orden": 2,
+                        "tiempo": 19,
+                        "tipoEquipo": {
+                            "id": 1,
+                            "nombre": "cierra"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "cierra este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "cierra"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-27T14:19:00-03:00",
+                    "fin": "2023-05-28T01:59:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir patas",
+                        "orden": 3,
+                        "tiempo": 10,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-28T01:59:00-03:00",
+                    "fin": "2023-05-29T11:49:00-03:00",
+                    "tarea": {
+                        "nombre": "pulir tapa",
+                        "orden": 4,
+                        "tiempo": 29,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "lijadora de banda este 1",
+                        "capacidad": 1,
+                        "tipoEquipo": {
+                            "nombre": "lijadora de banda"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-29T11:49:00-03:00",
+                    "fin": "2023-05-30T08:02:20-03:00",
+                    "tarea": {
+                        "nombre": "ensamblar y encolar",
+                        "orden": 5,
+                        "tiempo": 52,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                },
+                {
+                    "inicio": "2023-05-30T08:02:20-03:00",
+                    "fin": "2023-05-30T01:23:59:00-03:00",
+                    "tarea": {
+                        "nombre": "pintar y finalizar",
+                        "orden": 6,
+                        "tiempo": 41,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    },
+                    "equipo": {
+                        "codigo": "mesa ensamblado este",
+                        "capacidad": 3,
+                        "tipoEquipo": {
+                            "nombre": "mesa ensamblado"
+                        }
+                    }
+                }
+            ]
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+    ]
+}
