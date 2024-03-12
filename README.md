@@ -3,7 +3,8 @@
 # MRP Lite
 
 Para la instalación y configuración del entorno de desarrollo es necesario seguir el siguiente 
-<a href="https://git.fi.mdn.unp.edu.ar/labprog/core/infraestructura-tps/-/blob/master/README.md" target="_blank">INSTRUCTIVO</a>
+<a href="https://git.fi.mdn.unp.edu.ar/labprog/talleres/taller-restful-uix" 
+target="_blank">INSTRUCTIVO</a>
 
 ---
 
