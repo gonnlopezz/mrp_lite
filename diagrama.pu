@@ -1,57 +1,88 @@
-@startuml
+@startuml mrp-lite
 
-class Producto{
-  -String nombre
-}
-class Taller{
-  -String codigo
-  -String nombre
-}
-class TipoEquipo{
-  -String nombre
-}
-class Tarea{
-  -String nombre
-  -int orden
-  -int tiempo
-}
-class Equipo{
-  -String codigo
-  -int capacidad
-}
-class PedidoFabricacion{
-  -Date fecha_pedido
-  -Date fecha_entrega
-  -int cantidad
-}
-class OrdenTrabajo{
-  -int numero
-}
-class Planificacion{
-  -Time inicio
-  -Time fin
-}
-class Estado<<Enumeration>>{
-  -"Pendiente"
-  -"Planificado"
-  -"No planificable"
-  -"Finalizado"
-}
-class Cliente{
-  -String razonSocial
-  -long cuit
+package "Talleres" {
+  entity Taller{
+    -String codigo
+    -String nombre
+  }
+  entity TipoEquipo{
+    -String nombre
+  }
+  entity Equipo{
+    -String codigo
+    -int capacidad
+  }
+
+  Equipo "*" <-right- "1" Taller
+  TipoEquipo "1" <-right- "*" Equipo
 }
 
-Producto "1" <-- "*" PedidoFabricacion
-Equipo "*" <-- "1" Taller
-Producto "1" --> "*" Tarea
-OrdenTrabajo "1" <--> "*" Planificacion
-Planificacion "*"<--> Equipo
-TipoEquipo "1" <-- "*" Equipo
+package "Productos" {
+  entity Producto{
+    -String nombre
+  }
+
+  entity Tarea{
+    -String nombre
+    -int orden
+    -int tiempo
+  }
+
+  Producto "1" -right-> "*" Tarea
+}
+
+package "Pedidos" {
+  enum EstadoPedido<<Enumeration>>{
+    -"Pendiente"
+    -"Planificado"
+    -"No planificable"
+    -"Finalizado"
+  }
+  
+  entity PedidoFabricacion{
+    -Date fecha_pedido
+    -Date fecha_entrega
+    -int cantidad
+    -EstadoPedido estado
+  }
+  
+  entity Cliente{
+    -String razonSocial
+    -long cuit
+  }
+
+  Cliente "1" <-down- "*" PedidoFabricacion
+}
+
+package "Planificaciones"{
+    
+  entity OrdenTrabajo{
+    -int numero
+  }
+
+  entity Planificacion{
+    -Periodo periodo
+  }
+
+  entity ProcesoPlanificacion{
+    -Time inicio
+    -Time fin
+  }
+
+  class Periodo {
+    -Time inicio
+    -Time fin
+    -int duracion
+  }
+
+  ProcesoPlanificacion "1" -down-> "*" Planificacion
+  OrdenTrabajo "1" <-left-> "1" Planificacion
+}
+
+Producto "1" <-up- "*" PedidoFabricacion
+Planificacion "*"<-->"1" Equipo
 Tarea "*" --> "1" TipoEquipo
-Tarea "1" <-- "*" Planificacion
-PedidoFabricacion "1" --> "*" OrdenTrabajo
-PedidoFabricacion "*" --> "1" Estado
-Cliente "1" <-- "*" PedidoFabricacion
+Tarea "1" <-right- "*" Planificacion
+ProcesoPlanificacion "1" --> "*" PedidoFabricacion
 
 @enduml
