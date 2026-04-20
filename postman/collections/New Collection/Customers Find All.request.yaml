@@ -1,0 +1,5 @@
+$kind: http-request
+name: Customers Find All
+url: localhost:8080/customers
+method: GET
+order: 1776656021696

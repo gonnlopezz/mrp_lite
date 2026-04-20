@@ -12,5 +12,8 @@ Característica: gestión de clientes
       | marcelo t. de alvear       | 2000000002 | 200    | Cliente marcelo t. de alvear (2000000002) registrado correctamente | 
       | domingo faustino sarmiento | 3000000003 | 200    | Cliente domingo faustino sarmiento (3000000003) registrado correctamente | 
       | walter runciman            | 4000000004 | 200    | Cliente walter runciman (4000000004) registrado correctamente | 
-      | julio argentino roca       | 5000000005 | 200    | Cliente julio argentino roca (5000000005) registrado correctamente | 
+      | julio argentino roca       | 5000000005 | 200    | Cliente julio argentino roca (5000000005) registrado correctamente |                             |
+      | un cliente sin cuit        | 123         | 400   | El CUIT debe tener exactamente 11 números      |
+      |                            | 10000000010 | 400   | La razón social no puede estar vacía           |
+      | cliente letras cuit        | ABCDEFGHIJK | 400   | El CUIT debe contener solo caracteres numéricos|
 

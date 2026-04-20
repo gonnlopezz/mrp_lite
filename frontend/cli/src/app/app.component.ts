@@ -1,16 +1,12 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'; 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <router-outlet />
-  `,
+  imports: [RouterOutlet, NgbDropdownModule],
+  templateUrl: './app.html',
   styles: [],
 })
 export class AppComponent {
-  title = 'cli';
+  title = 'MRP Lite';
 }

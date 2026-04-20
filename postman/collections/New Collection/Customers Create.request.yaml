@@ -1,0 +1,12 @@
+$kind: http-request
+name: Customers Create
+url: localhost:8080/customers
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "cuit": 20449470843,
+        "companyName": "Prueba de Compañia"
+    }
+order: 3779358842443430

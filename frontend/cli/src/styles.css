@@ -1,1 +1,36 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* Tipografía y espaciado moderno para la marca */
+.tracking-tight {
+  letter-spacing: -0.5px;
+}
+
+/* Suavizar transiciones */
+.transition-base {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilizar el dropdown para que parezca una tarjeta flotante moderna */
+.dropdown-menu-modern {
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem !important; /* Separación del navbar */
+}
+
+/* Mejorar el hover de los ítems del dropdown */
+.dropdown-menu-modern .dropdown-item {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.dropdown-menu-modern .dropdown-item:hover,
+.dropdown-menu-modern .dropdown-item:focus {
+  background-color: #f8f9fa; /* Un gris muy sutil */
+  color: #0d6efd; /* Cambia al color primario (Bootstrap text-primary) */
+}
+
+.dropdown-menu-modern .dropdown-item:hover i {
+  color: #0d6efd !important;
+}
