@@ -1,7 +1,7 @@
 <header class="navbar navbar-expand-lg navbar-light bg-white mb-4 shadow-sm border-bottom">
     <div class="container">
 
-        <a class="navbar-brand d-flex align-items-center me-4 transition-base" routerLink="/">
+        <a class="navbar-brand d-flex align-items-center me-4 transition-base" href="/">
             <i class="fa fa-ticket-alt me-2 text-primary"></i>
             <span class="fw-bolder tracking-tight">{{title}}</span>
         </a>
@@ -14,15 +14,15 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center nav-separador">
 
-                <li class="nav-item dropdown" ngbDropdown>
+                <li class="nav-item dropdown" ngbDropdown #clientesDrop="ngbDropdown" (mouseenter)="clientesDrop.open()" (mouseleave)="clientesDrop.close()">
                     <a class="nav-link dropdown-toggle fw-medium text-secondary" id="clientesDropdown" role="button" ngbDropdownToggle>Clientes</a>
                     <ul class="dropdown-menu dropdown-menu-modern border-0 shadow" ngbDropdownMenu
                         aria-labelledby="clientesDropdown">
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" routerLink="/clientes"><i class="fa fa-list-ul me-2 text-muted" style="width: 16px;"></i> Listar</a>
+                            <a class="dropdown-item d-flex align-items-center" href="/clientes"><i class="fa fa-list-ul me-2 text-muted" style="width: 16px;"></i> Listar</a>
                         </li>
 
-                        <li><a class="dropdown-item d-flex align-items-center" routerLink="/clientes/nuevo"><i class="fa fa-plus me-2 text-muted" style="width: 16px;"></i> Nuevo</a>
+                        <li><a class="dropdown-item d-flex align-items-center" href="/clientes/nuevo"><i class="fa fa-plus me-2 text-muted" style="width: 16px;"></i> Nuevo</a>
                         </li>
                     </ul>
                 </li>

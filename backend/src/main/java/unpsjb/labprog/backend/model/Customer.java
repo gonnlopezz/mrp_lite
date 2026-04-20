@@ -18,4 +18,7 @@ public class Customer {
 
     @Column(unique = true, nullable = false)
     private String companyName;
+
+    @Column(nullable = false)
+    private String observations;
 }

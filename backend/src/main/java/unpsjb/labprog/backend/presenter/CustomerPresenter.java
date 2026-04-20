@@ -2,6 +2,7 @@ package unpsjb.labprog.backend.presenter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +35,7 @@ public class CustomerPresenter {
 
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> delete(int id) {
+    public ResponseEntity<Object> delete(@PathVariable("id") int id) {
         service.delete(id);
         return Response.ok("Cliente id " + id + " eliminado con éxito.");
     }
