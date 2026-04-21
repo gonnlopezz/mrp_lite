@@ -14,7 +14,7 @@
 .dropdown-menu-modern {
   border-radius: 0.75rem;
   padding: 0.5rem;
-  margin-top: 0.5rem !important; /* Separación del navbar */
+  margin-top: 0.5rem; /* Separación del navbar */
 }
 
 /* Mejorar el hover de los ítems del dropdown */
@@ -32,5 +32,44 @@
 }
 
 .dropdown-menu-modern .dropdown-item:hover i {
-  color: #0d6efd !important;
+  color: #0d6efd;
 }
+
+/* 1. Centrar el menú desplegable justo debajo de la palabra (Clientes/Talleres) */
+.nav-separador .dropdown-menu-modern {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    
+    /* Quitamos el margen nativo de Bootstrap para reducir la zona muerta */
+    margin-top: 0; 
+}
+
+/* 2. El "Puente Invisible" para arreglar el parpadeo del Hover */
+/* Esto crea un bloque transparente arriba del menú. Si pasas el ratón muy lento,
+   pisarás este puente en lugar del fondo de la página, evitando que se cierre. */
+.nav-separador .dropdown-menu-modern::before {
+    content: "";
+    position: absolute;
+    top: -15px; /* Ajusta la altura del puente hacia arriba */
+    left: 0;
+    right: 0;
+    height: 15px;
+    background-color: transparent; /* Totalmente invisible */
+}
+
+/* (Opcional) Si quieres que la pequeña flecha apunte al centro para más estética */
+.nav-separador .dropdown-menu-modern::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background-color: #fff; /* Mismo color que el fondo del menú */
+    border-top: 1px solid rgba(0,0,0,.15); /* Sombra suave de Bootstrap */
+    border-left: 1px solid rgba(0,0,0,.15);
+    z-index: -1; /* Para que quede por debajo del contenido del menú */
+}
+

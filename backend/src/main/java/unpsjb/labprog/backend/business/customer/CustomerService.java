@@ -1,4 +1,4 @@
-package unpsjb.labprog.backend.business;
+package unpsjb.labprog.backend.business.customer;
 
 import java.util.ArrayList;
 import java.util.List;

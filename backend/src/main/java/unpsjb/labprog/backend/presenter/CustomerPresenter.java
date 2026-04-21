@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
-import unpsjb.labprog.backend.business.CustomerService;
+import unpsjb.labprog.backend.business.customer.CustomerService;
 import unpsjb.labprog.backend.model.Customer;
 
 @RestController

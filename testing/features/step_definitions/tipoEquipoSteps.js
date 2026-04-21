@@ -1,24 +1,20 @@
 const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
-Given('que se ingresa el cliente con {string}, {word} y {string}', function (razonSocial, cuit, observaciones) {
-    this.razonSocial = razonSocial;
-    this.cuit = cuit;
-    this.observaciones = observaciones;
+Given('que se ingresa el tipo de equipo con {string}', function (nombre) {
+    this.nombre = nombre
 });
 
 
-When('presiono el botón de guardar', async function () {
+When('presiono el botón de guardar tipoEquipo', async function () {
     try {
-        const response = await fetch('http://backend:8080/customers', {
+        const response = await fetch('http://backend:8080/equipmentTypes', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                razonSocial: this.razonSocial,
-                cuit: this.cuit,
-                observaciones: this.observaciones
+                nombre: this.nombre
             })
         });
         
@@ -50,4 +46,3 @@ Then('se espera el siguiente status: {int} con la respuesta: {string}', function
     assert.strictEqual(this.resultado.status, status); // Ya no hace falta parseInt, {int} lo hace solo
     assert.strictEqual(this.resultado.respuesta.trim(), respuesta.trim());
 });
-
