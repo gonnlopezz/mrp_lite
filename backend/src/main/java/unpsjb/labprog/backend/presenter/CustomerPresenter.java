@@ -23,9 +23,18 @@ public class CustomerPresenter {
         return Response.ok(service.findAll());
     }
 
+
+    @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Object> findById(@PathVariable("id") int id) {
+        return Response.ok(service.findById(id));
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody Customer aCustomer) {
-        return Response.ok(service.save(aCustomer));
+        if(aCustomer.getId() != 0) {
+            return Response.error("El id del cliente debe ser 0 o no estar presente.");
+        }
+        return Response.ok(service.save(aCustomer), "Cliente " + aCustomer.getRazonSocial() + " (" + aCustomer.getCuit() + ") registrado correctamente");
     }
 
     @RequestMapping(method = RequestMethod.PUT)

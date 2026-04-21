@@ -2,6 +2,8 @@ package unpsjb.labprog.backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +14,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Customer {
+    
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
     @Column(unique = true, nullable = false)
     private long cuit;
 
     @Column(unique = true, nullable = false)
-    private String companyName;
+    private String razonSocial;
 
-    @Column(nullable = false)
-    private String observations;
+    @Column(nullable = true)
+    private String observaciones;
 }

@@ -7,6 +7,6 @@ body:
   content: |-
     {
         "cuit": 20449470843,
-        "companyName": "Prueba de Compañia"
+        "razonSocial": "test"
     }
-order: 3779358842443430
+order: 2000

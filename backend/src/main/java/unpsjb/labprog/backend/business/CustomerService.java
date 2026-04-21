@@ -20,6 +20,10 @@ public class CustomerService {
         return result;
     }
 
+    public Customer findById(int id) {
+        return repository.findById(id).orElse(null);
+    }
+
     @Transactional
     public Customer save(Customer e) {
         return repository.save(e);

@@ -1,0 +1,83 @@
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink="/" class="text-decoration-none text-secondary">
+          <i class="fa fa-users me-1"></i> Home
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/clientes/" class="text-decoration-none text-secondary">
+          <i class="fa fa-users me-1"></i> Clientes
+        </a>
+      </li>
+      <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">Nuevo</li>
+    </ol>
+  </nav>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+          <div class="d-flex align-items-center">
+            <div class="icon-shape bg-primary text-white shadow-sm me-3">
+              <i class="fa fa-user-plus fs-5"></i>
+            </div>
+            <div>
+              <h4 class="mb-1 fw-bold text-dark tracking-tight">Registrar Cliente</h4>
+              <p class="text-muted small mb-0">Ingresá los datos fiscales y de contacto para el alta.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <form>
+            <div class="row g-4">
+
+              <div class="col-md-5">
+                <label for="inputCuit" class="form-label fw-semibold text-secondary small text-uppercase">CUIT</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light text-muted">
+                    <i class="fa fa-id-card"></i>
+                  </span>
+                  <input type="number" class="form-control" id="inputCuit" name="cuit" placeholder="Ej: 20123456789"
+                    [(ngModel)]="customer.cuit">
+                </div>
+              </div>
+
+              <div class="col-md-7">
+                <label for="inputRazonSocial" class="form-label fw-semibold text-secondary small text-uppercase">Razón
+                  Social</label>
+                <input type="text" class="form-control" id="inputRazonSocial" name="razonSocial"
+                  [(ngModel)]="customer.razonSocial" placeholder="Ej: Tech Solutions S.A.">
+              </div>
+
+              <div class="col-12">
+                <div class="d-flex justify-content-between align-items-end mb-2">
+                  <label for="inputObservaciones"
+                    class="form-label fw-semibold text-secondary small text-uppercase mb-0">Observaciones</label>
+                  <span class="badge bg-light text-secondary border fw-normal">Opcional</span>
+                </div>
+                <textarea class="form-control" id="inputObservaciones" rows="4" name="observaciones"
+                  [(ngModel)]="customer.observaciones" placeholder="Condiciones de entrega, contactos..."></textarea>
+              </div>
+
+            </div>
+
+            <hr class="my-4 text-muted opacity-25">
+
+            <div class="d-flex justify-content-end gap-3">
+              <button type="button" class="btn btn-light px-4 fw-medium text-secondary" (click)="goBack()">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-primary px-4 fw-medium shadow-sm" (click)="save()">
+                <i class="fa fa-check-circle me-2"></i> Crear Cliente
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
