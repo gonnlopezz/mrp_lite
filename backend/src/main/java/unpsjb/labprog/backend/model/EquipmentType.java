@@ -20,5 +20,5 @@ public class EquipmentType {
     private int id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String nombre;
 }

@@ -8,7 +8,7 @@ Given('que se ingresa el tipo de equipo con {string}', function (nombre) {
 
 When('presiono el botón de guardar tipoEquipo', async function () {
     try {
-        const response = await fetch('http://backend:8080/equipmentTypes', {
+        const response = await fetch('http://backend:8080/equipment-types', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -40,9 +40,4 @@ When('presiono el botón de guardar tipoEquipo', async function () {
             respuesta: "Error de conexión: " + error.message
         };
     }
-});
-
-Then('se espera el siguiente status: {int} con la respuesta: {string}', function (status, respuesta) {
-    assert.strictEqual(this.resultado.status, status); // Ya no hace falta parseInt, {int} lo hace solo
-    assert.strictEqual(this.resultado.respuesta.trim(), respuesta.trim());
 });

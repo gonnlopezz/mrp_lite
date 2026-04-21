@@ -1,13 +1,15 @@
-package unpsjb.labprog.backend.business.tipoEquipo;
+package unpsjb.labprog.backend.business.equipment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.model.EquipmentType;
 
+@Service
 public class EquipmentTypeService {
     @Autowired
     EquipmentTypeRepository repository;
