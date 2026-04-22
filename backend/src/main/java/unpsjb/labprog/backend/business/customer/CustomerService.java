@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -16,8 +18,12 @@ public class CustomerService {
 
     public List<Customer> findAll() {
         List<Customer> result = new ArrayList<>();
-        repository.findAll().forEach(e-> result.add(e));
+        repository.findAll().forEach(e -> result.add(e));
         return result;
+    }
+
+    public Page<Customer> findByPage(int page, int size) {
+        return repository.findAll(PageRequest.of(page, size));
     }
 
     public Customer findById(int id) {

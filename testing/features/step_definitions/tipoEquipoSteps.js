@@ -1,8 +1,8 @@
 const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
-Given('que se ingresa el tipo de equipo con {string}', function (nombre) {
-    this.nombre = nombre
+Given('que se ingresa el tipo de equipo con {string}', function (name) {
+    this.name = name
 });
 
 
@@ -14,7 +14,7 @@ When('presiono el botón de guardar tipoEquipo', async function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                nombre: this.nombre
+                name: this.name
             })
         });
         

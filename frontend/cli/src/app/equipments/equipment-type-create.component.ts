@@ -7,13 +7,13 @@ import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-tipo-equipo-create',
+  selector: 'app-equipment-type-create',
   imports: [CommonModule, UpperCasePipe, FormsModule, NgbTypeaheadModule, RouterLink],
-  templateUrl: './tipo-equipo-create.html',
+  templateUrl: './equipment-type-create.html',
   styles: ``
 })
-export class TipoEquipoCreateComponent {
-  equipmentType: EquipmentType = { id: null as unknown as number, nombre: "" };
+export class EquipmentTypeCreateComponent {
+  equipmentType: EquipmentType = { id: null as unknown as number, name: ""  };
 
   constructor(
     private equipmentTypeService: EquipmentTypeService,

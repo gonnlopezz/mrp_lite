@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
-import { CustomersCreateComponent } from './customers/customers-create.component';
+import { CustomersDetailComponent } from './customers/customers-detail.component';
 import { HomeComponent } from './home/home.component';
-import { TipoEquipoCreateComponent } from './equipments/tipo-equipo-create.component';
+import { EquipmentTypeCreateComponent } from './equipments/equipment-type-create.component';
+import { CustomersComponent } from './customers/customers.component';
 
 export const routes: Routes = [
     {path: "", component: HomeComponent},
-    {path: "clientes/nuevo", component: CustomersCreateComponent},
-    {path: "talleres/nuevo-tipo-equipo", component: TipoEquipoCreateComponent},
+    {path: "customers/:id", component: CustomersDetailComponent},
+    {path: "talleres/new-equipment-type", component: EquipmentTypeCreateComponent},
+    {path: "customers", component: CustomersComponent}
 ];

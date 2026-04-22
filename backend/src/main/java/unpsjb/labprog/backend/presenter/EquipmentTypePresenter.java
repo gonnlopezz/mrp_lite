@@ -33,6 +33,6 @@ public class EquipmentTypePresenter {
         if(aEquipmentType.getId() != 0) {
             return Response.error("El id del tipo de equipo debe ser 0 o no estar presente.");
         }
-        return Response.ok(service.save(aEquipmentType), "Tipo de equipo " + aEquipmentType.getNombre() + " registrado correctamente");
+        return Response.ok(service.save(aEquipmentType), "Tipo de equipo " + aEquipmentType.getName() + " registrado correctamente");
     }
 }

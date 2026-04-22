@@ -1,0 +1,8 @@
+$kind: http-request
+name: Customers Find By Page
+url: localhost:8080/customers/page?page=0&size=6
+method: GET
+queryParams:
+  page: "0"
+  size: "6"
+order: 1941327799387249

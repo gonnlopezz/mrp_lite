@@ -1,0 +1,10 @@
+insert into equipment_type (id, name) values (1000, 'Amoladora Angular');
+insert into equipment_type (id, name) values (1001, 'Soldadora MIG/MAG');
+insert into equipment_type (id, name) values (1002, 'Taladro de Banco');
+insert into equipment_type (id, name) values (1003, 'Pistola de Pintura a Gravedad');
+insert into equipment_type (id, name) values (1004, 'Torno CNC');
+insert into equipment_type (id, name) values (1005, 'Fresadora Universal');
+insert into equipment_type (id, name) values (1006, 'Plegadora de Chapa');
+insert into equipment_type (id, name) values (1007, 'Cortadora Láser');
+insert into equipment_type (id, name) values (1008, 'Compresor de Aire Industrial');
+insert into equipment_type (id, name) values (1009, 'Puente Grúa 5T');

@@ -9,28 +9,53 @@ import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-customers-create',
   imports: [CommonModule, UpperCasePipe, FormsModule, NgbTypeaheadModule, RouterLink],
-  templateUrl: "./customers-create.html",
+  templateUrl: "./customers-detail.html",
   styles: ``
 })
-export class CustomersCreateComponent {
-  
-  customer: Customer = <Customer>{ cuit: null as unknown as number, razonSocial: "", observaciones: "" };
-  
+export class CustomersDetailComponent {
+
+  customer!: Customer;
+
 
   constructor(
     private customerService: CustomerService,
     private location: Location,
-  ) {}
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef  
+  ) { }
 
   goBack(): void {
     this.location.back();
   }
 
+  ngOnInit(): void {
+    this.get();
+  }
+
+  get(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    
+    if (id === 'new' || !id) {
+      this.customer = <Customer>{ cuit: null as unknown as number, companyName: "", observations: "" };
+    } else {
+      this.customerService.get(id).subscribe(dataPackage => {
+        this.customer = <Customer>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    }
+  }
+
   save(): void {
     this.customerService.save(this.customer).subscribe(dataPackage => {
       this.customer = <Customer>dataPackage.data;
-      this.goBack();
+      
+      this.cdr.markForCheck();
+      
+      alert('¡Cliente guardado con éxito!'); 
+    
     });
   }
+
+  
 
 }

@@ -2,12 +2,12 @@
 Característica: gestión de clientes
 
    Esquema del escenario: Nuevo cliente que encargan pedidos de fabricación de productos
-      Dado que se ingresa el cliente con <razonSocial>, <cuit> y <observaciones>
+      Dado que se ingresa el cliente con <companyName>, <cuit> y <observations>
       Cuando presiono el botón de guardar
       Entonces se espera el siguiente status: <status> con la respuesta: <respuesta>
 
     Ejemplos:
-      | razonSocial                  | cuit         | observaciones | status | respuesta                                                                   |
+      | companyName                  | cuit         | observations | status | respuesta                                                                   |
       | "prilidiano pueyrredon"      | 10000000013  | ""            | 200    | "Cliente prilidiano pueyrredon (10000000013) registrado correctamente"      |
       | "marcelo t. de alvear"       | 20000000022  | ""            | 200    | "Cliente marcelo t. de alvear (20000000022) registrado correctamente"       | 
       | "domingo faustino sarmiento" | 30000000033  | ""            | 200    | "Cliente domingo faustino sarmiento (30000000033) registrado correctamente" | 

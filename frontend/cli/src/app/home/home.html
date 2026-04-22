@@ -1,1 +1,208 @@
-<h5>MRP Lite</h5>
+<div class="container py-4">
+  
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <h2 class="fw-bolder text-dark tracking-tight mb-1">Bienvenido a MRP Lite</h2>
+      <p class="text-muted mb-0">Resumen general y estado del sistema.</p>
+    </div>
+    <div class="d-none d-sm-block text-end">
+      <span class="badge bg-light text-secondary border px-3 py-2 fw-medium">
+        <i class="fa fa-calendar-alt me-2"></i> {{ today | date:'longDate' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100 card-hover transition-base cursor-pointer" routerLink="/clientes">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted small text-uppercase fw-bold tracking-wide mb-1">Clientes Activos</p>
+              <h3 class="fw-bolder text-dark mb-0">24</h3>
+            </div>
+            <div class="icon-shape bg-primary-soft text-primary rounded-3">
+              <i class="fa fa-users fs-5"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-success small fw-medium">
+            <i class="fa fa-arrow-up me-1"></i> +3 este mes
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100 card-hover transition-base cursor-pointer" routerLink="/tipos-equipo">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted small text-uppercase fw-bold tracking-wide mb-1">Catálogo Equipos</p>
+              <h3 class="fw-bolder text-dark mb-0">18</h3>
+            </div>
+            <div class="icon-shape bg-success-soft text-success rounded-3">
+              <i class="fa fa-cogs fs-5"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-secondary small fw-medium">
+            Registrados en sistema
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100 card-hover transition-base cursor-pointer" routerLink="/talleres">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted small text-uppercase fw-bold tracking-wide mb-1">Órdenes en Taller</p>
+              <h3 class="fw-bolder text-dark mb-0">7</h3>
+            </div>
+            <div class="icon-shape bg-warning-soft text-warning rounded-3">
+              <i class="fa fa-tools fs-5"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-warning small fw-medium">
+            <i class="fa fa-clock me-1"></i> 2 pendientes de cierre
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card border-0 shadow-sm rounded-4 h-100 card-hover transition-base cursor-pointer">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <p class="text-muted small text-uppercase fw-bold tracking-wide mb-1">Alertas Stock</p>
+              <h3 class="fw-bolder text-dark mb-0">3</h3>
+            </div>
+            <div class="icon-shape bg-danger-soft text-danger rounded-3">
+              <i class="fa fa-exclamation-triangle fs-5"></i>
+            </div>
+          </div>
+          <div class="mt-3 text-danger small fw-medium">
+            <i class="fa fa-exclamation-circle me-1"></i> Requieren atención
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row g-4">
+    
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-header bg-white border-bottom pt-4 px-4 pb-3">
+          <h5 class="mb-0 fw-bold text-dark">Accesos Rápidos</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            
+            <div class="col-md-6">
+              <a routerLink="customers/new" class="text-decoration-none">
+                <div class="p-3 border rounded-3 hover-bg-light transition-base d-flex align-items-center">
+                  <div class="icon-shape bg-light text-secondary me-3" style="width: 40px; height: 40px;">
+                    <i class="fa fa-user-plus"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">Nuevo Cliente</h6>
+                    <small class="text-muted">Registrar empresa</small>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-md-6">
+              <a routerLink="/tipos-equipo/new" class="text-decoration-none">
+                <div class="p-3 border rounded-3 hover-bg-light transition-base d-flex align-items-center">
+                  <div class="icon-shape bg-light text-secondary me-3" style="width: 40px; height: 40px;">
+                    <i class="fa fa-plus-circle"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">Nuevo Equipo</h6>
+                    <small class="text-muted">Añadir a catálogo</small>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-md-6">
+              <a routerLink="/talleres/new" class="text-decoration-none">
+                <div class="p-3 border rounded-3 hover-bg-light transition-base d-flex align-items-center">
+                  <div class="icon-shape bg-light text-secondary me-3" style="width: 40px; height: 40px;">
+                    <i class="fa fa-clipboard-check"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">Crear Orden</h6>
+                    <small class="text-muted">Ingreso a taller</small>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-md-6">
+              <a routerLink="/clientes" class="text-decoration-none">
+                <div class="p-3 border rounded-3 hover-bg-light transition-base d-flex align-items-center">
+                  <div class="icon-shape bg-light text-secondary me-3" style="width: 40px; height: 40px;">
+                    <i class="fa fa-search"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark">Buscar</h6>
+                    <small class="text-muted">Consultar registros</small>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-header bg-white border-bottom pt-4 px-4 pb-3">
+          <h5 class="mb-0 fw-bold text-dark">Actividad Reciente</h5>
+        </div>
+        <div class="card-body p-4">
+          
+          <div class="d-flex mb-4">
+            <div class="me-3 mt-1">
+              <span class="badge bg-primary rounded-circle p-2"><i class="fa fa-check text-white"></i></span>
+            </div>
+            <div>
+              <p class="mb-0 fw-medium text-dark small">Orden #1042 finalizada</p>
+              <small class="text-muted">Hace 2 horas</small>
+            </div>
+          </div>
+
+          <div class="d-flex mb-4">
+            <div class="me-3 mt-1">
+              <span class="badge bg-success rounded-circle p-2"><i class="fa fa-user text-white"></i></span>
+            </div>
+            <div>
+              <p class="mb-0 fw-medium text-dark small">Tech Solutions S.A. registrado</p>
+              <small class="text-muted">Ayer, 15:30</small>
+            </div>
+          </div>
+
+          <div class="d-flex">
+            <div class="me-3 mt-1">
+              <span class="badge bg-warning rounded-circle p-2"><i class="fa fa-cog text-white"></i></span>
+            </div>
+            <div>
+              <p class="mb-0 fw-medium text-dark small">Actualización de equipo: Taladro</p>
+              <small class="text-muted">Ayer, 10:15</small>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

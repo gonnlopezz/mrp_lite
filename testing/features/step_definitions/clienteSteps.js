@@ -1,10 +1,10 @@
 const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
-Given('que se ingresa el cliente con {string}, {word} y {string}', function (razonSocial, cuit, observaciones) {
-    this.razonSocial = razonSocial;
+Given('que se ingresa el cliente con {string}, {word} y {string}', function (companyName, cuit, observations) {
+    this.companyName = companyName;
     this.cuit = cuit;
-    this.observaciones = observaciones;
+    this.observations = observations;
 });
 
 
@@ -16,9 +16,9 @@ When('presiono el botón de guardar', async function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                razonSocial: this.razonSocial,
+                companyName: this.companyName,
                 cuit: this.cuit,
-                observaciones: this.observaciones
+                observations: this.observations
             })
         });
         
