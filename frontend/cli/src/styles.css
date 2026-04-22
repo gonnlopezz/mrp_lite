@@ -1,151 +1,300 @@
+/* ==========================================================================
+   1. CONFIGURACIÓN, FUENTES Y VARIABLES
+   ========================================================================== */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
+@import '@fontsource-variable/inter';
 
-/* Tipografía y espaciado moderno para la marca */
-.tracking-tight {
-  letter-spacing: -0.5px;
+:root {
+  --mrp-blue: #2563eb;    /* Azul profesional, no violeta */
+  --mrp-navy: #1e293b;    /* El color de tu Navbar */
+  --mrp-link: #60a5fa;;
 }
 
-/* Suavizar transiciones */
-.transition-base {
-  transition: all 0.2s ease-in-out;
+body {
+  font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--steel-900);
+  background-color: #fbfcfd;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Estilizar el dropdown para que parezca una tarjeta flotante moderna */
-.dropdown-menu-modern {
-  border-radius: 0.75rem;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
-  /* Separación del navbar */
-}
-
-/* Mejorar el hover de los ítems del dropdown */
-.dropdown-menu-modern .dropdown-item {
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
+label {
   font-weight: 500;
-  transition: background-color 0.2s;
+  color: var(--steel-600);
 }
 
-.dropdown-menu-modern .dropdown-item:hover,
-.dropdown-menu-modern .dropdown-item:focus {
-  background-color: #f8f9fa;
-  /* Un gris muy sutil */
-  color: #0d6efd;
-  /* Cambia al color primario (Bootstrap text-primary) */
+/* ==========================================================================
+   2. NAVEGACIÓN (NAVBAR NAVY Y DROPDOWNS)
+   ========================================================================== */
+/* Navbar Navy - Forzamos el color */
+.navbar.bg-dark-mrp {
+    background-color: #1e293b !important; /* El azul navy oscuro */
+    border-bottom: none !important;
+    padding: 0.6rem 1rem;
 }
 
-.dropdown-menu-modern .dropdown-item:hover i {
-  color: #0d6efd;
+/* Links en blanco para fondo oscuro */
+.bg-dark-mrp .nav-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
-/* 1. Centrar el menú desplegable justo debajo de la palabra (Clientes/Talleres) */
-.nav-separador .dropdown-menu-modern {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
-
-  /* Quitamos el margen nativo de Bootstrap para reducir la zona muerta */
-  margin-top: 0;
+.bg-dark-mrp .nav-link:hover {
+    color: #ffffff !important;
 }
 
-/* 2. El "Puente Invisible" para arreglar el parpadeo del Hover */
-/* Esto crea un bloque transparente arriba del menú. Si pasas el ratón muy lento,
-   pisarás este puente en lugar del fondo de la página, evitando que se cierre. */
-.nav-separador .dropdown-menu-modern::before {
-  content: "";
-  position: absolute;
-  top: -15px;
-  /* Ajusta la altura del puente hacia arriba */
-  left: 0;
-  right: 0;
-  height: 15px;
-  background-color: transparent;
-  /* Totalmente invisible */
+.bg-dark-mrp .navbar-brand, 
+.bg-dark-mrp .navbar-brand span {
+    color: #ffffff !important;
 }
 
-/* (Opcional) Si quieres que la pequeña flecha apunte al centro para más estética */
-.nav-separador .dropdown-menu-modern::after {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 12px;
-  height: 12px;
-  background-color: #fff;
-  /* Mismo color que el fondo del menú */
-  border-top: 1px solid rgba(0, 0, 0, .15);
-  /* Sombra suave de Bootstrap */
-  border-left: 1px solid rgba(0, 0, 0, .15);
-  z-index: -1;
-  /* Para que quede por debajo del contenido del menú */
+/* Dropdown Moderno (Afecta a todos los menús desplegables) */
+.dropdown-menu-modern {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.4rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
+}
+
+.dropdown-menu-modern .dropdown-item {
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--steel-600);
+}
+
+.dropdown-menu-modern .dropdown-item:hover {
+  background-color: var(--slate-50);
+  color: var(--mrp-blue);
+}
+
+.dropdown-menu-modern .dropdown-item i {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  width: 20px;
+}
+
+/* ==========================================================================
+   3. COMPONENTES: TABLAS Y PAGINACIÓN
+   ========================================================================== */
+/* En tu styles.css */
+table.custom-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+table.custom-table tbody tr:hover {
+    background-color: #f8fafc; /* Un gris casi blanco para el foco */
+}
+   
+table.custom-table thead th {
+  padding: 0.75rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--steel-600);
+  background-color: var(--slate-50);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+table.custom-table td {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: #334155;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Paginación */
+app-pagination .pagination {
+  margin-bottom: 0;
+  gap: 4px;
+}
+
+app-pagination .pagination .page-item .page-link {
+  border: 1px solid var(--mrp-navy);
+  color: var(--steel-600);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: var(--transition-base);
+  
+}
+
+app-pagination .pagination .page-item.active .page-link {
+  background-color: var(--mrp-navy);
+  border-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  z-index: 3;
+}
+
+app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+  background-color: var(--slate-50);
+  color: var(--steel-900);
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Flechas deshabilitadas */
+app-pagination .pagination .page-item.disabled .page-link {
+    background-color: #fbfcfd;
+    color: #cbd5e1;
+    border-color: #f1f5f9;
+}
+
+
+/* ==========================================================================
+   4. BOTONES, ACCIONES Y FORMULARIOS
+   ========================================================================== */
+.btn-primary {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  background-color: var(--mrp-navy); /* O var(--mrp-navy) si lo querés igual a la nav */
+  border: none;
+  transition: var(--transition-base);
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8; /* Un tono más oscuro para el hover */
+  transform: translateY(-1px);
 }
 
 .btn-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  transition: all 0.2s ease-in-out;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: transparent;
+  border: none;
+  color: var(--steel-600);
+  transition: var(--transition-base);
 }
 
-.hover-primary:hover {
-  color: #0d6efd !important;
-  background-color: rgba(13, 110, 253, 0.1) !important;
+.btn-icon.hover-primary:hover {
+  color: var(--mrp-navy);
+  background-color: rgba(37, 99, 235, 0.1);
 }
 
-.hover-danger:hover {
-  color: #dc3545 !important;
-  background-color: rgba(220, 53, 69, 0.1) !important;
+.btn-icon.hover-danger:hover {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
 }
 
-/* Un punto decorativo antes del nombre en la tabla */
+.form-control {
+  border: 1px solid #e2e8f0;
+  color: var(--steel-900);
+  font-size: 0.9rem;
+}
+
+.form-control:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input-group-text {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   5. MODALES Y DASHBOARD
+   ========================================================================== */
+.modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Métricas Dashboard */
+.border-top-primary { border-top: 3px solid var(--mrp-blue) !important; }
+.border-top-success { border-top: 3px solid #10b981 !important; }
+.border-top-warning { border-top: 3px solid #f59e0b !important; }
+.border-top-danger  { border-top: 3px solid #ef4444 !important; }
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+  background-color: var(--slate-100);
+}
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+.timeline-marker {
+  position: absolute;
+  left: -1.5rem;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px solid var(--mrp-blue);
+  z-index: 1;
+}
+
+/* ==========================================================================
+   6. UTILIDADES Y ANIMACIONES
+   ========================================================================== */
+.label-caps {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--steel-600);
+}
+
+.badge-soft-secondary {
+  background-color: transparent;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
 .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    opacity: 0.6;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  width: 6px;
+  height: 6px;
+  background-color: #cbd5e1;
 }
 
-/* Fondo suave para el ícono del header */
-.bg-primary-soft {
-    background-color: rgba(13, 110, 253, 0.1) !important;
-}
-
-/* Input más grande y moderno */
-.input-group-lg > .form-control, .input-group-lg > .input-group-text {
-    padding: 0.75rem 1.25rem;
-    font-size: 1rem;
-}
-
-/* Botón de eliminar con estilo 'Ghost' */
-.btn-icon-danger {
-    width: 36px;
-    height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    color: #dc3545;
-    background: transparent;
-    border: none;
-}
-
-.btn-icon-danger:hover {
-    background-color: rgba(220, 53, 69, 0.1);
-    transform: scale(1.1);
-}
-
-/* Animación simple al aparecer el formulario */
 .animate__fadeIn {
-    animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.text-steel { color: var(--steel-900); }
+
+.link-color {
+  color: var(--mrp-link);
 }

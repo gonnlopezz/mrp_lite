@@ -21,7 +21,7 @@ export class CustomersComponent {
   ) { }
 
   getCustomers(): void {
-    this.customerService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+    this.customerService.byPage(this.currentPage, 10).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });

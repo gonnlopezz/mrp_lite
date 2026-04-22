@@ -6,11 +6,12 @@ import { RouterModule } from '@angular/router';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EquipmentType } from './equipment-type';
+import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-equipment-types',
   standalone: true,
-  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule, UpperCasePipe],
+  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule, UpperCasePipe, NgbModule],
   templateUrl: './equipment-types.html',
   styles: ``
 })
@@ -24,7 +25,8 @@ export class EquipmentTypesComponent implements OnInit {
 
   constructor(
     private equipmentTypeService: EquipmentTypeService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
@@ -44,20 +46,18 @@ export class EquipmentTypesComponent implements OnInit {
     this.getEquipmentTypes();
   }
 
-  toggleCreateForm(): void {
-    this.showCreateForm = !this.showCreateForm;
-    if (!this.showCreateForm) {
-      this.newEquipmentType = { id: 0, name: "" };
-    }
+  openModal(content: any) {
+    this.newEquipmentType = { id: 0, name: "" }; // Limpiamos antes de abrir
+    this.modalService.open(content, { centered: true });
   }
 
-  save(): void {
+  save(modal: any): void { // 3. Recibimos la instancia del modal para cerrarlo
     if (!this.newEquipmentType.name.trim()) return;
 
     this.equipmentTypeService.save(this.newEquipmentType).subscribe(dataPackage => {
-      this.showCreateForm = false; // Cerramos el input
-      this.newEquipmentType = { id: 0, name: "" }; // Limpiamos
-      this.getEquipmentTypes(); // Recargamos la lista
+      this.newEquipmentType = { id: 0, name: "" };
+      modal.close();
+      this.getEquipmentTypes();
     });
   }
 

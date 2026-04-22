@@ -1,19 +1,35 @@
-<nav class="mt-4" aria-label="Page navigation">
-  <ul class="pagination pagination-centered">
-    <li class="page-item">
-      <a class="page-link" (click)="onPageChange(-2)">&laquo;</a>
+<nav aria-label="Page navigation">
+  <ul class="pagination pagination-sm mb-0">
+    
+    <li class="page-item" [class.disabled]="number === 0">
+      <a class="page-link shadow-none" (click)="onPageChange(-2)" role="button">
+        <i class="fas fa-angle-double-left"></i>
+      </a>
     </li>
-    <li class="page-item">
-      <a class="page-link" (click)="onPageChange(-1)">&lsaquo;</a>
+
+    <li class="page-item" [class.disabled]="number === 0">
+      <a class="page-link shadow-none" (click)="onPageChange(-1)" role="button">
+        <i class="fas fa-angle-left"></i>
+      </a>
     </li>
-    <li *ngFor="let t of pages" [ngClass]="t === number ? 'active' : ''">
-      <a class="page-link" (click)="onPageChange(t+1)">{{t+1}}</a>
+
+    <li class="page-item" *ngFor="let t of pages" [class.active]="t === number">
+      <a class="page-link shadow-none" (click)="onPageChange(t+1)" role="button">
+        {{ t + 1 }}
+      </a>
     </li>
-    <li class="page-item">
-      <a class="page-link" (click)="onPageChange(-3)">&rsaquo;</a>
+
+    <li class="page-item" [class.disabled]="number === totalPages - 1">
+      <a class="page-link shadow-none" (click)="onPageChange(-3)" role="button">
+        <i class="fas fa-angle-right"></i>
+      </a>
     </li>
-    <li class="page-item">
-      <a class="page-link" (click)="onPageChange(-4)">&raquo;</a>
+
+    <li class="page-item" [class.disabled]="number === totalPages - 1">
+      <a class="page-link shadow-none" (click)="onPageChange(-4)" role="button">
+        <i class="fas fa-angle-double-right"></i>
+      </a>
     </li>
+
   </ul>
 </nav>
