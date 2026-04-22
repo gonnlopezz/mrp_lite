@@ -17,12 +17,20 @@ export class EquipmentTypeService {
     return this.http.get<DataPackage>(this.equipmentTypesUrl);
   }
 
+  byPage(page: number, size: number): Observable<DataPackage> {
+    return this.http.get<DataPackage>(`${this.equipmentTypesUrl}/page?page=${page - 1}&size=${size}`);
+  }
+
   get(id: string): Observable<DataPackage> {
     return this.http.get<DataPackage>(`${this.equipmentTypesUrl}/id/${id}`);
   }
 
   save(equipmentType: EquipmentType): Observable<DataPackage> {
     return this.http.post<DataPackage>(this.equipmentTypesUrl, equipmentType);
+  }
+
+  delete(id: number): Observable<DataPackage> {
+    return this.http.delete<DataPackage>(`${this.equipmentTypesUrl}/id/${id}`);
   }
 
 
