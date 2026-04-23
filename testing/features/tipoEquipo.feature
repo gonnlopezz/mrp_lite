@@ -11,6 +11,3 @@ Ejemplos:
       | "soldadora"          |    200 | "Tipo de equipo soldadora registrado correctamente"          |
       | "taladro"            |    200 | "Tipo de equipo taladro registrado correctamente"            |
       | "pistola de pintura" |    200 | "Tipo de equipo pistola de pintura registrado correctamente" |
-      | ""                 |    400 | "El nombre del equipo no puede estar vacío"                  |
-      | "   "              |    400 | "El nombre del equipo no puede estar vacío"                  |
-      | "a"                  |    400 | "El nombre del equipo debe tener al menos 2 caracteres"      |

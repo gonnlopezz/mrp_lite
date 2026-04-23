@@ -8,6 +8,7 @@
 :root {
   --mrp-blue: #2563eb;    /* Azul profesional, no violeta */
   --mrp-navy: #1e293b;    /* El color de tu Navbar */
+  --mrp-navy-hover: #354969;
   --mrp-link: #60a5fa;;
 }
 
@@ -50,6 +51,17 @@ label {
     color: #ffffff !important;
 }
 
+.breadcrumb-item a {
+    color: var(--mrp-link);
+    font-weight: 500; /* Ni muy fino, ni muy grueso */
+    font-size: 0.85rem; 
+    transition: opacity 0.2s;
+}
+
+.breadcrumb-item a:hover {
+    opacity: 0.6; /* En lugar de cambiar de color, que se aclare un poquito */
+}
+
 /* Dropdown Moderno (Afecta a todos los menús desplegables) */
 .dropdown-menu-modern {
   border: 1px solid #e2e8f0;
@@ -69,7 +81,7 @@ label {
 
 .dropdown-menu-modern .dropdown-item:hover {
   background-color: var(--slate-50);
-  color: var(--mrp-blue);
+  color: var(--mrp-link);
 }
 
 .dropdown-menu-modern .dropdown-item i {
@@ -135,8 +147,8 @@ app-pagination .pagination .page-item.active .page-link {
 }
 
 app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
-  background-color: var(--slate-50);
-  color: var(--steel-900);
+  background-color: var(--mrp-navy-hover);
+  color: #ffffff;
   border-color: #cbd5e1;
   transform: translateY(-1px);
 }
@@ -164,7 +176,7 @@ app-pagination .pagination .page-item.disabled .page-link {
 }
 
 .btn-primary:hover {
-  background-color: #1d4ed8; /* Un tono más oscuro para el hover */
+  background-color: var(--mrp-navy-hover); /* Un tono más oscuro para el hover */
   transform: translateY(-1px);
 }
 
@@ -295,6 +307,3 @@ app-pagination .pagination .page-item.disabled .page-link {
 
 .text-steel { color: var(--steel-900); }
 
-.link-color {
-  color: var(--mrp-link);
-}

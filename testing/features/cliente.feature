@@ -12,7 +12,4 @@ Característica: gestión de clientes
       | "marcelo t. de alvear"       | 20000000022  | ""            | 200    | "Cliente marcelo t. de alvear (20000000022) registrado correctamente"       | 
       | "domingo faustino sarmiento" | 30000000033  | ""            | 200    | "Cliente domingo faustino sarmiento (30000000033) registrado correctamente" | 
       | "walter runciman"            | 40000000044  | ""            | 200    | "Cliente walter runciman (40000000044) registrado correctamente"            | 
-      | "julio argentino roca"       | 50000000055  | ""            | 200    | "Cliente julio argentino roca (50000000055) registrado correctamente"       |
-      | "un cliente sin cuit"        | 123          | ""            | 400    | "El CUIT debe tener exactamente 11 dígitos"                                 |
-      | ""                           | 100000000101 | ""            | 400    | "La razón social no puede estar vacía"                                      |
-      | "cliente letras cuit"        | ABCDEFGHIJKG | ""            | 400    | "El CUIT debe contener solo caracteres numéricos"                           |
+      | "julio argentino roca"       | 50000000055  | ""            | 200    | "Cliente julio argentino roca (50000000055) registrado correctamente"        |

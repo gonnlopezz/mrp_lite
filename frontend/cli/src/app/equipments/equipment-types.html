@@ -2,7 +2,7 @@
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
             <li class="breadcrumb-item">
-                <a routerLink="/" class="text-decoration-none text-slate transition-base">
+                <a routerLink="/" class="text-decoration-none link-color text-slate transition-base">
                     <i class="fas fa-home me-1"></i> Home
                 </a>
             </li>
@@ -29,7 +29,7 @@
                         <thead>
                             <tr>
                                 <th class="px-4">Nombre de Categoría</th>
-                                <th class="px-4 text-end">Acciones</th>
+                                <th class="px-4 text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -42,7 +42,7 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-4 text-end">
+                                <td class="px-4 text-center">
                                     <button (click)="delete(type.id)" class="btn-icon hover-danger" title="Eliminar">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -56,24 +56,25 @@
                                 </td>
                             </tr>
                         </tbody>
+                        <tfoot class="bg-white border-top" [hidden]="resultsPage.numberOfElements < 1">
+                            <tr>
+                                <td colspan="4" class="py-3 px-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted small">Total: <b>{{resultsPage.totalElements}}</b>
+                                            clientes</span>
+                                        <app-pagination [totalPages]="resultsPage.totalPages"
+                                            [currentPage]="currentPage"
+                                            (pageChangeRequested)="onPageChangeRequested($event)"
+                                            [number]="resultsPage.number">
+                                        </app-pagination>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
 
-                <tfoot class="bg-white border-top">
-                    <tr>
-                        <td colspan="2" class="py-2 px-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.75rem;">
-                                    Total: <span class="fw-bold text-steel">{{resultsPage.totalElements}}</span>
-                                    categorías
-                                </div>
-                                <app-pagination [totalPages]="resultsPage.totalPages" [currentPage]="currentPage"
-                                    (pageChangeRequested)="onPageChangeRequested($event)" [number]="resultsPage.number">
-                                </app-pagination>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>
+
             </div>
 
         </div>
@@ -105,7 +106,7 @@
             Cancelar
         </button>
         <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save(modal)"
-            [disabled]="!newEquipmentType.name.trim()" style="font-size: 0.8rem; background-color: #1e40af;">
+            [disabled]="!newEquipmentType.name.trim()">
             Confirmar Registro
         </button>
     </div>
