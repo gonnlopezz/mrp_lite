@@ -3,14 +3,15 @@
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
       <li class="breadcrumb-item">
-        <a routerLink="/" class="text-decoration-none link-color text-slate transition-base"><i class="fas fa-home me-1"></i>
+        <a routerLink="/" class="text-decoration-none link-color text-slate transition-base"><i
+            class="fas fa-home me-1"></i>
           Home</a>
       </li>
       <li class="breadcrumb-item">
         <a routerLink="/customers" class="text-decoration-none link-color text-slate transition-base">Clientes</a>
       </li>
       <li class="breadcrumb-item active fw-semibold text-steel" aria-current="page">
-        {{ customer.id ? 'Editar Ficha' : 'Nuevo Registro' }}
+        {{ customer.id ? 'Editar Cliente' : 'Nuevo Cliente' }}
       </li>
     </ol>
   </nav>
@@ -36,19 +37,35 @@
             <div class="row g-3">
               <div class="col-md-5">
                 <label class="label-caps mb-1 d-block">CUIT / Identificación</label>
-                <div class="input-group input-group-sm">
-                  <span class="input-group-text bg-slate-50 border-end-0 text-muted">
-                    <i class="fas fa-id-card"></i>
-                  </span>
-                  <input type="number" class="form-control border-start-0 ps-0 bg-white" name="cuit"
-                    placeholder="20123456789" [(ngModel)]="customer.cuit">
+                <input type="text" class="form-control form-control-sm bg-white" required id="inputCuit" name="cuit"
+                  placeholder="XX-XXXXXXXX-X" [ngModel]="formatCuit(customer.cuit)"
+                  (ngModelChange)="onCuitChange($event)" maxlength="13" #cuitInput="ngModel"
+                  [class.is-invalid]="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && (cuitInput.dirty || cuitInput.touched)">
+
+                <div class="error-container">
+                  <div class="error-feedback"
+                    *ngIf="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && (cuitInput.dirty || cuitInput.touched)">
+                    <span *ngIf="cuitInput.errors?.['required']">
+                      <i class="fa fa-exclamation-triangle"></i> El CUIT es obligatorio.
+                    </span>
+                    <span *ngIf="!cuitInput.errors?.['required'] && customer.cuit?.toString()?.length !== 11">
+                      <i class="fa fa-info-circle"></i> Debe tener 11 dígitos.
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <div class="col-md-7">
                 <label class="label-caps mb-1 d-block">Razón Social</label>
                 <input type="text" class="form-control form-control-sm bg-white" name="companyName"
-                  [(ngModel)]="customer.companyName" placeholder="Ej: Metalúrgica Industrial S.A.">
+                  [(ngModel)]="customer.companyName" placeholder="Ej: Metalúrgica Industrial S.A." required
+                  #nameInput="ngModel" [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+
+                <div class="error-container">
+                  <div class="error-feedback" *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+                    <i class="fa fa-exclamation-triangle"></i> La razón social es obligatoria.
+                  </div>
+                </div>
               </div>
 
               <div class="col-12">
@@ -72,7 +89,7 @@
               </button>
 
               <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save()"
-                [disabled]="!customer.companyName || !customer.cuit" style="font-size: 0.85rem;">
+                [disabled]="customerForm.invalid" style="font-size: 0.85rem;">
                 <i class="fas {{ customer.id ? 'fa-save' : 'fa-check-circle' }} me-2"></i>
                 {{ customer.id ? 'Guardar Cambios' : 'Confirmar Alta' }}
               </button>

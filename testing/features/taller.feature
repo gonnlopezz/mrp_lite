@@ -2,22 +2,22 @@
 Característica: gestión de talleres
 
   Esquema del escenario: Nuevo taller sin equipos
-    Dado que se ingresa el nuevo taller con "<codigo>" y "<nombre>"
+    Dado que se ingresa el nuevo taller con "<code>" y "<name>"
     Cuando presiono el botón de guardar taller
-    Entonces se espera el siguiente <status> con "<respuesta>"
+    Entonces se espera el siguiente status: <status> con la respuesta: "<respuesta>"
     Ejemplos:
-      | codigo | nombre                      | status | respuesta                            |
+      | code | name                      | status | respuesta                            |
       | ALFA   | Taller Alfa para lo básico  |    200 | Taller ALFA ingresado correctamente  |
       | BETA   | Taller Beta es muy rápido   |    200 | Taller BETA ingresado correctamente  |
       | GAMA   | Taller Gama puede con todo  |    200 | Taller GAMA ingresado correctamente  |
 
   Esquema del escenario: Agregar equipos a los talleres existente
-    Dado que existe el taller "<codigoTaller>"
-    Y se agrega el equipo "<codigoEquipo>" del tipo "<tipoEquipo>" y <capacidad>
+    Dado que existe el taller "<code>"
+    Y se agrega el equipo "<equipmentCode>" del tipo "<equipmentType>" y <capacity>
     Cuando presiono el botón de actualizar taller
-    Entonces se espera el siguiente <status> con "<respuesta>"
+    Entonces se espera el siguiente status: <status> con la respuesta: "<respuesta>"
     Ejemplos:
-      | codigoTaller | codigoEquipo               | tipoEquipo         | capacidad | status | respuesta                             |
+      | workshopCode | equipmentCode               | equipmentType         | capacity | status | respuesta                             |
       | ALFA         | A01_amoladora              | amoladora          |         1 |    200 | Taller ALFA actualizado correctamente |
       | ALFA         | A02_soldadora              | soldadora          |         1 |    200 | Taller ALFA actualizado correctamente |
       | BETA         | B01_amoladora              | amoladora          |         4 |    200 | Taller BETA actualizado correctamente |

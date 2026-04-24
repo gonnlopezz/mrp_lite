@@ -26,7 +26,9 @@ export class CustomerService {
   }
 
   save(customer: Customer): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.customersUrl, customer);
+    return customer.id?
+    this.http.put<DataPackage>(this.customersUrl, customer) :
+    this.http.post<DataPackage>(this.customersUrl, customer);
   }
   
   delete(id: number): Observable<DataPackage> {   

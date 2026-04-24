@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { Given, When, Then } = require('cucumber');
+const { Given, When } = require('cucumber');
 
 Given('que se ingresa el tipo de equipo con {string}', function (name) {
     this.name = name

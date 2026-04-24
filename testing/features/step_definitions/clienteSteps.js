@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { Given, When, Then } = require('cucumber');
+const { Given, When } = require('cucumber');
 
 Given('que se ingresa el cliente con {string}, {word} y {string}', function (companyName, cuit, observations) {
     this.companyName = companyName;
@@ -45,9 +45,3 @@ When('presiono el botón de guardar', async function () {
         };
     }
 });
-
-Then('se espera el siguiente status: {int} con la respuesta: {string}', function (status, respuesta) {
-    assert.strictEqual(this.resultado.status, status); // Ya no hace falta parseInt, {int} lo hace solo
-    assert.strictEqual(this.resultado.respuesta.trim(), respuesta.trim());
-});
-

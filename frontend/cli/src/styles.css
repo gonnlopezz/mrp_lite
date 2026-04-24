@@ -6,10 +6,13 @@
 @import '@fontsource-variable/inter';
 
 :root {
-  --mrp-blue: #2563eb;    /* Azul profesional, no violeta */
-  --mrp-navy: #1e293b;    /* El color de tu Navbar */
+  --mrp-blue: #2563eb;
+  /* Azul profesional, no violeta */
+  --mrp-navy: #1e293b;
+  /* El color de tu Navbar */
   --mrp-navy-hover: #354969;
-  --mrp-link: #60a5fa;;
+  --mrp-link: #60a5fa;
+  ;
 }
 
 body {
@@ -30,36 +33,39 @@ label {
    ========================================================================== */
 /* Navbar Navy - Forzamos el color */
 .navbar.bg-dark-mrp {
-    background-color: #1e293b !important; /* El azul navy oscuro */
-    border-bottom: none !important;
-    padding: 0.6rem 1rem;
+  background-color: #1e293b !important;
+  /* El azul navy oscuro */
+  border-bottom: none !important;
+  padding: 0.6rem 1rem;
 }
 
 /* Links en blanco para fondo oscuro */
 .bg-dark-mrp .nav-link {
-    color: rgba(255, 255, 255, 0.7) !important;
-    font-size: 0.85rem;
-    font-weight: 500;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .bg-dark-mrp .nav-link:hover {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
 
-.bg-dark-mrp .navbar-brand, 
+.bg-dark-mrp .navbar-brand,
 .bg-dark-mrp .navbar-brand span {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .breadcrumb-item a {
-    color: var(--mrp-link);
-    font-weight: 500; /* Ni muy fino, ni muy grueso */
-    font-size: 0.85rem; 
-    transition: opacity 0.2s;
+  color: var(--mrp-link);
+  font-weight: 500;
+  /* Ni muy fino, ni muy grueso */
+  font-size: 0.85rem;
+  transition: opacity 0.2s;
 }
 
 .breadcrumb-item a:hover {
-    opacity: 0.6; /* En lugar de cambiar de color, que se aclare un poquito */
+  opacity: 0.6;
+  /* En lugar de cambiar de color, que se aclare un poquito */
 }
 
 /* Dropdown Moderno (Afecta a todos los menús desplegables) */
@@ -95,13 +101,14 @@ label {
    ========================================================================== */
 /* En tu styles.css */
 table.custom-table tbody tr {
-    transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 table.custom-table tbody tr:hover {
-    background-color: #f8fafc; /* Un gris casi blanco para el foco */
+  background-color: #f8fafc;
+  /* Un gris casi blanco para el foco */
 }
-   
+
 table.custom-table thead th {
   padding: 0.75rem 1rem;
   font-size: 0.7rem;
@@ -135,7 +142,7 @@ app-pagination .pagination .page-item .page-link {
   font-weight: 500;
   border-radius: 8px;
   transition: var(--transition-base);
-  
+
 }
 
 app-pagination .pagination .page-item.active .page-link {
@@ -155,9 +162,9 @@ app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hov
 
 /* Flechas deshabilitadas */
 app-pagination .pagination .page-item.disabled .page-link {
-    background-color: #fbfcfd;
-    color: #cbd5e1;
-    border-color: #f1f5f9;
+  background-color: #fbfcfd;
+  color: #cbd5e1;
+  border-color: #f1f5f9;
 }
 
 
@@ -170,13 +177,15 @@ app-pagination .pagination .page-item.disabled .page-link {
   padding: 0.5rem 1.25rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   border-radius: 6px;
-  background-color: var(--mrp-navy); /* O var(--mrp-navy) si lo querés igual a la nav */
+  background-color: var(--mrp-navy);
+  /* O var(--mrp-navy) si lo querés igual a la nav */
   border: none;
   transition: var(--transition-base);
 }
 
 .btn-primary:hover {
-  background-color: var(--mrp-navy-hover); /* Un tono más oscuro para el hover */
+  background-color: var(--mrp-navy-hover);
+  /* Un tono más oscuro para el hover */
   transform: translateY(-1px);
 }
 
@@ -231,16 +240,28 @@ app-pagination .pagination .page-item.disabled .page-link {
 }
 
 /* Métricas Dashboard */
-.border-top-primary { border-top: 3px solid var(--mrp-blue) !important; }
-.border-top-success { border-top: 3px solid #10b981 !important; }
-.border-top-warning { border-top: 3px solid #f59e0b !important; }
-.border-top-danger  { border-top: 3px solid #ef4444 !important; }
+.border-top-primary {
+  border-top: 3px solid var(--mrp-blue) !important;
+}
+
+.border-top-success {
+  border-top: 3px solid #10b981 !important;
+}
+
+.border-top-warning {
+  border-top: 3px solid #f59e0b !important;
+}
+
+.border-top-danger {
+  border-top: 3px solid #ef4444 !important;
+}
 
 /* Timeline */
 .timeline {
   position: relative;
   padding-left: 1.5rem;
 }
+
 .timeline::before {
   content: '';
   position: absolute;
@@ -250,10 +271,12 @@ app-pagination .pagination .page-item.disabled .page-link {
   width: 2px;
   background-color: var(--slate-100);
 }
+
 .timeline-item {
   position: relative;
   padding-bottom: 1.5rem;
 }
+
 .timeline-marker {
   position: absolute;
   left: -1.5rem;
@@ -301,9 +324,122 @@ app-pagination .pagination .page-item.disabled .page-link {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.text-steel { color: var(--steel-900); }
+.text-steel {
+  color: var(--steel-900);
+}
 
+.error-container {
+    min-height: 18px; 
+    margin-top: 4px;
+}
+
+
+/* Estilo de error refinado (Steel Blue Style) */
+.error-feedback {
+    font-size: 0.75rem;
+    color: #ef4444; /* Un rojo más moderno, menos "alerta de Windows" */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.error-feedback i {
+    font-size: 0.7rem;
+}
+
+.form-control.is-invalid {
+    border-color: #fca5a5 !important;
+    background-image: none !important; /* Quitamos el ícono de Bootstrap que suele molestar */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+.mrp-custom-toast {
+  background-color: #ffffff !important;
+  color: var(--steel-900) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 1rem 1.25rem !important;
+  opacity: 1 !important;
+}
+
+.mrp-custom-toast .toast-progress {
+    height: 2px !important; 
+    opacity: 0.4;
+}
+
+.toast-success { border-left: 4px solid #10b981 !important; } 
+.toast-error   { border-left: 4px solid #ef4444 !important; } 
+.toast-info    { border-left: 4px solid var(--mrp-blue) !important; } 
+.toast-warning { border-left: 4px solid #f59e0b !important; } 
+
+
+.mrp-custom-toast .toast-title {
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  color: var(--steel-900) !important;
+}
+
+.mrp-custom-toast .toast-message {
+  font-size: 0.8rem !important;
+  color: var(--steel-600) !important;
+}
+
+.toast-container {
+  top: 60px !important;
+}
+/* Contenedor circular para el icono */
+.icon-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fondos sutiles (Soft Backgrounds) */
+.bg-warning-soft {
+    background-color: #fffbeb !important; /* Amarillo crema muy suave */
+}
+
+.bg-danger-soft {
+    background-color: #fef2f2 !important; /* Rojo/Rosa muy suave */
+}
+
+/* Si en el futuro hacés uno de éxito: */
+.bg-success-soft {
+    background-color: #f0fdf4 !important; /* Verde muy suave */
+}
+
+/* Para que el modal no tenga bordes toscos */
+.modal-content {
+    border: none !important;
+    border-radius: 12px !important;
+}

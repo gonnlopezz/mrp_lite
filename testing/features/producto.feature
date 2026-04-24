@@ -9,7 +9,7 @@ Característica: gestión de productos
       | cortar perfiles     |     2 |     20 | amoladora          |
       | armado              |     3 |     90 | soldadora          |      
     Cuando presiono el botón de guardar producto
-    Entonces se espera el siguiente 200 con "Soporte metálico mediano creado exitosamente"
+    Entonces se espera el siguiente 200 con "Producto Soporte metálico mediano creado exitosamente"
 
   Escenario: Crear un producto con sus tareas que pueda fabricarse en el taller BETA
     Dado se ingresa un nuevo producto con nombre "Andamio básico 2x2x4"
@@ -19,7 +19,7 @@ Característica: gestión de productos
       | realizar perforaciones  |     2 |     40 | taladro            |
       | aplicar capa protectora |     3 |     80 | pistola de pintura |      
     Cuando presiono el botón de guardar producto
-    Entonces se espera el siguiente 200 con "Andamio básico 2x2x4 creado exitosamente"
+    Entonces se espera el siguiente 200 con "Producto Andamio básico 2x2x4 creado exitosamente"
 
   Escenario: Crear un producto con sus tareas que pueda fabricarse solo en el taller GAMA
     Dado se ingresa un nuevo producto con nombre "Canasto de basura chico 1,5mts"

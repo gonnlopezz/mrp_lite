@@ -4,6 +4,8 @@ import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 
 @Component({
   selector: 'app-customers',
@@ -17,6 +19,7 @@ export class CustomersComponent {
 
   constructor(
     private customerService: CustomerService,
+    private modalService: NgbModal,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -38,10 +41,26 @@ export class CustomersComponent {
   }
 
   delete(id: number): void {
-    if (confirm("¿Confirma que desea eliminar este cliente?")) {
-      this.customerService.delete(id).subscribe(() => {
-        this.getCustomers();
-      });
-    }
+    const modalRef = this.modalService.open(ConfirmModalComponent, {
+      centered: true,
+      backdrop: 'static' 
+    });
+
+
+    modalRef.componentInstance.title = 'Eliminar Cliente';
+    modalRef.componentInstance.message = `¿Estás seguro de eliminar a este cliente? Esta acción no se puede deshacer.`;
+    modalRef.componentInstance.btnOkText = 'Sí, Eliminar';
+    modalRef.componentInstance.isDelete = true;
+
+    modalRef.result.then((result) => {
+      if (result) {
+        this.customerService.delete(id).subscribe(() => {
+          this.getCustomers();
+        });
+      }
+    }).catch(() => {
+    });
+
+
   }
 }
