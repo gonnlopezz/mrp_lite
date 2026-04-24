@@ -24,25 +24,28 @@ public class WorkshopPresenter {
     }
     
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Object> findById(@PathVariable("id") long id) {
+    public ResponseEntity<Object> findById(@PathVariable("id") int id) {
         return Response.ok(service.findById(id));
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody Workshop aWorkshop) {
-        if(aWorkshop.getId() != 0) {
-            return Response.error("El id del taller debe ser 0 o no estar presente.");
-        }
         return Response.ok(service.save(aWorkshop), "Taller " + aWorkshop.getCode() + " ingresado correctamente");
     }
 
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<Object> update(@RequestBody Workshop aWorkshop) {
+        if (aWorkshop.getId() == 0) {
+        Workshop existente = service.findByCode(aWorkshop.getCode());
+        if (existente != null) {
+            aWorkshop.setId(existente.getId());
+        }
+    }
         return Response.ok(service.save(aWorkshop), "Taller " + aWorkshop.getCode() + " actualizado correctamente");
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Object> delete(@PathVariable("id") long id) {
+    public ResponseEntity<Object> delete(@PathVariable("id") int id) {
         service.delete(id);
         return Response.ok("Taller id " + id + " eliminado con éxito.");
     }

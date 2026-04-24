@@ -11,7 +11,7 @@ import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-equipment-types',
   standalone: true,
-  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule, UpperCasePipe, NgbModule],
+  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule, NgbModule],
   templateUrl: './equipment-types.html',
   styles: ``
 })

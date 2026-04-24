@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,7 @@ import lombok.Setter;
 public class Workshop {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private int id;
 
     @Column(unique = true, nullable = false)
     private String code;
@@ -29,7 +28,6 @@ public class Workshop {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "workshop_id")
-    private Collection<Equipment> equipment;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE} ,orphanRemoval = true)
+    private Collection<Equipment> equipments;
 }

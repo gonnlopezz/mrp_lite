@@ -43,7 +43,7 @@ export class CustomersComponent {
   delete(id: number): void {
     const modalRef = this.modalService.open(ConfirmModalComponent, {
       centered: true,
-      backdrop: 'static' 
+      backdrop: 'static'
     });
 
 

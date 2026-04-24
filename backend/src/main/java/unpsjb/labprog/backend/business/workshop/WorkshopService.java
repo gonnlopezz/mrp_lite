@@ -24,6 +24,10 @@ public class WorkshopService {
         return repository.findById(id).orElse(null);
     }
 
+    public Workshop findByCode(String code) {
+        return repository.findByCode(code).orElse(null);
+    }
+
     @Transactional
     public Workshop save(Workshop e) {
         return repository.save(e);

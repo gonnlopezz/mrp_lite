@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-customers-create',
-  imports: [CommonModule, UpperCasePipe, FormsModule, NgbTypeaheadModule, RouterLink],
+  imports: [CommonModule, FormsModule, NgbTypeaheadModule, RouterLink],
   templateUrl: "./customers-detail.html",
   styles: ``
 })

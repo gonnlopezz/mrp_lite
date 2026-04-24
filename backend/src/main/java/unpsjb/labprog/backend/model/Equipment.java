@@ -17,7 +17,7 @@ import lombok.Setter;
 public class Equipment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private int id;
 
     @Column(unique = true, nullable = false)
     private String code;

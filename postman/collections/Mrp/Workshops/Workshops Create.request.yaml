@@ -1,0 +1,12 @@
+$kind: http-request
+name: Workshops Create
+url: localhost:8080/workshops
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "code": "GAMA-2",
+        "name": "Taller Gama para lo básico"
+    }
+order: 1777054313396

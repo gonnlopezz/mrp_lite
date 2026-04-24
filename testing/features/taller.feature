@@ -17,7 +17,7 @@ Característica: gestión de talleres
     Cuando presiono el botón de actualizar taller
     Entonces se espera el siguiente status: <status> con la respuesta: "<respuesta>"
     Ejemplos:
-      | workshopCode | equipmentCode               | equipmentType         | capacity | status | respuesta                             |
+      |code | equipmentCode               | equipmentType         | capacity | status | respuesta                             |
       | ALFA         | A01_amoladora              | amoladora          |         1 |    200 | Taller ALFA actualizado correctamente |
       | ALFA         | A02_soldadora              | soldadora          |         1 |    200 | Taller ALFA actualizado correctamente |
       | BETA         | B01_amoladora              | amoladora          |         4 |    200 | Taller BETA actualizado correctamente |

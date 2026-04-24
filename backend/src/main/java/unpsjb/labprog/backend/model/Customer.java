@@ -17,7 +17,7 @@ public class Customer {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private int id;
 
     @Column(unique = true, nullable = false)
     private long cuit;

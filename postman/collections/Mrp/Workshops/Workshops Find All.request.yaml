@@ -1,0 +1,5 @@
+$kind: http-request
+name: Workshops Find All
+url: localhost:8080/workshops
+method: GET
+order: 710789515365139
