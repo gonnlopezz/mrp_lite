@@ -1,0 +1,5 @@
+$kind: http-request
+name: EquipmentTypes Find All
+url: localhost:8080/equipment-types
+method: GET
+order: 1777146679617

@@ -28,6 +28,11 @@ public class WorkshopPresenter {
         return Response.ok(service.findById(id));
     }
 
+    @RequestMapping(value = "/code/{code}", method = RequestMethod.GET)
+    public ResponseEntity<Object> findByCode(@PathVariable("code") String code) {
+        return Response.ok(service.findByCode(code));
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody Workshop aWorkshop) {
         return Response.ok(service.save(aWorkshop), "Taller " + aWorkshop.getCode() + " ingresado correctamente");
@@ -35,12 +40,6 @@ public class WorkshopPresenter {
 
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<Object> update(@RequestBody Workshop aWorkshop) {
-        if (aWorkshop.getId() == 0) {
-        Workshop existente = service.findByCode(aWorkshop.getCode());
-        if (existente != null) {
-            aWorkshop.setId(existente.getId());
-        }
-    }
         return Response.ok(service.save(aWorkshop), "Taller " + aWorkshop.getCode() + " actualizado correctamente");
     }
 

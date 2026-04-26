@@ -443,3 +443,23 @@ app-pagination .pagination .page-item.disabled .page-link {
     border: none !important;
     border-radius: 12px !important;
 }
+
+/* Color de fondo muy suave para la fila expandida */
+.bg-light-subtle {
+  background-color: #f8fafc !important;
+}
+
+/* Efecto de borde lateral para indicar jerarquía */
+.border-primary {
+  border-color: var(--mrp-blue) !important;
+}
+
+/* Ajuste para que las filas colapsables no tengan hover visual extraño */
+tr.collapse.show {
+  display: table-row !important;
+}
+
+/* Animación de apertura suave */
+.collapse {
+  transition: all 0.3s ease-out;
+}

@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import unpsjb.labprog.backend.business.equipment.EquipmentService;
 import unpsjb.labprog.backend.model.Workshop;
 
 @Service
 public class WorkshopService {
     @Autowired
     WorkshopRepository repository;
+
+    @Autowired
+    EquipmentService equipmentService;
 
     public List<Workshop> findAll() {
         List<Workshop> result = new ArrayList<>();
@@ -29,8 +33,11 @@ public class WorkshopService {
     }
 
     @Transactional
-    public Workshop save(Workshop e) {
-        return repository.save(e);
+    public Workshop save(Workshop workshop) {
+        if (workshop.getEquipments() != null) {
+            workshop.getEquipments().forEach(e -> equipmentService.prepareForSaving(e));
+        }
+        return repository.save(workshop);
     }
 
     @Transactional

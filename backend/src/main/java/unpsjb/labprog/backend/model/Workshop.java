@@ -28,6 +28,6 @@ public class Workshop {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE} ,orphanRemoval = true)
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } )
     private Collection<Equipment> equipments;
 }

@@ -39,12 +39,12 @@
                 <label class="label-caps mb-1 d-block">CUIT / Identificación</label>
                 <input type="text" class="form-control form-control-sm bg-white" required id="inputCuit" name="cuit"
                   placeholder="XX-XXXXXXXX-X" [ngModel]="formatCuit(customer.cuit)"
-                  (ngModelChange)="onCuitChange($event)" maxlength="13" #cuitInput="ngModel"
-                  [class.is-invalid]="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && (cuitInput.dirty || cuitInput.touched)">
+                  (ngModelChange)="onCuitChange($event)" minlength="13" maxlength="13" #cuitInput="ngModel"
+                  [class.is-invalid]="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && cuitInput.touched">
 
                 <div class="error-container">
                   <div class="error-feedback"
-                    *ngIf="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && (cuitInput.dirty || cuitInput.touched)">
+                    *ngIf="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && cuitInput.touched">
                     <span *ngIf="cuitInput.errors?.['required']">
                       <i class="fa fa-exclamation-triangle"></i> El CUIT es obligatorio.
                     </span>

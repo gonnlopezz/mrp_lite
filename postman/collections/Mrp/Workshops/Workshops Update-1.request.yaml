@@ -1,19 +1,20 @@
 $kind: http-request
-name: Workshops Create
+name: Workshops Update
 url: localhost:8080/workshops
-method: POST
+method: PUT
 body:
   type: json
   content: |-
     {
-        "code": "GAMA-18",
-        "name": "Taller Gama para lo básico",
+        "id": 802,
+        "code": "ALFA",
+        "name": "Taller Alfa para lo básico",
         "equipments": [{
-            "code": "A07-Amoladora",
+            "code": "A08-Amoladora",
             "capacity": 10,
             "type": {
                 "name": "amoladora"
             }
         }]
     }
-order: 1777054313396
+order: 2062649605921416
