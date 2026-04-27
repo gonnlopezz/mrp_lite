@@ -24,4 +24,8 @@ export class WorkshopService {
   save(workshop: Workshop): Observable<DataPackage> { 
     return this.http.post<DataPackage>(this.workshopsUrl, workshop);
   }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.workshopsUrl}/id/${id}`);
+  }
 }

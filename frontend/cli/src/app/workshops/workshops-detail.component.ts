@@ -58,6 +58,8 @@ export class WorkshopsDetailComponent {
     });
   }
 
+
+
   goBack(): void {
     this.location.back();
   }

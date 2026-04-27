@@ -12,5 +12,5 @@ import unpsjb.labprog.backend.model.EquipmentType;
 @Repository
 public interface EquipmentTypeRepository extends CrudRepository<EquipmentType, Integer>, PagingAndSortingRepository<EquipmentType, Integer> {
     @Query("Select e FROM EquipmentType e Where e.name = ?1")
-    Optional<EquipmentType> findByCode(String name);
+    Optional<EquipmentType> findByName(String name);
 }

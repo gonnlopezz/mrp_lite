@@ -16,7 +16,7 @@ public class EquipmentService {
 
     public void prepareForSaving(Equipment e) {
         if (e.getType() != null && e.getType().getName() != null) {
-            EquipmentType realType = typeRepository.findByCode(e.getType().getName())
+            EquipmentType realType = typeRepository.findByName(e.getType().getName())
                 .orElseThrow(() -> new RuntimeException("Tipo no encontrado"));
             e.setType(realType);
         }

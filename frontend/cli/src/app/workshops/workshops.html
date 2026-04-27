@@ -71,7 +71,7 @@
                                 <button class="btn-icon hover-primary" title="Editar">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
-                                <button class="btn-icon hover-danger" title="Eliminar">
+                                <button (click)="delete(workshop.id)" class="btn-icon hover-danger" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -83,7 +83,7 @@
                     <tr>
                         <td colspan="4" class="py-3 px-4">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted small">Total: <b>2</b> talleres</span>
+                                <span class="text-muted small">Total: <b>{{workshops.length}}</b>{{ workshops.length > 1? ' talleres' : ' taller'}}</span>
                                 <nav aria-label="Page navigation">
                                     <ul class="pagination pagination-sm mb-0">
                                         <li class="page-item active"><a class="page-link">1</a></li>
