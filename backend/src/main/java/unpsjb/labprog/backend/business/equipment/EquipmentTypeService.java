@@ -26,6 +26,9 @@ public class EquipmentTypeService {
         return repository.findAll(PageRequest.of(page, size));
     }
 
+    public EquipmentType findByName(String name) {
+        return repository.findByName(name).orElse(null);
+    }
 
 
     public EquipmentType findById(int id) {

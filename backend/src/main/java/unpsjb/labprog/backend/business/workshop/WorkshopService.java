@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -24,7 +26,11 @@ public class WorkshopService {
         return result;
     }
 
-    public Workshop findById(long id) {
+    public Page<Workshop> findByPage(int page, int size) {
+        return repository.findAll(PageRequest.of(page, size));
+    }
+
+    public Workshop findById(int id) {
         return repository.findById(id).orElse(null);
     }
 
@@ -41,8 +47,8 @@ public class WorkshopService {
     }
 
     @Transactional
-    public void delete(long id) {
-        repository.deleteById(id); 
+    public void delete(int id) {
+        repository.deleteById(id);
     }
 
 }

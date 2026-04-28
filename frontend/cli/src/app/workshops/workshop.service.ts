@@ -17,6 +17,10 @@ export class WorkshopService {
     return this.http.get<DataPackage>(this.workshopsUrl);
   }
 
+  byPage(page: number, size: number): Observable<DataPackage> {
+    return this.http.get<DataPackage>(`${this.workshopsUrl}/page?page=${page - 1}&size=${size}`);
+  }
+
   get(id: string): Observable<DataPackage> {    
     return this.http.get<DataPackage>(`${this.workshopsUrl}/id/${id}`);
   }

@@ -1,0 +1,6 @@
+$kind: http-request
+name: Products Create
+url: localhost:8080/products
+method: POST
+examples: .resources/Products Create.resources/examples
+order: 1777342390658

@@ -1,0 +1,26 @@
+$kind: http-example
+request:
+  url: localhost:8080/products
+  method: POST
+  body:
+    type: json
+    content: |-
+      {
+          "name": "Producto 1",
+          "tasks": [{
+              "name": "Tarea 1",
+              "orderType": 2,
+              "time": 60,
+              "type": {
+                  "id": 852,
+                  "name": "amoladora"
+              }
+          }]
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: ""
+order: 1777342402183

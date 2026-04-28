@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
 import { Workshop } from './workshop';
 import { WorkshopService } from './workshop.service';
 import { Equipment } from '../equipments/equipment';
@@ -11,7 +11,7 @@ import { EquipmentTypeService } from '../equipments/equipment-type.service';
 
 @Component({
   selector: 'app-workshop-detail',
-  imports: [RouterModule, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './workshops-detail.html'  ,
   styles: ``
 })
@@ -19,12 +19,14 @@ export class WorkshopsDetailComponent {
   workshop!: Workshop;
   showEquipmentForm: boolean = false;
   equipmentTypes!: EquipmentType[]; 
+  newEquipment!: Equipment;
 
   constructor(
     private workshopService: WorkshopService,  
     private equipmentTypeService: EquipmentTypeService, 
     private route: ActivatedRoute,
     private location: Location,
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private toastr: ToastrService
   ) {}
@@ -46,7 +48,13 @@ export class WorkshopsDetailComponent {
     }); 
   }
 
+  openEquipmentForm(): void {
+    this.newEquipment = {code: "", capacity: 0, type: { name: ""}} as Equipment;
+    this.showEquipmentForm = true;
+  }
+
   addEquipment () {
+    this.workshop.equipments.push(this.newEquipment);
     this.showEquipmentForm = false;
   }
 
@@ -54,7 +62,13 @@ export class WorkshopsDetailComponent {
     this.workshopService.save(this.workshop).subscribe(dataPackage => {
       this.workshop = <Workshop>dataPackage.data;
       this.cdr.markForCheck();
-      this.toastr.success('¡Taller guardado con éxito!', 'Éxito');  
+
+      this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
+        this.router.navigate(["/workshops/", + this.workshop.id]);
+
+        this.toastr.success('Taller guardado con éxito!', 'Éxito');
+
+      });
     });
   }
 

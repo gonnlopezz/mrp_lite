@@ -17,7 +17,7 @@
     <p class="text-muted small mb-0">Defina los datos del taller y su equipamiento inicial.</p>
   </div>
 
-  <form>
+  <form #workshopForm="ngForm">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
       <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
         <h6 class="fw-bold text-steel text-uppercase tracking-wider mb-0" style="font-size: 0.75rem;">Información del Taller</h6>
@@ -26,12 +26,22 @@
         <div class="row g-3">
           <div class="col-md-3">
             <label class="label-caps mb-1">Código</label>
-            <input type="text" name="code" [(ngModel)]="workshop.code" class="form-control form-control-sm bg-white" placeholder="Ej: ALFA">
+            <input type="text" name="code" [(ngModel)]="workshop.code" class="form-control form-control-sm bg-white" placeholder="Ej: ALFA" required #codeInput="ngModel" [class.is-invalid]="codeInput.invalid && (codeInput.dirty || codeInput.touched)">
+            <div class="error-container">
+              <div class="error-feedback" *ngIf="codeInput.invalid && (codeInput.dirty || codeInput.touched)">
+                <i class="fa fa-exclamation-triangle"></i> El código del taller es obligatorio.
+              </div>
+            </div>
           </div>
           <div class="col-md-9">
             <label class="label-caps mb-1">Nombre</label>
             <input type="text" name="name" [(ngModel)]="workshop.name" class="form-control form-control-sm bg-white"
-              placeholder="Ej: Taller Alfa para mantenimiento de maquinaria pesada">
+              placeholder="Ej: Taller Alfa para mantenimiento de maquinaria pesada" required #nameInput="ngModel" [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+            <div class="error-container">
+              <div class="error-feedback" *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+                <i class="fa fa-exclamation-triangle"></i> El nombre del taller es obligatorio.
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -41,7 +51,7 @@
       <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
         <h6 class="fw-bold text-steel text-uppercase tracking-wider mb-0" style="font-size: 0.75rem;">Equipamiento Registrado</h6>
 
-        <button type="button" class="btn btn-sm btn-primary shadow-sm" (click)="showEquipmentForm = true"
+        <button type="button" class="btn btn-sm btn-primary shadow-sm" (click)="openEquipmentForm()"
           *ngIf="!showEquipmentForm">
           <i class="fas fa-plus me-1"></i> Añadir Equipo
         </button>
@@ -69,7 +79,7 @@
 
             <tr *ngFor="let eq of workshop.equipments; let i = index" class="animate__fadeIn">
               <td><span class="text-primary fw-bold font-monospace">{{ eq.code }}</span></td>
-              <td class="fw-semibold text-steel">{{ eq.type }}</td>
+              <td class="fw-semibold text-steel">{{ eq.type.name }}</td>
               <td><span class="badge bg-light text-dark border px-2">{{ eq.capacity }}</span></td>
               <td class="text-end">
                 <button type="button" class="btn-icon hover-danger" (click)="workshop.equipments.splice(i, 1)">
@@ -95,21 +105,41 @@
         <div class="row g-3 align-items-end">
           <div class="col-md-4">
             <label class="label-caps mb-1">Nombre / Código</label>
-            <input type="text" class="form-control form-control-sm bg-white" placeholder="Ej: Sierra Circular">
+            <input required type="text" class="form-control form-control-sm bg-white" placeholder="Ej: Sierra Circular" [(ngModel)]="newEquipment.code" name="equipmentCode" #eqCodeInput="ngModel" [class.is-invalid]="eqCodeInput.invalid && eqCodeInput.touched">
+            <div class="error-container">
+              <div class="error-feedback" *ngIf="eqCodeInput.invalid && eqCodeInput.touched">
+                <i class="fa fa-exclamation-triangle"></i> El código del equipo es obligatorio.
+              </div>
+            </div>
           </div>
           <div class="col-md-3">
             <label class="label-caps mb-1">Tipo de equipo</label>
-            <select class="form-select form-select-sm bg-white">
+            <select required class="form-select form-select-sm bg-white" [(ngModel)]="newEquipment.type" name="equipmentType" #eqTypeInput="ngModel" [class.is-invalid]="eqTypeInput.invalid && eqTypeInput.touched">
               <option value="" selected disabled>Seleccionar...</option>
-              <option *ngFor="let type of equipmentTypes" [value]="type.id">{{ type.name }}</option>
+              <option *ngFor="let type of equipmentTypes" [ngValue]="type">{{ type.name }}</option>
             </select>
+            <div class="error-container">
+              <div class="error-feedback" *ngIf="eqTypeInput.invalid && eqTypeInput.touched">
+                <i class="fa fa-exclamation-triangle"></i> Debe seleccionar un tipo.
+              </div>
+            </div>
           </div>
           <div class="col-md-3">
             <label class="label-caps mb-1">Capacidad</label>
-            <input type="text" class="form-control form-control-sm bg-white" placeholder="0.00">
+            <input required type="number" step="1" min="1" class="form-control form-control-sm bg-white" placeholder="1" [(ngModel)]="newEquipment.capacity" name="equipmentCapacity" #eqCapacityInput="ngModel" [class.is-invalid]="eqCapacityInput.invalid && eqCapacityInput.touched">
+            <div class="error-container">
+              <div class="error-feedback" *ngIf="eqCapacityInput.invalid && eqCapacityInput.touched">
+                <span *ngIf="eqCapacityInput.errors?.['required']">
+                  <i class="fa fa-exclamation-triangle"></i> La capacidad es obligatoria.
+                </span>
+                <span *ngIf="eqCapacityInput.errors?.['min']">
+                  <i class="fa fa-exclamation-triangle"></i> La capacidad debe ser mayor a 0.
+                </span>
+              </div>
+            </div>
           </div>
           <div class="col-md-2">
-            <button type="button" class="btn btn-sm btn-primary w-100 fw-bold" (click)="addEquipment()">
+            <button type="button" class="btn btn-sm btn-primary w-100 fw-bold" [disabled]="eqCodeInput.invalid || eqTypeInput.invalid || eqCapacityInput.invalid" (click)="addEquipment()">
               Confirmar
             </button>
           </div>
@@ -121,7 +151,7 @@
       <button type="button" class="btn btn-light px-4 fw-semibold text-secondary border-0" (click)="goBack()">
         Cancelar
       </button>
-      <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm transition-base" (click)="save()">
+      <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm transition-base" (click)="save()" [disabled]="workshopForm.invalid">
         <i class="fas fa-save me-2"></i> Guardar Taller
       </button>
     </div>

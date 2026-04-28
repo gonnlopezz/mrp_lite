@@ -1,22 +1,30 @@
 /* ==========================================================================
-   1. CONFIGURACIÓN, FUENTES Y VARIABLES
+   1. VARIABLES, FUENTES Y RESET
    ========================================================================== */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 @import '@fontsource-variable/inter';
 
 :root {
+  /* Brand Colors */
   --mrp-blue: #2563eb;
-  /* Azul profesional, no violeta */
   --mrp-navy: #1e293b;
-  /* El color de tu Navbar */
-  --mrp-navy-hover: #354969;
+  --mrp-navy-hover: #334155;
   --mrp-link: #60a5fa;
-  ;
+
+  /* Steel UI Scale */
+  --steel-100: #f1f5f9;
+  --steel-600: #475569;
+  --steel-900: #0f172a;
+
+  /* Slate & States */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --transition-base: all 0.2s ease-in-out;
 }
 
 body {
-  font-family: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter Variable', 'Inter', system-ui, sans-serif;
   color: var(--steel-900);
   background-color: #fbfcfd;
   -webkit-font-smoothing: antialiased;
@@ -29,17 +37,14 @@ label {
 }
 
 /* ==========================================================================
-   2. NAVEGACIÓN (NAVBAR NAVY Y DROPDOWNS)
+   2. NAVEGACIÓN Y ESTRUCTURA (NAVBAR, BREADCRUMBS)
    ========================================================================== */
-/* Navbar Navy - Forzamos el color */
 .navbar.bg-dark-mrp {
-  background-color: #1e293b !important;
-  /* El azul navy oscuro */
+  background-color: var(--mrp-navy) !important;
   border-bottom: none !important;
   padding: 0.6rem 1rem;
 }
 
-/* Links en blanco para fondo oscuro */
 .bg-dark-mrp .nav-link {
   color: rgba(255, 255, 255, 0.7) !important;
   font-size: 0.85rem;
@@ -58,17 +63,15 @@ label {
 .breadcrumb-item a {
   color: var(--mrp-link);
   font-weight: 500;
-  /* Ni muy fino, ni muy grueso */
   font-size: 0.85rem;
   transition: opacity 0.2s;
 }
 
 .breadcrumb-item a:hover {
   opacity: 0.6;
-  /* En lugar de cambiar de color, que se aclare un poquito */
 }
 
-/* Dropdown Moderno (Afecta a todos los menús desplegables) */
+/* Dropdown Moderno */
 .dropdown-menu-modern {
   border: 1px solid #e2e8f0;
   border-radius: 0.75rem;
@@ -90,25 +93,9 @@ label {
   color: var(--mrp-link);
 }
 
-.dropdown-menu-modern .dropdown-item i {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  width: 20px;
-}
-
 /* ==========================================================================
-   3. COMPONENTES: TABLAS Y PAGINACIÓN
+   3. TABLAS Y COMPONENTES DE LISTADO (MASTER-DETAIL)
    ========================================================================== */
-/* En tu styles.css */
-table.custom-table tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-table.custom-table tbody tr:hover {
-  background-color: #f8fafc;
-  /* Un gris casi blanco para el foco */
-}
-
 table.custom-table thead th {
   padding: 0.75rem 1rem;
   font-size: 0.7rem;
@@ -128,70 +115,58 @@ table.custom-table td {
   border-bottom: 1px solid #f1f5f9;
 }
 
-/* Paginación */
-app-pagination .pagination {
-  margin-bottom: 0;
-  gap: 4px;
+table.custom-table tbody tr {
+  transition: background-color 0.2s ease;
 }
 
-app-pagination .pagination .page-item .page-link {
-  border: 1px solid var(--mrp-navy);
-  color: var(--steel-600);
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 500;
+table.custom-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Detail Expansion (Talleres) */
+.detail-container {
+  background-color: var(--slate-50) !important;
+  border-left: 4px solid var(--mrp-blue) !important;
+}
+
+.equipment-card {
+  background: white;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  transition: var(--transition-base);
-
+  padding: 0.5rem 0.8rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s;
 }
 
-app-pagination .pagination .page-item.active .page-link {
-  background-color: var(--mrp-navy);
-  border-color: #2563eb;
-  color: #ffffff;
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-  z-index: 3;
+.equipment-card:hover {
+  transform: translateY(-2px);
 }
-
-app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
-  background-color: var(--mrp-navy-hover);
-  color: #ffffff;
-  border-color: #cbd5e1;
-  transform: translateY(-1px);
-}
-
-/* Flechas deshabilitadas */
-app-pagination .pagination .page-item.disabled .page-link {
-  background-color: #fbfcfd;
-  color: #cbd5e1;
-  border-color: #f1f5f9;
-}
-
 
 /* ==========================================================================
-   4. BOTONES, ACCIONES Y FORMULARIOS
+   4. BOTONES Y ACCIONES
    ========================================================================== */
 .btn-primary {
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.5rem 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: var(--mrp-navy);
-  /* O var(--mrp-navy) si lo querés igual a la nav */
   border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: var(--transition-base);
 }
 
 .btn-primary:hover {
   background-color: var(--mrp-navy-hover);
-  /* Un tono más oscuro para el hover */
   transform: translateY(-1px);
 }
 
 .btn-icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -213,6 +188,14 @@ app-pagination .pagination .page-item.disabled .page-link {
   background-color: rgba(220, 53, 69, 0.1);
 }
 
+.btn-icon.active-primary {
+  background-color: var(--mrp-link);
+  color: white;
+}
+
+/* ==========================================================================
+   5. FORMULARIOS Y VALIDACIÓN
+   ========================================================================== */
 .form-control {
   border: 1px solid #e2e8f0;
   color: var(--steel-900);
@@ -220,76 +203,60 @@ app-pagination .pagination .page-item.disabled .page-link {
 }
 
 .form-control:focus {
-  border-color: #2563eb;
+  border-color: var(--mrp-blue);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.input-group-text {
-  background-color: #f8fafc;
-  border-color: #e2e8f0;
-  color: #94a3b8;
+.border-dashed {
+  border: 2px dashed #e2e8f0 !important;
+}
+
+.error-feedback {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* ==========================================================================
-   5. MODALES Y DASHBOARD
+   6. ALERTAS, TOASTS Y MODALES
    ========================================================================== */
+.mrp-custom-toast {
+  background-color: #ffffff !important;
+  color: var(--steel-900) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.toast-success {
+  border-left: 4px solid #10b981 !important;
+}
+
+.toast-error {
+  border-left: 4px solid #ef4444 !important;
+}
+
 .modal-content {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* Métricas Dashboard */
-.border-top-primary {
-  border-top: 3px solid var(--mrp-blue) !important;
-}
-
-.border-top-success {
-  border-top: 3px solid #10b981 !important;
-}
-
-.border-top-warning {
-  border-top: 3px solid #f59e0b !important;
-}
-
-.border-top-danger {
-  border-top: 3px solid #ef4444 !important;
-}
-
-/* Timeline */
-.timeline {
-  position: relative;
-  padding-left: 1.5rem;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 5px;
-  bottom: 5px;
-  width: 2px;
-  background-color: var(--slate-100);
-}
-
-.timeline-item {
-  position: relative;
-  padding-bottom: 1.5rem;
-}
-
-.timeline-marker {
-  position: absolute;
-  left: -1.5rem;
-  width: 16px;
-  height: 16px;
+.icon-badge {
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background-color: #fff;
-  border: 2px solid var(--mrp-blue);
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ==========================================================================
-   6. UTILIDADES Y ANIMACIONES
+   7. UTILIDADES Y ANIMACIONES
    ========================================================================== */
 .label-caps {
   font-size: 0.7rem;
@@ -300,23 +267,12 @@ app-pagination .pagination .page-item.disabled .page-link {
 }
 
 .badge-soft-secondary {
-  background-color: transparent;
   color: #94a3b8;
   border: 1px solid #e2e8f0;
   padding: 1px 6px;
   border-radius: 4px;
   font-size: 0.65rem;
   font-weight: 600;
-  text-transform: lowercase;
-}
-
-.dot {
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 8px;
-  width: 6px;
-  height: 6px;
-  background-color: #cbd5e1;
 }
 
 .animate__fadeIn {
@@ -335,131 +291,60 @@ app-pagination .pagination .page-item.disabled .page-link {
   }
 }
 
-.text-steel {
-  color: var(--steel-900);
+/* ==========================================================================
+   PAGINACIÓN (CORRECCIÓN DE ESTADO DESACTIVADO)
+   ========================================================================== */
+.table-footer-compact {
+  display: flex;
+  justify-content: center;
+  /* Llevamos todo al medio */
+  flex-direction: column;
+  /* Uno abajo del otro */
+  align-items: center;
+  gap: 10px;
 }
 
-.error-container {
-    min-height: 18px; 
-    margin-top: 4px;
+app-pagination .pagination {
+  margin-bottom: 0;
+  gap: 4px;
 }
 
-
-/* Estilo de error refinado (Steel Blue Style) */
-.error-feedback {
-    font-size: 0.75rem;
-    color: #ef4444; /* Un rojo más moderno, menos "alerta de Windows" */
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    animation: fadeIn 0.2s ease-out;
+app-pagination .pagination .page-item .page-link {
+  border: 1px solid #e2e8f0;
+  /* Borde suave por defecto */
+  color: var(--steel-600);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: var(--transition-base);
 }
 
-.error-feedback i {
-    font-size: 0.7rem;
+/* Estado Activo (La página actual) */
+app-pagination .pagination .page-item.active .page-link {
+  background-color: var(--mrp-navy);
+  border-color: var(--mrp-navy);
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(30, 41, 59, 0.2);
 }
 
-.form-control.is-invalid {
-    border-color: #fca5a5 !important;
-    background-image: none !important; /* Quitamos el ícono de Bootstrap que suele molestar */
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-
-.mrp-custom-toast {
-  background-color: #ffffff !important;
-  color: var(--steel-900) !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 8px !important;
-  padding: 1rem 1.25rem !important;
-  opacity: 1 !important;
-}
-
-.mrp-custom-toast .toast-progress {
-    height: 2px !important; 
-    opacity: 0.4;
-}
-
-.toast-success { border-left: 4px solid #10b981 !important; } 
-.toast-error   { border-left: 4px solid #ef4444 !important; } 
-.toast-info    { border-left: 4px solid var(--mrp-blue) !important; } 
-.toast-warning { border-left: 4px solid #f59e0b !important; } 
-
-
-.mrp-custom-toast .toast-title {
-  font-weight: 700 !important;
-  font-size: 0.85rem !important;
-  color: var(--steel-900) !important;
-}
-
-.mrp-custom-toast .toast-message {
-  font-size: 0.8rem !important;
-  color: var(--steel-600) !important;
-}
-
-.toast-container {
-  top: 60px !important;
-}
-/* Contenedor circular para el icono */
-.icon-badge {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Fondos sutiles (Soft Backgrounds) */
-.bg-warning-soft {
-    background-color: #fffbeb !important; /* Amarillo crema muy suave */
-}
-
-.bg-danger-soft {
-    background-color: #fef2f2 !important; /* Rojo/Rosa muy suave */
-}
-
-/* Si en el futuro hacés uno de éxito: */
-.bg-success-soft {
-    background-color: #f0fdf4 !important; /* Verde muy suave */
-}
-
-/* Para que el modal no tenga bordes toscos */
-.modal-content {
-    border: none !important;
-    border-radius: 12px !important;
-}
-
-/* Color de fondo muy suave para la fila expandida */
-.bg-light-subtle {
+/* Estado Desactivado (Flechas cuando no hay más páginas) */
+app-pagination .pagination .page-item.disabled .page-link {
   background-color: #f8fafc !important;
+  /* Gris casi blanco */
+  color: #cbd5e1 !important;
+  /* Texto "lavado" */
+  border-color: #f1f5f9 !important;
+  /* Borde que casi no se ve */
+  cursor: not-allowed;
+  pointer-events: none;
+  /* Clave: hace que no se pueda clickear */
 }
 
-/* Efecto de borde lateral para indicar jerarquía */
-.border-primary {
-  border-color: var(--mrp-blue) !important;
-}
-
-/* Ajuste para que las filas colapsables no tengan hover visual extraño */
-tr.collapse.show {
-  display: table-row !important;
-}
-
-/* Animación de apertura suave */
-.collapse {
-  transition: all 0.3s ease-out;
+/* Hover solo para los que NO están activos ni deshabilitados */
+app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+  background-color: var(--slate-50);
+  color: var(--mrp-blue);
+  border-color: var(--mrp-link);
+  transform: translateY(-1px);
 }

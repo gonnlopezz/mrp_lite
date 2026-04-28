@@ -4,5 +4,8 @@ export interface Equipment {
     id: number;
     code: string;
     capacity: number;
-    type: EquipmentType;
+    type: {
+        id?: number;
+        name: string;       
+    };
 }

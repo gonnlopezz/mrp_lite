@@ -22,6 +22,7 @@ export class CustomersDetailComponent {
     private customerService: CustomerService,
     private location: Location,
     private route: ActivatedRoute,
+    private router: Router,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) { }
@@ -54,9 +55,13 @@ export class CustomersDetailComponent {
 
       this.cdr.markForCheck();
 
-      this.toastr.success('¡Cliente guardado con éxito!', 'Éxito');
+      this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
+        this.router.navigate(["/customers/", + this.customer.id]);
 
-    });
+        this.toastr.success('¡Cliente guardado con éxito!', 'Éxito');
+
+      });
+    })
   }
 
   formatCuit(value: number | string): string {

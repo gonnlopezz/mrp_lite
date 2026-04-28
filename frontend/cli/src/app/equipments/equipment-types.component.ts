@@ -21,7 +21,7 @@ export class EquipmentTypesComponent implements OnInit {
   
   // Lógica para el alta rápida
   showCreateForm: boolean = false;
-  newEquipmentType: EquipmentType = { id: 0, name: "" };
+  newEquipmentType: EquipmentType = { name: "" };
 
   constructor(
     private equipmentTypeService: EquipmentTypeService,
@@ -47,7 +47,7 @@ export class EquipmentTypesComponent implements OnInit {
   }
 
   openModal(content: any) {
-    this.newEquipmentType = { id: 0, name: "" }; // Limpiamos antes de abrir
+    this.newEquipmentType = { name: "" }; // Limpiamos antes de abrir
     this.modalService.open(content, { centered: true });
   }
 

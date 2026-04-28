@@ -1,0 +1,5 @@
+$kind: http-request
+name: Products Find All
+url: localhost:8080/products
+method: GET
+order: 4014013400528336

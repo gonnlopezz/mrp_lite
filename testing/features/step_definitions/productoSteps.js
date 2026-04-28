@@ -3,31 +3,49 @@ const { Given, When, Then } = require('cucumber');
 
 
 
-Given('se ingresa un nuevo producto con nombre {string}', function (nombre) {
-    this.nombreProducto = nombre;
+Given('se ingresa un nuevo producto con nombre {string}', function (name) {
+    this.name = name;
 });
 
 
 
-Given('se fabrica haciendo la siguiente lista de tareas', function (tabla) {
-    this.listaTareas = tabla.hashes().map(tarea => ({
-        nombre: tarea.nombreTarea,
-        orden: parseInt(tarea.orden),
-        tiempo: parseInt(tarea.tiempo),
-        tipoEquipo: tarea.tipoEquipo
+Given('se fabrica haciendo la siguiente lista de tareas', async function (tabla) {
+    const filas = tabla.hashes();
+    this.tasks = await Promise.all(filas.map(async (fila) => {
+
+        const response = await fetch(`http://backend:8080/equipment-types/search/${fila.tipoEquipo}`);
+        const dataPackage = await response.json();
+
+        const realType = dataPackage.data;
+
+
+        return {
+            name: fila.nombreTarea,
+            orderTask: parseInt(fila.orden),
+            duration: parseInt(fila.tiempo),
+            type: {
+                id: realType.id,
+                name: realType.name
+            }
+        };
     }));
 });
 
 When('presiono el botón de guardar producto', async function () {
     try {
+        console.log("Enviando solicitud para crear producto:", JSON.stringify({
+            name: this.name,
+            tasks: this.tasks // Asegurate que el nombre coincida con tu variable
+        }, null, 2));
         const response = await fetch('http://backend:8080/products', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                nombre: this.nombreProducto,
-                tareas: this.listaTareas
+                name: this.name,
+                tasks: this.tasks
             })
         });
+
 
         const textoCrudo = await response.text();
         let mensajeFinal = textoCrudo;

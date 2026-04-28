@@ -31,6 +31,11 @@ public class EquipmentTypePresenter {
         return Response.ok(service.findByPage(page, size));
     }
 
+    @RequestMapping(value = "/search/{name}", method = RequestMethod.GET)
+    public ResponseEntity<Object> findByName(@PathVariable("name") String name) {       
+        return Response.ok(service.findByName(name));
+    }            
+
     @RequestMapping(value = "/id/{id}")
     public ResponseEntity<Object> findById(@PathVariable("id") int id) {
         return Response.ok(service.findById(id));
