@@ -7,6 +7,7 @@ import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EquipmentType } from './equipment-type';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 
 @Component({
   selector: 'app-equipment-types',
@@ -62,10 +63,25 @@ export class EquipmentTypesComponent implements OnInit {
   }
 
   delete(id: number): void {
-    if (confirm("¿Confirma que desea eliminar este tipo de equipo?")) {
-      this.equipmentTypeService.delete(id).subscribe(() => {
-        this.getEquipmentTypes();
-      });
-    }
+    const modalRef = this.modalService.open(ConfirmModalComponent, {
+          centered: true,
+          backdrop: 'static'
+        });
+    
+    
+        modalRef.componentInstance.title = 'Eliminar Tipo de Equipo';
+        modalRef.componentInstance.message = `¿Estás seguro de eliminar este tipo de equipo? Esta acción no se puede deshacer.`;
+        modalRef.componentInstance.btnOkText = 'Sí, Eliminar';
+        modalRef.componentInstance.isDelete = true;
+    
+        modalRef.result.then((result) => {
+          if (result) {
+            this.equipmentTypeService.delete(id).subscribe(() => {
+              this.getEquipmentTypes();
+            });
+          }
+        }).catch(() => {
+        });
+    
   }
 }
