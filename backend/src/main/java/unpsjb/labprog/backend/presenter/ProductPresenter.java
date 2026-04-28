@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
@@ -13,7 +14,7 @@ import unpsjb.labprog.backend.business.product.ProductService;
 import unpsjb.labprog.backend.model.Product;
 
 @RestController
-@RequestMapping("/products")    
+@RequestMapping("/products")
 public class ProductPresenter {
     @Autowired
     ProductService service;
@@ -23,16 +24,22 @@ public class ProductPresenter {
         return Response.ok(service.findAll());
     }
 
+    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    public ResponseEntity<Object> findByPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Response.ok(service.findByPage(page, size));
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/name/{name}")
     public ResponseEntity<Object> findByName(@PathVariable("name") String name) {
         return Response.ok(service.findByName(name));
-    }       
+    }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Object> findById(@PathVariable("id") int id) {
         return Response.ok(service.findById(id));
     }
-
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody Product aProduct) {
