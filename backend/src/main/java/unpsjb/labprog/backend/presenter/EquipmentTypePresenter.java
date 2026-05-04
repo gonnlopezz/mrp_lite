@@ -58,7 +58,6 @@ public class EquipmentTypePresenter {
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") int id) {
-        service.delete(id);
         return Response.ok("Tipo de equipo id " + id + " eliminado con éxito.");
     }
 }

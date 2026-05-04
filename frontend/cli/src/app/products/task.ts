@@ -1,8 +1,8 @@
 
 export interface Task {
     id: number;
-    code: string;
     name: string;
+    duration: number;
     type: {
         id?: number;
         name: string;

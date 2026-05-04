@@ -31,6 +31,11 @@ export class WorkshopsDetailComponent {
     private toastr: ToastrService
   ) {}
 
+ ngOnInit(): void {
+    this.getWorkshops();
+    this.getEquipmentTypes();
+  }
+
   getWorkshops(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if(id === 'new' || !id) {
@@ -78,8 +83,5 @@ export class WorkshopsDetailComponent {
     this.location.back();
   }
 
-  ngOnInit(): void {
-    this.getWorkshops();
-    this.getEquipmentTypes();
-  }
+ 
 }

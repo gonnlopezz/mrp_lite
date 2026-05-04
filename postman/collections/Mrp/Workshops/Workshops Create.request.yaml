@@ -12,6 +12,7 @@ body:
             "code": "A07-Amoladora",
             "capacity": 10,
             "type": {
+                "id": 1334,
                 "name": "amoladora"
             }
         }]

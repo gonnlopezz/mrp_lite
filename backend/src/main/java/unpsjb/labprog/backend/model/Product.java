@@ -19,13 +19,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } , orphanRemoval = true)
     private Collection<Task> tasks;
 
 }

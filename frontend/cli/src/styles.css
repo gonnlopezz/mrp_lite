@@ -211,15 +211,21 @@ table.custom-table tbody tr:hover {
   border: 2px dashed #e2e8f0 !important;
 }
 
-.error-feedback {
-  font-size: 0.75rem;
-  color: #ef4444;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.error-container {
+    min-height: 20px; /* Ajustalo para que coincida con la altura de tu texto */
+    margin-top: 4px;
+    display: block; /* Aseguramos que ocupe su lugar */
 }
 
+.error-feedback {
+    font-size: 0.75rem;
+    color: #ef4444;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* Ya no necesita el min-height aquí porque lo tiene el padre */
+}
 /* ==========================================================================
    6. ALERTAS, TOASTS Y MODALES
    ========================================================================== */

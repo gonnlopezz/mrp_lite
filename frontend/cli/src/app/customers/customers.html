@@ -93,8 +93,8 @@
                     <tr>
                         <td colspan="4" class="py-3 px-4">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted small">Total: <b>{{resultsPage.totalElements}}</b>
-                                    clientes</span>
+                                <span class="text-muted small">Total: <b>{{ resultsPage.totalElements}}</b>
+                                    {{ resultsPage.totalElements === 1 ? 'cliente' : 'clientes' }}</span>
                                 <app-pagination [totalPages]="resultsPage.totalPages" [currentPage]="currentPage"
                                     (pageChangeRequested)="onPageChangeRequested($event)" [number]="resultsPage.number">
                                 </app-pagination>

@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Workshop {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true, nullable = false)
@@ -28,6 +28,6 @@ public class Workshop {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } )
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
     private Collection<Equipment> equipments;
 }

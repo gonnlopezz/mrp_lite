@@ -8,11 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { EquipmentType } from './equipment-type';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { ToastrModule } from 'ngx-toastr';
 
 @Component({
   selector: 'app-equipment-types',
   standalone: true,
-  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule, NgbModule],
+  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule, NgbModule, ToastrModule],
   templateUrl: './equipment-types.html',
   styles: ``
 })
