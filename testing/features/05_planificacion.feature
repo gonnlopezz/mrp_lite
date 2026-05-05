@@ -1,3 +1,4 @@
+#language: es
 Característica: Proceso de planificación progresivo
   Escenario: Planificación de un producto sobre un taller seleccionado vacío
     Dado el producto con nombre "Soporte metálico mediano"
