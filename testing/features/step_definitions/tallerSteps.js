@@ -9,11 +9,11 @@ Given('que se ingresa el nuevo taller con {string} y {string}', function (code, 
 
 Given('que existe el taller {string}', async function (code) {
     this.code = code;
-    const response = await fetch(`http://backend:8080/workshops/code/${code}`);
+    const response = await fetch(`http://backend:8080/workshops/code/${this.code}`);
     const dataPackage = await response.json();
     const tallerEncontrado = dataPackage.data;
 
-    if (!tallerEncontrado) throw new Error(`No se encontró un taller con el código ${code}`);
+    if (!tallerEncontrado) throw new Error(`No se encontró un taller con el código ${this.code}`);
 
     this.tallerActualizado = {
         id: tallerEncontrado.id,

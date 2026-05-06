@@ -16,8 +16,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Equipment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String code;

@@ -2,51 +2,55 @@ const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
 Given('el producto con nombre {string}', async function (productName) {
-    const response = await fetch(`http://backend:8080/products/name/${productName}`);
-    const dataPackage = await response.json();
-    const productFound = dataPackage.data;
-
-    if (!productFound) throw new Error(`No se encontró un producto con el nombre ${productName}`);
-    
-});
-
-Given('que existe el taller {string}', async function (workshopCode) {
-    const response = await fetch(`http://backend:8080/workshops/code/${workshopCode}`);
-    const dataPackage = await response.json();
-    const workshopFound = dataPackage.data;
-
-    if (!workshopFound) throw new Error(`No se encontró un taller con el código ${workshopCode}`);
+    this.payloadPlanificacion = this.payloadPlanificacion || {};
+    this.payloadPlanificacion.productName = productName;
 });
 
 When('se solicita planificar el producto en el taller el día {string}', async function (date) {
-    const response = await fetch('http://backend:8080/planning', {
+    this.payloadPlanificacion.tallerCodigo = this.code || this.workshopCode;
+    this.payloadPlanificacion.fechaInicio = date;
+
+    const [dia, mes, año] = date.split('-');
+    const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
+
+    const response = await fetch('http://backend:8080/plannings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            startDate: date,     
-            productId: this.producto.id, 
-            workshopId: this.taller.id  
+            startDate: fechaISO,
+            productName: this.payloadPlanificacion.productName,
+            workshopCode: this.payloadPlanificacion.tallerCodigo
         })
     });
-    
-    this.lastResponse = response; 
-    this.dataPackage = await response.json();
+
+    const data = await response.json();
+    this.resultado = {
+        status: response.status,
+        respuesta: data.message
+    };
+    this.responseBody = data.data;
 });
 
+
 Then('se generaron las siguientes planificaciones', function (dataTable) {
-    const esperadas = dataTable.hashes(); 
-    
-    const reales = this.dataPackage.data.planificaciones; 
+    const planificacionesEsperadas = dataTable.hashes();
+    const planificacionesReal = this.responseBody.plannings;
 
-    assert.strictEqual(reales.length, esperadas.length, "La cantidad de bloques planificados no es la correcta");
+    assert.ok(planificacionesReal, "El backend no devolvió planificaciones");
+    assert.strictEqual(planificacionesReal.length, planificacionesEsperadas.length,
+        `La cantidad de tareas planificadas no es la correcta`);
 
-    esperadas.forEach((esperada, index) => {
-        const real = reales[index];
+    planificacionesEsperadas.forEach((esperada, index) => {
+        const real = planificacionesReal[index];
 
-        assert.strictEqual(real.tarea.nombre, esperada.tarea);
-        assert.strictEqual(real.equipo.codigo, esperada.equipo);
+        const inicio = real.period.start.replace('T', ' ').substring(0, 16);
+        const fin = real.period.endDate.replace('T', ' ').substring(0, 16);
+        const equipo = real.equipment.code;
+        const tarea = real.task.name;
 
-        assert.strictEqual(real.periodo.inicio, esperada.inicio);
-        assert.strictEqual(real.periodo.fin, esperada.fin);
+        assert.strictEqual(inicio, esperada.inicio, `Error en inicio (Fila ${index + 1})`);
+        assert.strictEqual(fin, esperada.fin, `Error en fin (Fila ${index + 1})`);
+        assert.strictEqual(equipo, esperada.equipo, `Error en equipo (Fila ${index + 1})`);
+        assert.strictEqual(tarea, esperada.tarea, `Error en tarea (Fila ${index + 1})`);
     });
 });

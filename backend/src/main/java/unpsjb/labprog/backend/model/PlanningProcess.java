@@ -20,14 +20,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PlanningProcess {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false)
     private LocalDateTime start;
 
     @Column(nullable = false)
-    private LocalDateTime end;
+    private LocalDateTime endDate;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
     private Collection<Planning> plannings;

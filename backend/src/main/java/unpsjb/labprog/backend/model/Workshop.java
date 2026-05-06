@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Workshop {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column(unique = true, nullable = false)

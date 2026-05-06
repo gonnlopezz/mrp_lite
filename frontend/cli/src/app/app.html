@@ -16,8 +16,8 @@
 
                 <li class="nav-item dropdown me-2" ngbDropdown #customersDrop="ngbDropdown"
                     (mouseenter)="customersDrop.open()" (mouseleave)="customersDrop.close()">
-                    <a class="nav-link dropdown-toggle fw-medium" id="customersDropdown"
-                        ngbDropdownToggle role="button">
+                    <a class="nav-link dropdown-toggle fw-medium" id="customersDropdown" ngbDropdownToggle
+                        role="button">
                         Clientes
                     </a>
                     <ul class="dropdown-menu dropdown-menu-modern border-0 shadow-lg" ngbDropdownMenu>
@@ -36,8 +36,8 @@
 
                 <li class="nav-item dropdown me-2" ngbDropdown #workshopsDrop="ngbDropdown"
                     (mouseenter)="workshopsDrop.open()" (mouseleave)="workshopsDrop.close()">
-                    <a class="nav-link dropdown-toggle fw-medium" id="workshopsDropdown"
-                        ngbDropdownToggle role="button">
+                    <a class="nav-link dropdown-toggle fw-medium" id="workshopsDropdown" ngbDropdownToggle
+                        role="button">
                         Talleres
                     </a>
                     <ul class="dropdown-menu dropdown-menu-modern border-0 shadow-lg" ngbDropdownMenu>
@@ -56,8 +56,7 @@
 
                 <li class="nav-item dropdown me-2" ngbDropdown #productsDrop="ngbDropdown"
                     (mouseenter)="productsDrop.open()" (mouseleave)="productsDrop.close()">
-                    <a class="nav-link dropdown-toggle fw-medium" id="productsDropdown"
-                        ngbDropdownToggle role="button">
+                    <a class="nav-link dropdown-toggle fw-medium" id="productsDropdown" ngbDropdownToggle role="button">
                         Productos
                     </a>
                     <ul class="dropdown-menu dropdown-menu-modern border-0 shadow-lg" ngbDropdownMenu>
@@ -69,6 +68,20 @@
                         <li>
                             <a class="dropdown-item d-flex align-items-center" routerLink="products/new">
                                 <i class="fas fa-plus me-2"></i> Nuevo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown me-2" ngbDropdown #planningsDrop="ngbDropdown"
+                    (mouseenter)="planningsDrop.open()" (mouseleave)="planningsDrop.close()">
+                    <a class="nav-link dropdown-toggle fw-medium" id="planningsDropdown" ngbDropdownToggle
+                        role="button">
+                        Planificaciones
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-modern border-0 shadow-lg" ngbDropdownMenu>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" routerLink="plannings">
+                                <i class="fas fa-list-ul me-2"></i> Ver todas
                             </a>
                         </li>
                     </ul>
