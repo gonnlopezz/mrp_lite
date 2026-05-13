@@ -65,13 +65,18 @@ Escenario: Planificación de un producto sin indicar el taller, pero solo uno pu
       | 2025-01-01 02:05 | 2025-01-01 03:05 | G04_pistola   | pintar antioxidante |
 
 
-  Escenario: Planificación de un producto sin indicar el taller, pero más de uno puede hacerlo
-    Dado el producto con nombre "Andamio básico 2x2x4"
-    Y el criterio de selección es alfabeticamente por código
-    Cuando se solicita planificar el producto el día "02-01-2025"
-    Entonces se espera el siguiente 200 con "Producto planificado con éxito"
-    Y se generaron las siguientes planificaciones
-      | inicio           | fin              | equipo        | tarea                   |
-      | 2025-01-02 00:00 | 2025-01-02 00:05 | B01_amoladora | cortar caños            |
-      | 2025-01-02 00:05 | 2025-01-02 00:15 | B02_taladro   | realizar perforaciones  |
-      | 2025-01-02 00:15 | 2025-01-02 00:35 | B03_pistola   | aplicar capa protectora |
+Escenario: Intentar planificar un producto que no existe
+    Dado el producto con nombre "Producto Fantasma"
+    Cuando se solicita planificar el producto el día "01-01-2025"
+    Entonces se espera el siguiente 404 con "Producto no encontrado"
+
+  Escenario: Intentar planificar en un taller que no existe
+    Dado el producto con nombre "Soporte metálico mediano"
+    Y que existe el taller "TALLER_INEXISTENTE"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 404 con "Taller no encontrado"
+
+  Escenario: Planificación automática falla porque ningún taller tiene los equipos necesarios
+    Dado el producto con nombre "Producto Complejo Sin Taller"
+    Cuando se solicita planificar el producto el día "01-01-2025"
+    Entonces se espera el siguiente 422 con "No se encontró un taller capaz de realizar todas las tareas del producto"

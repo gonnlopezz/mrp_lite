@@ -43,12 +43,16 @@ public class PlanningProcessService {
     }
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
+
         PlanningProcess process = new PlanningProcess();
         Workshop workshop;
         Product product = productRepository.findByName(productName).orElse(null);
         
         if(workshopCode != null) {
             workshop = workshopRepository.findByCode(workshopCode).orElse(null);
+            if(workshop == null) {
+                throw new RuntimeException("Taller no encontrado.");
+            }
         } else {
             List<EquipmentType> requiredTypes = new ArrayList<>();
             for(Task t : product.getTasks()) {

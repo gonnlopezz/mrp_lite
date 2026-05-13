@@ -6,6 +6,11 @@ Given('el producto con nombre {string}', async function (productName) {
     this.payloadPlanificacion.productName = productName;
 });
 
+
+Given('el criterio de selección es alfabeticamente por código', function () {
+
+});
+
 When('se solicita planificar el producto en el taller el día {string}', async function (date) {
     this.payloadPlanificacion.tallerCodigo = this.code || this.workshopCode;
     this.payloadPlanificacion.fechaInicio = date;

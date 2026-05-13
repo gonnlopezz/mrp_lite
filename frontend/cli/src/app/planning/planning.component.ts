@@ -47,45 +47,72 @@ export class PlanningComponent implements OnInit {
 generateTimelineChart(): void {
     if (!this.planningsProcess || this.planningsProcess.length === 0 || !this.chartDiv) return;
 
-    const processPalette = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6'];
+    const processPalette = [
+        '#3366cc', '#dc3912', '#ff9900', '#109618',
+        '#990099', '#0099c6', '#dd4477', '#66aa00'
+    ];
+
+    const dataTable = new google.visualization.DataTable();
+    dataTable.addColumn({ type: 'string', id: 'Equipo' });
+    dataTable.addColumn({ type: 'string', id: 'Proceso' });
+    dataTable.addColumn({ type: 'string', role: 'tooltip', p: { html: true } }); 
+    dataTable.addColumn({ type: 'date', id: 'Inicio' });
+    dataTable.addColumn({ type: 'date', id: 'Fin' });
+
     const rows: any[] = [];
 
-    // 1. Generamos las filas - cada planning obtiene el color de su PlanningProcess
     this.planningsProcess.forEach((process, pIndex) => {
-        const pColor = processPalette[pIndex % processPalette.length];
+        const processLabel = `Planificación: ${process.id.toString()}` || `Proceso ${pIndex + 1}`;
 
         process.plannings.forEach((planning) => {
             const start = new Date(planning.period.start);
-            const end = new Date(planning.period.endDate);
+            const end   = new Date(planning.period.endDate);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
 
-            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-                rows.push([
-                    planning.equipment?.code || 'S/E',
-                    planning.task?.name || 'Tarea',
-                    start,
-                    end,
-                    pColor // Color directo basado en el índice del PlanningProcess
-                ]);
-            }
+            const taskName    = planning.task?.name    || 'Tarea';
+            const equipCode   = planning.equipment?.code || 'S/E';
+
+            const tooltip = `
+                <div style="padding:12px; font-size:13px;">
+                    <b>${taskName}</b><br/>
+                    Equipo:${equipCode}<br/>
+                    <b>Duración</b>: ${planning.task.duration} min<br/>
+                </div>`;
+
+            rows.push([
+                equipCode,
+                {v: processLabel, f:taskName},
+                tooltip,
+                start,
+                end
+            ]);
         });
     });
 
-    // 2. DataTable con columna de estilo
-    const dataTable = new google.visualization.DataTable();
-    dataTable.addColumn({ type: 'string', id: 'Equipo' });
-    dataTable.addColumn({ type: 'string', id: 'Tarea' });
-    dataTable.addColumn({ type: 'date', id: 'Inicio' });
-    dataTable.addColumn({ type: 'date', id: 'Fin' });
-    dataTable.addColumn({ type: 'string', role: 'style' });
     dataTable.addRows(rows);
 
+    const seenLabels: string[] = [];
+    const colors: string[] = [];
+
+    this.planningsProcess.forEach((process, pIndex) => {
+        const label = `Planificación: ${process.id.toString()}` || `Proceso ${pIndex + 1}`;
+        if (!seenLabels.includes(label)) {
+            seenLabels.push(label);
+            colors.push(processPalette[pIndex % processPalette.length]);
+        }
+    });
+
     const options = {
-        height: 600,
+        height: Math.max(400, this.planningsProcess.reduce(
+            (acc, p) => acc + p.plannings.length, 0) * 45
+        ),
+        colors,
+        tooltip: { isHtml: true },
         timeline: {
             showRowLabels: true,
             groupByRowLabel: true,
-            colorByRowLabel: false
-        }
+            colorByRowLabel: false,
+        },
     };
 
     const chart = new google.visualization.Timeline(this.chartDiv.nativeElement);

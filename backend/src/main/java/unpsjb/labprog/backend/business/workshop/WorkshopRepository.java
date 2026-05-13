@@ -18,10 +18,12 @@ public interface WorkshopRepository extends CrudRepository<Workshop, Integer>, P
     Optional<Workshop> findByCode(String code);
 
     @Query("SELECT w FROM Workshop w " +
-       "JOIN w.equipments e " +
-       "WHERE e.type IN :types " +
-       "GROUP BY w.id " +
-       "HAVING COUNT(DISTINCT e.type) = :count")
+   "JOIN w.equipments e " +
+   "WHERE e.type IN :types " +
+   "GROUP BY w.id " +
+   "HAVING COUNT(DISTINCT e.type) = :count " +
+   "ORDER BY w.code ASC " +
+   "LIMIT 1")
     Optional<Workshop> findByEquipmentTypes(List<EquipmentType> types, int count);
 
 }
