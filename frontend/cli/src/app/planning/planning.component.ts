@@ -9,36 +9,7 @@ declare var google: any;
     selector: 'app-planning',
     standalone: true,
     imports: [CommonModule],
-    template: `
-    <div class="container-fluid p-4">
-      <div class="row mb-4">
-        <div class="col">
-          <h1>Planificaciones</h1>
-        </div>
-      </div>
-
-      <div class="row" *ngIf="loading">
-        <div class="col">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-      </div>
-
-     <div class="row" *ngIf="!loading && plannings && plannings.length > 0">
-        <div class="col-12">
-          <div #chartDiv [style.width]="'100%'" [style.height]="'800px'"></div>
-        </div>
-      </div>
-
-
-      <div class="row mt-4" *ngIf="!loading && plannings?.length === 0">
-        <div class="col">
-          <div class="alert alert-info">No hay datos de planificación disponibles.</div>
-        </div>
-      </div>
-    </div>
-  `,
+    templateUrl: './planning.html',
 })
 export class PlanningComponent implements OnInit {
     @ViewChild('chartDiv') chartDiv!: ElementRef;
