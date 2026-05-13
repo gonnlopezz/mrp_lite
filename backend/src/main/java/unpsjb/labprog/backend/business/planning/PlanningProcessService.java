@@ -16,6 +16,7 @@ import unpsjb.labprog.backend.business.product.ProductRepository;
 import unpsjb.labprog.backend.business.workshop.WorkshopRepository;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.model.Equipment;
+import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.Planning;
 import unpsjb.labprog.backend.model.PlanningProcess;
@@ -43,9 +44,21 @@ public class PlanningProcessService {
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         PlanningProcess process = new PlanningProcess();
-
+        Workshop workshop;
         Product product = productRepository.findByName(productName).orElse(null);
-        Workshop workshop = workshopRepository.findByCode(workshopCode).orElse(null);
+        
+        if(workshopCode != null) {
+            workshop = workshopRepository.findByCode(workshopCode).orElse(null);
+        } else {
+            List<EquipmentType> requiredTypes = new ArrayList<>();
+            for(Task t : product.getTasks()) {
+                if(t.getType() != null && !requiredTypes.contains(t.getType())) {
+                    requiredTypes.add(t.getType());
+                }
+            }
+            int distinctTypes = requiredTypes.size();
+            workshop = workshopRepository.findByEquipmentTypes(requiredTypes, distinctTypes).orElse(null);
+        }   
 
         Collection<Planning> plannings = new ArrayList<>();
         LocalDateTime currentTime = start;
@@ -55,9 +68,9 @@ public class PlanningProcessService {
 
         for (Task t : product.getTasks()) {
             Equipment eq = equipments.stream().filter(e -> e.getType().equals(t.getType())).findFirst().orElse(null);
-            
+            long taskDuration = t.getDuration() / (eq != null ? eq.getCapacity() : 1);
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
-            LocalDateTime end = availableTime.plusMinutes(t.getDuration());
+            LocalDateTime end = availableTime.plusMinutes(taskDuration);
             
             Planning p = new Planning();
             p.setTask(t);

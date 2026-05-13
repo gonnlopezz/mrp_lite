@@ -38,6 +38,9 @@ public class PlanningPresenter {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> createPlanning(@RequestBody PlanningRequestDTO request) {
+        if(request.getWorkshopCode() != null && request.getWorkshopCode().isBlank()) {
+            request.setWorkshopCode(null);
+        }
         return Response.ok(service.save(request), "Producto planificado con éxito");
     }
 

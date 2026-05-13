@@ -14,7 +14,7 @@ declare var google: any;
 export class PlanningComponent implements OnInit {
     @ViewChild('chartDiv') chartDiv!: ElementRef;
 
-    plannings: PlanningProcess[] = [];
+    planningsProcess: PlanningProcess[] = [];
     loading = true;
 
     constructor(private planningService: PlanningService) { }
@@ -30,9 +30,9 @@ export class PlanningComponent implements OnInit {
     loadPlanning(): void {
         this.planningService.getAll().subscribe(
             dataPackage => {
-                this.plannings = <PlanningProcess[]> dataPackage.data;
+                this.planningsProcess = <PlanningProcess[]>dataPackage.data;
 
-                if (this.plannings && this.plannings.length > 0) {
+                if (this.planningsProcess && this.planningsProcess.length > 0) {
                     setTimeout(() => this.generateTimelineChart(), 100);
                 }
                 this.loading = false;
@@ -44,59 +44,53 @@ export class PlanningComponent implements OnInit {
         );
     }
 
-    generateTimelineChart(): void {
-        if (!this.plannings || this.plannings.length === 0 || !this.chartDiv) return;
+generateTimelineChart(): void {
+    if (!this.planningsProcess || this.planningsProcess.length === 0 || !this.chartDiv) return;
 
-        const options = {
-            height: 800,
-            timeline: {
-                showRowLabels: true,
-                groupByRowLabel: true,
-                barLabelStyle: { fontSize: 10 }
-            },
-            hAxis: {
-                format: 'HH:mm',
-                gridlines: {
-                    color: '#e0e0e0',
-                    units: {
-                        minutes: { format: ['HH:mm'] },
-                        hours: { format: ['HH:mm'] }
-                    }
-                }
+    const processPalette = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6'];
+    const rows: any[] = [];
+
+    // 1. Generamos las filas - cada planning obtiene el color de su PlanningProcess
+    this.planningsProcess.forEach((process, pIndex) => {
+        const pColor = processPalette[pIndex % processPalette.length];
+
+        process.plannings.forEach((planning) => {
+            const start = new Date(planning.period.start);
+            const end = new Date(planning.period.endDate);
+
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                rows.push([
+                    planning.equipment?.code || 'S/E',
+                    planning.task?.name || 'Tarea',
+                    start,
+                    end,
+                    pColor // Color directo basado en el índice del PlanningProcess
+                ]);
             }
-        };
-
-        const dataTable = new google.visualization.DataTable();
-        dataTable.addColumn({ type: 'string', id: 'Equipo' });
-        dataTable.addColumn({ type: 'string', id: 'Tarea' });
-        dataTable.addColumn({ type: 'date', id: 'Inicio' });
-        dataTable.addColumn({ type: 'date', id: 'Fin' });
-
-        const rows: any[] = [];
-
-        this.plannings.forEach((process) => {
-            process.plannings.forEach((planning) => {
-                try {
-                    const equipmentCode = planning.equipment?.code || 'S/E';
-                    const taskName = planning.task?.name || 'Tarea';
-
-                    const start = new Date(planning.period.start);
-                    const end = new Date(planning.period.endDate);
-
-                    if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-                        rows.push([equipmentCode, taskName, start, end]);
-                    }
-                } catch (e) {
-                    console.error('Error procesando tarea:', e);
-                }
-            });
         });
+    });
 
-        if (rows.length > 0) {
-            dataTable.addRows(rows);
-            const chart = new google.visualization.Timeline(this.chartDiv.nativeElement);
-            chart.draw(dataTable, options);
+    // 2. DataTable con columna de estilo
+    const dataTable = new google.visualization.DataTable();
+    dataTable.addColumn({ type: 'string', id: 'Equipo' });
+    dataTable.addColumn({ type: 'string', id: 'Tarea' });
+    dataTable.addColumn({ type: 'date', id: 'Inicio' });
+    dataTable.addColumn({ type: 'date', id: 'Fin' });
+    dataTable.addColumn({ type: 'string', role: 'style' });
+    dataTable.addRows(rows);
+
+    const options = {
+        height: 600,
+        timeline: {
+            showRowLabels: true,
+            groupByRowLabel: true,
+            colorByRowLabel: false
         }
-    }
+    };
+
+    const chart = new google.visualization.Timeline(this.chartDiv.nativeElement);
+    chart.draw(dataTable, options);
+}
+
 
 }
