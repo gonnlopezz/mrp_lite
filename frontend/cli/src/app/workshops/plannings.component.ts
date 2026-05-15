@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PlanningService } from './planning.service';
-import { PlanningProcess } from './planning';
-
+import { PlanningProcess } from '../planning/planning';
+import { PlanningService } from '../planning/planning.service';
 declare var google: any;
 
 @Component({
