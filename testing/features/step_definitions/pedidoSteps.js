@@ -1,32 +1,24 @@
 const assert = require('assert');
-const { Given, When } = require('cucumber');
+const { Given, When, Then } = require('cucumber');
 
-Given('que se ingresa el cliente con {string} y {word}', function (companyName, cuit) {
-    this.companyName = companyName;
-    this.cuit = cuit;
-});
-
-Given('que se ingresa el cliente con {string}, {word} y {string}', function (companyName, cuit, observations) {
-    this.companyName = companyName;
-    this.cuit = cuit;
-    this.observations = observations;
-});
-
-Given('y el cliente con {word}', function (cuit) {
-    this.cuit = cuit;
-});
-
-When('presiono el botón de guardar cliente', async function () {
+When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto') , function (fechaPedido, fechaEntrega, cantidad) {
+    this.pedido = {
+        fechaPedido: fechaPedido,
+        fechaEntrega: fechaEntrega,
+        cantidad: cantidad
+    };
     try {
-        const response = await fetch('http://backend:8080/customers', {
+        const response = await fetch('http://backend:8080/orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                companyName: this.companyName,
                 cuit: this.cuit,
-                observations: this.observations
+                product: this.product,
+                fechaPedido: this.pedido.fechaPedido,
+                fechaEntrega: this.pedido.fechaEntrega,
+                cantidad: this.pedido.cantidad
             })
         });
         
@@ -52,4 +44,4 @@ When('presiono el botón de guardar cliente', async function () {
             respuesta: "Error de conexión: " + error.message
         };
     }
-});
+};

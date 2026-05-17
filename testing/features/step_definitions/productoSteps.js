@@ -7,6 +7,10 @@ Given('se ingresa un nuevo producto con nombre {string}', function (name) {
     this.name = name;
 });
 
+Given('el producto con nombre {string}', function (name) {
+    this.name = name;
+});
+
 
 
 Given('se fabrica haciendo la siguiente lista de tareas', async function (tabla) {

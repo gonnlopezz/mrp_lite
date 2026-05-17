@@ -42,7 +42,7 @@ public class CustomerPresenter {
             return Response.error("El id del cliente debe ser 0 o no estar presente.");
         }
         return Response.ok(service.save(aCustomer),
-                "Cliente " + aCustomer.getCompanyName() + " (" + aCustomer.getCuit() + ") registrado correctamente");
+                "Cliente " + aCustomer.getCompanyName() + " " + aCustomer.getCuit() + " registrado correctamente");
     }
 
     @RequestMapping(method = RequestMethod.PUT)
