@@ -1,5 +1,7 @@
 package unpsjb.labprog.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,5 +28,6 @@ public class Planning {
     private Task task;
 
     @ManyToOne
+    @JsonIgnoreProperties("plannings")
     private Equipment equipment;
 }

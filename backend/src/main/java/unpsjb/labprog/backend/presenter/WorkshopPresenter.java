@@ -2,6 +2,7 @@ package unpsjb.labprog.backend.presenter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,5 +56,10 @@ public class WorkshopPresenter {
     public ResponseEntity<Object> delete(@PathVariable("id") int id) {
         service.delete(id);
         return Response.ok("Taller id " + id + " eliminado con éxito.");
+    }
+
+    @RequestMapping(value = "/id/{id}/plannings", method = RequestMethod.GET)
+    public ResponseEntity<Object> getPlanningProcesses(@PathVariable Integer id) {
+        return Response.ok(service.getPlanningProcesses(id));
     }
 }

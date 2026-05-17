@@ -21,11 +21,15 @@ export class WorkshopService {
     return this.http.get<DataPackage>(`${this.workshopsUrl}/page?page=${page - 1}&size=${size}`);
   }
 
-  get(id: string): Observable<DataPackage> {    
+  get(id: string): Observable<DataPackage> {
     return this.http.get<DataPackage>(`${this.workshopsUrl}/id/${id}`);
   }
 
-  save(workshop: Workshop): Observable<DataPackage> { 
+  getPlannings(id: string): Observable<DataPackage> {
+    return this.http.get<DataPackage>(`${this.workshopsUrl}/id/${id}/plannings`);
+  }
+
+  save(workshop: Workshop): Observable<DataPackage> {
     return this.http.post<DataPackage>(this.workshopsUrl, workshop);
   }
 

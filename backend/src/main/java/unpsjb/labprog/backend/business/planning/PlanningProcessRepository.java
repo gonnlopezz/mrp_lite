@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.business.planning;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
@@ -12,10 +13,16 @@ import org.springframework.stereotype.Repository;
 import unpsjb.labprog.backend.model.PlanningProcess;
 
 @Repository
-public interface PlanningProcessRepository extends CrudRepository<PlanningProcess, Long>, PagingAndSortingRepository<PlanningProcess, Long> {
-    
+public interface PlanningProcessRepository
+        extends CrudRepository<PlanningProcess, Long>, PagingAndSortingRepository<PlanningProcess, Long> {
+
     @Query("SELECT MAX(p.period.endDate) FROM Planning p WHERE p.equipment.id = :equipmentId")
     Optional<LocalDateTime> findMaxEndTimeForEquipment(@Param("equipmentId") Long equipmentId);
 
-    
+    @Query("SELECT pp FROM PlanningProcess pp " +
+            "JOIN FETCH pp.plannings p " +
+            "JOIN FETCH p.equipment e " +
+            "WHERE e IN (SELECT eq FROM Workshop w JOIN w.equipments eq WHERE w.id = :workshopId)")
+    List<PlanningProcess> findAllByWorkshopId(@Param("workshopId") Integer workshopId);
+
 }

@@ -65,18 +65,24 @@ Escenario: Planificación de un producto sin indicar el taller, pero solo uno pu
       | 2025-01-01 02:05 | 2025-01-01 03:05 | G04_pistola   | pintar antioxidante |
 
 
-Escenario: Intentar planificar un producto que no existe
+  Escenario: Intentar planificar un producto que no existe
     Dado el producto con nombre "Producto Fantasma"
     Cuando se solicita planificar el producto el día "01-01-2025"
     Entonces se espera el siguiente 404 con "Producto no encontrado"
 
-  Escenario: Intentar planificar en un taller que no existe
+ Escenario: Intentar planificar en un taller que no existe
     Dado el producto con nombre "Soporte metálico mediano"
-    Y que existe el taller "TALLER_INEXISTENTE"
+    Y que no existe el taller "TALLER_INEXISTENTE"
     Cuando se solicita planificar el producto en el taller el día "01-01-2025"
-    Entonces se espera el siguiente 404 con "Taller no encontrado"
+    Entonces se espera el siguiente 404 con "Taller no encontrado."
 
   Escenario: Planificación automática falla porque ningún taller tiene los equipos necesarios
-    Dado el producto con nombre "Producto Complejo Sin Taller"
+    Dado el producto con nombre "Soporte en U para estantería"
     Cuando se solicita planificar el producto el día "01-01-2025"
-    Entonces se espera el siguiente 422 con "No se encontró un taller capaz de realizar todas las tareas del producto"
+    Entonces se espera el siguiente 409 con "No se encontró un taller con el equipamiento requerido para el producto"
+
+  Escenario: Intentar planificar en un taller que no tiene los equipos requeridos por el producto
+    Dado el producto con nombre "Canasto de basura chico 1,5mts"
+    Y que existe el taller "BETA"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 409 con "El taller no cuenta con los equipos necesarios para fabricar el producto"

@@ -8,13 +8,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import unpsjb.labprog.backend.business.planning.PlanningProcessService;
+import unpsjb.labprog.backend.model.Planning;
+import unpsjb.labprog.backend.model.PlanningProcess;
 import unpsjb.labprog.backend.model.Workshop;
 
 @Service
 public class WorkshopService {
     @Autowired
     WorkshopRepository repository;
+
+    @Autowired
+    PlanningProcessService planningProcessService;
 
     public List<Workshop> findAll() {
         List<Workshop> result = new ArrayList<>();
@@ -31,7 +38,12 @@ public class WorkshopService {
     }
 
     public Workshop findByCode(String code) {
-        return repository.findByCode(code).orElse(null);
+        return repository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Taller no encontrado"));
+    }
+
+    public List<PlanningProcess> getPlanningProcesses(Integer workshopId) {
+        findById(workshopId);
+        return planningProcessService.findByWorkshop(workshopId);
     }
 
     @Transactional

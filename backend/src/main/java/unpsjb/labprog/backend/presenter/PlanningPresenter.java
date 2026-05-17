@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.planning.PlanningProcessService;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
+import unpsjb.labprog.backend.exception.BusinessException;
 
 @RestController
 @RequestMapping("plannings")
@@ -38,12 +40,20 @@ public class PlanningPresenter {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> createPlanning(@RequestBody PlanningRequestDTO request) {
-        if(request.getWorkshopCode() != null && request.getWorkshopCode().isBlank()) {
+        if (request.getWorkshopCode() != null && request.getWorkshopCode().isBlank()) {
             request.setWorkshopCode(null);
         }
-        return Response.ok(service.save(request), "Producto planificado con éxito");
+        try {
+            return Response.ok(service.save(request), "Producto planificado con éxito");
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage()); // 409
+        } 
+         catch (EntityNotFoundException e) {
+            return Response.notFound(e.getMessage()); // 404
+        } catch (Exception e) {
+            return Response.error(e.getMessage()); // 400 para el resto
+        }
     }
-
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") long id) {

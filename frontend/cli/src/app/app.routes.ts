@@ -7,7 +7,7 @@ import { WorkshopsComponent } from './workshops/workshops.component';
 import { WorkshopsDetailComponent } from './workshops/workshops-detail.component';
 import { ProductsComponent } from './products/products.component';
 import { ProductsDetailComponent } from './products/products-detail.component';
-import { PlanningComponent } from './planning/planning.component';
+import { PlanningComponent } from './planning/plannings.component';
 
 export const routes: Routes = [
     {path: "", component: HomeComponent},
@@ -18,5 +18,5 @@ export const routes: Routes = [
     {path: "workshops/:id", component: WorkshopsDetailComponent},
     {path: "products", component: ProductsComponent},
     {path: "products/:id", component: ProductsDetailComponent},
-    {path: "plannings", component: PlanningComponent},
+    {path: "workshops/:id/plannings", component: PlanningComponent}
 ];

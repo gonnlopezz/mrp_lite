@@ -13,14 +13,16 @@ Given('que existe el taller {string}', async function (code) {
     const dataPackage = await response.json();
     const tallerEncontrado = dataPackage.data;
 
-    if (!tallerEncontrado) throw new Error(`No se encontró un taller con el código ${this.code}`);
-
     this.tallerActualizado = {
         id: tallerEncontrado.id,
         code: tallerEncontrado.code,
         name: tallerEncontrado.name,
         equipments: tallerEncontrado.equipments
     };
+});
+
+Given('que no existe el taller {string}', function (workshopCode) {
+    this.workshopCode = workshopCode; // solo guarda el código sin validar
 });
 
 Given('se agrega el equipo {string} del tipo {string} y {int}', async function (equipmentCode, equipmentType, capacity) {

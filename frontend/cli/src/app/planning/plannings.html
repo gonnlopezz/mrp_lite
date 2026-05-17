@@ -1,7 +1,7 @@
 <div class="container-fluid p-4">
     <div class="row mb-4">
-        <div class="col">
-            <h1>Planificaciones</h1>
+        <div class="col" *ngIf="workshop">
+            <h1>Taller: {{ workshop.code }}</h1>
         </div>
     </div>
 
@@ -13,14 +13,14 @@
         </div>
     </div>
 
-    <div class="row" *ngIf="!loading && planningsProcess && planningsProcess.length > 0">
+    <div class="row" *ngIf="!loading && planningProcesses && planningProcesses.length > 0">
         <div class="col-12">
             <div #chartDiv [style.width]="'100%'" [style.height]="'800px'"></div>
         </div>
     </div>
 
 
-    <div class="row mt-4" *ngIf="!loading && planningsProcess?.length === 0">
+    <div class="row mt-4" *ngIf="!loading && planningProcesses?.length === 0">
         <div class="col">
             <div class="alert alert-info">No hay datos de planificación disponibles.</div>
         </div>

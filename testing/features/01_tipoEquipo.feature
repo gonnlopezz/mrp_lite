@@ -11,3 +11,4 @@ Ejemplos:
       | "soldadora"          |    200 | "Tipo de equipo soldadora registrado correctamente"          |
       | "taladro"            |    200 | "Tipo de equipo taladro registrado correctamente"            |
       | "pistola de pintura" |    200 | "Tipo de equipo pistola de pintura registrado correctamente" |
+      | "sierra"             |    200 | "Tipo de equipo sierra registrado correctamente" |

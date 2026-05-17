@@ -41,3 +41,13 @@ Característica: gestión de productos
       | realizar perforaciones |     2 |    160 | taladro            |
     Cuando presiono el botón de guardar producto
     Entonces se espera el siguiente 200 con "Producto Pieza chica en U creado exitosamente"
+
+  Escenario: Crear un producto con sus tareas que no pueda fabricarse en ningun taller.
+    Dado se ingresa un nuevo producto con nombre "Soporte en U para estantería"
+    Y se fabrica haciendo la siguiente lista de tareas
+      | nombreTarea            | orden | tiempo | tipoEquipo         |
+      | unir ramas             |     1 |     30 | soldadora          |
+      | realizar perforaciones |     2 |    160 | taladro            |
+      | cortar maderas         |     3 |    50  | sierra             |
+    Cuando presiono el botón de guardar producto
+    Entonces se espera el siguiente 200 con "Producto Soporte en U para estantería creado exitosamente"
