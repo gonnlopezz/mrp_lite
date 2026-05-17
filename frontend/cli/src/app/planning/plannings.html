@@ -1,28 +1,57 @@
-<div class="container-fluid p-4">
-    <div class="row mb-4">
-        <div class="col" *ngIf="workshop">
-            <h1>Taller: {{ workshop.code }}</h1>
-        </div>
-    </div>
+<div class="container py-3">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
+            <li class="breadcrumb-item">
+                <a routerLink="/" class="text-decoration-none link-color text-slate transition-base">
+                    <i class="fas fa-home me-1"></i> Home
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a routerLink="/workshops" class="text-decoration-none link-color text-slate transition-base">
+                    Talleres
+                </a>
+            </li>
+            <li class="breadcrumb-item active fw-semibold text-steel" aria-current="page">
+                Planificación
+            </li>
+        </ol>
+    </nav>
 
-    <div class="row" *ngIf="loading">
-        <div class="col">
-            <div class="spinner-border" role="status">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div *ngIf="workshop">
+                <h5 class="mb-0 fw-bold text-steel tracking-tight">
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i> Planificación — {{ workshop.name }}
+                </h5>
+                <p class="text-muted small mb-0 d-none d-sm-block">
+                    <span class="font-monospace text-primary fw-bold">{{ workshop.code }}</span>
+                    &nbsp;·&nbsp; {{ planningProcesses?.length || 0 }} {{ planningProcesses?.length === 1 ? 'producto' : 'productos' }} en planificación
+                </p>
+            </div>
+            <a routerLink="/workshops" class="btn btn-outline-secondary btn-sm transition-base">
+                <i class="fas fa-arrow-left me-2"></i> Volver
+            </a>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="loading" class="d-flex justify-content-center align-items-center py-5">
+            <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Cargando...</span>
             </div>
+            <span class="ms-3 text-muted">Cargando planificación...</span>
         </div>
-    </div>
 
-    <div class="row" *ngIf="!loading && planningProcesses && planningProcesses.length > 0">
-        <div class="col-12">
-            <div #chartDiv [style.width]="'100%'" [style.height]="'800px'"></div>
+        <!-- Sin datos -->
+        <div *ngIf="!loading && planningProcesses?.length === 0" class="px-4 py-5 text-center">
+            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 2rem;"></i>
+            <p class="text-muted mb-0">No hay productos en planificación en este taller.</p>
         </div>
-    </div>
 
-
-    <div class="row mt-4" *ngIf="!loading && planningProcesses?.length === 0">
-        <div class="col">
-            <div class="alert alert-info">No hay datos de planificación disponibles.</div>
+        <!-- Chart -->
+        <div [hidden]="loading || !planningProcesses?.length" class="p-3">
+            <div #chartDiv style="width: 100%;"></div>
         </div>
+
     </div>
 </div>

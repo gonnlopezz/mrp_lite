@@ -10,7 +10,7 @@ declare var google: any;
 @Component({
     selector: 'app-planning',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './plannings.html',
 })
 

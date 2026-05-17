@@ -73,4 +73,6 @@ export class WorkshopsComponent {
     return this.openedWorkshops.has(id);
   }
 
+
+  
 }
