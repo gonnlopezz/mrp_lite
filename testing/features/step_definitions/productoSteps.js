@@ -4,11 +4,11 @@ const { Given, When, Then } = require('cucumber');
 
 
 Given('se ingresa un nuevo producto con nombre {string}', function (name) {
-    this.name = name;
+    this.productName = name;
 });
 
 Given('el producto con nombre {string}', function (name) {
-    this.name = name;
+    this.productName = name;
 });
 
 
@@ -38,14 +38,14 @@ Given('se fabrica haciendo la siguiente lista de tareas', async function (tabla)
 When('presiono el botón de guardar producto', async function () {
     try {
         // console.log("Enviando solicitud para crear producto:", JSON.stringify({
-        //     name: this.name,
+        //     name: this.productName,
         //     tasks: this.tasks
         // }, null, 2));
         const response = await fetch('http://backend:8080/products', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                name: this.name,
+                name: this.productName,
                 tasks: this.tasks
             })
         });

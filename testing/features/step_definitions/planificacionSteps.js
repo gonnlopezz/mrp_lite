@@ -1,10 +1,10 @@
 const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
-Given('el producto con nombre {string}', async function (productName) {
-    this.payloadPlanificacion = this.payloadPlanificacion || {};
-    this.payloadPlanificacion.productName = productName;
-});
+// Given('el producto con nombre {string}', async function (productName) {
+//     this.payloadPlanificacion = this.payloadPlanificacion || {};
+//     this.payloadPlanificacion.productName = productName;
+// });
 
 
 Given('el criterio de selección es alfabeticamente por código', function () {
@@ -12,9 +12,6 @@ Given('el criterio de selección es alfabeticamente por código', function () {
 });
 
 When('se solicita planificar el producto en el taller el día {string}', async function (date) {
-    this.payloadPlanificacion.tallerCodigo = this.code || this.workshopCode;
-    this.payloadPlanificacion.fechaInicio = date;
-
     const [dia, mes, año] = date.split('-');
     const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
 
@@ -23,8 +20,8 @@ When('se solicita planificar el producto en el taller el día {string}', async f
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             startDate: fechaISO,
-            productName: this.payloadPlanificacion.productName,
-            workshopCode: this.payloadPlanificacion.tallerCodigo
+            productName: this.productName,
+            workshopCode: this.workshopCode
         })
     });
 
@@ -37,8 +34,6 @@ When('se solicita planificar el producto en el taller el día {string}', async f
 });
 
 When('se solicita planificar el producto el día {string}', async function (date) {
-    this.payloadPlanificacion.fechaInicio = date;
-
     const [dia, mes, año] = date.split('-');
     const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
 
@@ -47,7 +42,7 @@ When('se solicita planificar el producto el día {string}', async function (date
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             startDate: fechaISO,
-            productName: this.payloadPlanificacion.productName,
+            productName: this.productName,
             workshopCode: ""
         })
     });

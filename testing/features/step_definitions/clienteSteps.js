@@ -12,7 +12,7 @@ Given('que se ingresa el cliente con {string}, {word} y {string}', function (com
     this.observations = observations;
 });
 
-Given('y el cliente con {word}', function (cuit) {
+Given('el cliente con {word}', function (cuit) {
     this.cuit = cuit;
 });
 

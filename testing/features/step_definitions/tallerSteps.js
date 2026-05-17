@@ -2,14 +2,14 @@ const assert = require('assert');
 const { Given, When } = require('cucumber');
 
 Given('que se ingresa el nuevo taller con {string} y {string}', function (code, name) {
-    this.code = code;
+    this.workshopCode = code;
     this.name = name;
     this.equipments = [];
 });
 
 Given('que existe el taller {string}', async function (code) {
-    this.code = code;
-    const response = await fetch(`http://backend:8080/workshops/code/${this.code}`);
+    this.workshopCode = code;
+    const response = await fetch(`http://backend:8080/workshops/code/${this.workshopCode}`);
     const dataPackage = await response.json();
     const tallerEncontrado = dataPackage.data;
 
@@ -52,7 +52,7 @@ When('presiono el botón de guardar taller', async function () {
 
 
             body: JSON.stringify({
-                code: this.code,
+                code: this.workshopCode,
                 name: this.name
             })
         });
