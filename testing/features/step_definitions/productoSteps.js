@@ -7,8 +7,11 @@ Given('se ingresa un nuevo producto con nombre {string}', function (name) {
     this.productName = name;
 });
 
-Given('el producto con nombre {string}', function (name) {
+Given('el producto con nombre {string}', async function (name) {
     this.productName = name;
+    const response = await fetch(`http://backend:8080/workshops/code/${this.productName}`);
+    const dataPackage = await response.json();
+    this.producto = dataPackage.data;
 });
 
 

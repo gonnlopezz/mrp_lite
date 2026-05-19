@@ -3,17 +3,17 @@ const { Given, When } = require('cucumber');
 
 Given('que se ingresa el cliente con {string} y {word}', function (companyName, cuit) {
     this.companyName = companyName;
-    this.cuit = cuit;
+    this.customerCuit = cuit;
 });
 
 Given('que se ingresa el cliente con {string}, {word} y {string}', function (companyName, cuit, observations) {
     this.companyName = companyName;
-    this.cuit = cuit;
+    this.customerCuit = cuit;
     this.observations = observations;
 });
 
 Given('el cliente con {word}', function (cuit) {
-    this.cuit = cuit;
+    this.customerCuit = cuit;
 });
 
 When('presiono el botón de guardar cliente', async function () {
@@ -25,7 +25,7 @@ When('presiono el botón de guardar cliente', async function () {
             },
             body: JSON.stringify({
                 companyName: this.companyName,
-                cuit: this.cuit,
+                cuit: this.customerCuit,
                 observations: this.observations
             })
         });

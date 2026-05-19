@@ -11,18 +11,11 @@ Given('que existe el taller {string}', async function (code) {
     this.workshopCode = code;
     const response = await fetch(`http://backend:8080/workshops/code/${this.workshopCode}`);
     const dataPackage = await response.json();
-    const tallerEncontrado = dataPackage.data;
-
-    this.tallerActualizado = {
-        id: tallerEncontrado.id,
-        code: tallerEncontrado.code,
-        name: tallerEncontrado.name,
-        equipments: tallerEncontrado.equipments
-    };
+    this.taller = dataPackage.data;
 });
 
 Given('que no existe el taller {string}', function (workshopCode) {
-    this.workshopCode = workshopCode; // solo guarda el código sin validar
+    this.workshopCode = workshopCode;
 });
 
 Given('se agrega el equipo {string} del tipo {string} y {int}', async function (equipmentCode, equipmentType, capacity) {
@@ -40,7 +33,7 @@ Given('se agrega el equipo {string} del tipo {string} y {int}', async function (
          }
     };
 
-    this.tallerActualizado.equipments.push(equip);
+    this.taller.equipments.push(equip);
 });
 
 When('presiono el botón de guardar taller', async function () {
@@ -93,7 +86,7 @@ When('presiono el botón de actualizar taller', async function () {
         const putResponse = await fetch('http://backend:8080/workshops', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.tallerActualizado)
+            body: JSON.stringify(this.taller)
         });
 
         const textoCrudo = await putResponse.text();

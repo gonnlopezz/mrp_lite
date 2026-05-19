@@ -106,7 +106,7 @@ export class PlanningComponent implements OnInit {
 
         const options = {
             height: Math.max(400, totalPlannings * 45),
-            width: '100%',                    // ← ancho completo
+            width: '100%',               
             colors,
             tooltip: { isHtml: true },
             timeline: {

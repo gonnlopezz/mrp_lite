@@ -15,7 +15,6 @@ public class Period {
     private LocalDateTime endDate;
     private int duration;
     
-    // Constructor sin argumentos requerido por Hibernate para embeddables
     public Period() {
     }
     

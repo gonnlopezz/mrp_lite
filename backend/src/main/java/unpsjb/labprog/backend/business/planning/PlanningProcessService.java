@@ -79,7 +79,10 @@ public class PlanningProcessService {
         process.setStart(currentTime);
 
         for (Task t : product.getTasks()) {
-            Equipment eq = equipments.stream().filter(e -> e.getType().equals(t.getType())).findFirst().orElse(null);
+            Equipment eq = equipments.stream()
+            .filter(e -> e.getType().equals(t.getType()))
+            .findFirst().orElse(null);
+            
             long taskDuration = t.getDuration() / (eq != null ? eq.getCapacity() : 1);
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
             LocalDateTime end = availableTime.plusMinutes(taskDuration);

@@ -1,11 +1,6 @@
 const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
-// Given('el producto con nombre {string}', async function (productName) {
-//     this.payloadPlanificacion = this.payloadPlanificacion || {};
-//     this.payloadPlanificacion.productName = productName;
-// });
-
 
 Given('el criterio de selección es alfabeticamente por código', function () {
 
