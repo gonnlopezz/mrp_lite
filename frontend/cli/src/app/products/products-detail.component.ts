@@ -8,10 +8,13 @@ import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { EquipmentType } from '../equipments/equipment-type';
 import { EquipmentTypeService } from '../equipments/equipment-type.service';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-products-detail',
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [RouterLink, FormsModule, CommonModule, NgbTypeaheadModule],
   templateUrl: './products-detail.html',
   styles: ``
 })
@@ -20,6 +23,7 @@ export class ProductsDetailComponent {
   showTaskForm: boolean = false;
   equipmentTypes!: EquipmentType[];
   newTask!: Task;
+  selectedEquipmentType: EquipmentType | null = null;
 
   constructor(
     private productService: productService,
@@ -48,8 +52,39 @@ export class ProductsDetailComponent {
     });
   }
 
+  searchEquipmentTypes = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(term =>
+        term.length < 1
+          ? of([])
+          : of(this.equipmentTypes.filter(et =>
+            et.name.toLowerCase().includes(term.toLowerCase())
+          )).pipe(
+            map(results => results.slice(0, 10))
+          )
+      ),
+      catchError(() => of([]))
+    );
+
+  equipmentTypeInputFormatter = (type: EquipmentType): string => {
+    return type?.name ? type.name : '';
+  };
+
+  equipmentTypeResultFormatter = (type: EquipmentType): string => {
+    return type.name;
+  };
+
+  onEquipmentTypeSelected(type: EquipmentType): void {
+    this.selectedEquipmentType = type;
+    this.newTask.type = type;
+    this.cdr.markForCheck();
+  }
+
   openTaskForm(): void {
     this.newTask = {name: "", duration: 0, type: { name: ""}} as Task;
+    this.selectedEquipmentType = null;
     this.showTaskForm = true;
   }
 
