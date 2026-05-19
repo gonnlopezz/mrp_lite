@@ -72,6 +72,25 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="nav-item dropdown me-2" ngbDropdown #ordersDrop="ngbDropdown"
+                    (mouseenter)="ordersDrop.open()" (mouseleave)="ordersDrop.close()">
+                    <a class="nav-link dropdown-toggle fw-medium" id="ordersDropdown" ngbDropdownToggle role="button">
+                        Pedidos
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-modern border-0 shadow-lg" ngbDropdownMenu>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" routerLink="orders">
+                                <i class="fas fa-list-ul me-2"></i> Listar
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" routerLink="orders/new">
+                                <i class="fas fa-plus me-2"></i> Nuevo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>
