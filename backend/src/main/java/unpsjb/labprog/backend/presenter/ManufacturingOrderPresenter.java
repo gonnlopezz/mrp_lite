@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
-import unpsjb.labprog.backend.business.customer.CustomerService;
-import unpsjb.labprog.backend.model.Customer;
+import unpsjb.labprog.backend.business.order.OrderService;
+import unpsjb.labprog.backend.model.ManufacturingOrder;
 
 @RestController
-@RequestMapping("customers")
-public class CustomerPresenter {
+@RequestMapping("orders")
+public class ManufacturingOrderPresenter {
     @Autowired
-    CustomerService service;
+    OrderService service;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Object> findAll() {
@@ -36,30 +36,23 @@ public class CustomerPresenter {
         return Response.ok(service.findById(id));
     }
 
-    @RequestMapping(value = "/cuit/{cuit}", method = RequestMethod.GET)
-    public ResponseEntity<Object> findByCuit(@PathVariable("cuit") String cuit) {
-        return Response.ok(service.findByCuit(cuit));
-    }
-
-
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Object> create(@RequestBody Customer aCustomer) {
-        if (aCustomer.getId() != 0) {
-            return Response.error("El id del cliente debe ser 0 o no estar presente.");
+    public ResponseEntity<Object> create(@RequestBody ManufacturingOrder aOrder) {
+        if (aOrder.getId() != 0) {
+            return Response.error("El id del pedido debe ser 0 o no estar presente.");
         }
-        return Response.ok(service.save(aCustomer),
-                "Cliente " + aCustomer.getCompanyName() + " " + aCustomer.getCuit() + " registrado correctamente");
+        return Response.ok(service.save(aOrder),
+                "Pedido de fabricación generado correctamente");
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<Object> update(@RequestBody Customer aCustomer) {
-        return Response.ok(service.save(aCustomer));
+    public ResponseEntity<Object> update(@RequestBody ManufacturingOrder aOrder) {
+        return Response.ok(service.save(aOrder));
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") int id) {
         service.delete(id);
-        return Response.ok("Cliente id " + id + " eliminado con éxito.");
+        return Response.ok("Pedido id " + id + " eliminado con éxito.");
     }
-
 }

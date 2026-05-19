@@ -1,4 +1,4 @@
-package unpsjb.labprog.backend.business.customer;
+package unpsjb.labprog.backend.business.order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,39 +9,35 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.model.Customer;
+import unpsjb.labprog.backend.model.ManufacturingOrder;
 
 @Service
-public class CustomerService {
+public class OrderService {
     @Autowired
-    CustomerRepository repository;
+    OrderRepository repository;
 
-    public List<Customer> findAll() {
-        List<Customer> result = new ArrayList<>();
+    public List<ManufacturingOrder> findAll() {
+        List<ManufacturingOrder> result = new ArrayList<>();
         repository.findAll().forEach(e -> result.add(e));
         return result;
     }
 
-    public Page<Customer> findByPage(int page, int size) {
+    public Page<ManufacturingOrder> findByPage(int page, int size) {
         return repository.findAll(PageRequest.of(page, size));
     }
 
-    public Customer findById(int id) {
+    public ManufacturingOrder findById(long id) {
         return repository.findById(id).orElse(null);
     }
 
-    public Customer findByCuit(String cuit) {
-        return repository.findByCuit(cuit);
-    }
-
-
     @Transactional
-    public Customer save(Customer e) {
-        return repository.save(e);
+    public ManufacturingOrder save(ManufacturingOrder order) {
+        return repository.save(order);
     }
 
     @Transactional
-    public void delete(int id) {
+    public void delete(long id) {
         repository.deleteById(id);
     }
+
 }

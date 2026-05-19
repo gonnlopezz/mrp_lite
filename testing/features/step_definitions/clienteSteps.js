@@ -12,8 +12,11 @@ Given('que se ingresa el cliente con {string}, {word} y {string}', function (com
     this.observations = observations;
 });
 
-Given('el cliente con {word}', function (cuit) {
+Given('el cliente con {word}', async function (cuit) {
     this.customerCuit = cuit;
+    const response = await fetch(`http://backend:8080/customers/cuit/${this.customerCuit}`);
+    const dataPackage = await response.json();
+    this.customer = dataPackage.data;
 });
 
 When('presiono el botón de guardar cliente', async function () {

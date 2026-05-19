@@ -2,24 +2,23 @@ const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
 When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto' , async function (fechaPedido, fechaEntrega, cantidad) {
+
     this.pedido = {
-        fechaPedido: fechaPedido,
-        fechaEntrega: fechaEntrega,
-        cantidad: cantidad
+        orderDate: fechaPedido,
+        deliveryDate: fechaEntrega,
+        quantity: cantidad,
+        customer: this.customer,
+        product: this.product
     };
+
+ 
     try {
         const response = await fetch('http://backend:8080/orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                cuit: this.cuit,
-                product: this.product,
-                fechaPedido: this.pedido.fechaPedido,
-                fechaEntrega: this.pedido.fechaEntrega,
-                cantidad: this.pedido.cantidad
-            })
+            body: JSON.stringify(this.pedido)
         });
         
 
