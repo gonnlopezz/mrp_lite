@@ -31,6 +31,10 @@ public class ProductService {
         return repository.findAll(PageRequest.of(page, size));
     }
 
+    public Page<Product> search(String term, int page, int size) {
+        return repository.search(term, PageRequest.of(page, size));
+    }
+
     public Page<Product> findAll(int page, int size) {
         return repository.findAll(PageRequest.of(page, size));
     }      

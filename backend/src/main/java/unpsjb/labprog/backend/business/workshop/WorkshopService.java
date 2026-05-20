@@ -32,6 +32,10 @@ public class WorkshopService {
         return repository.findAll(PageRequest.of(page, size));
     }
 
+    public Page<Workshop> search(String term, int page, int size) {
+        return repository.search(term, PageRequest.of(page, size));
+    }
+
     public Workshop findById(int id) {
         return repository.findById(id).orElse(null);
     }

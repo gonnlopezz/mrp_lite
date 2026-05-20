@@ -6,10 +6,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { productService } from './product.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Product } from './product';
 
 @Component({
   selector: 'app-products',
-  imports: [PaginationComponent, RouterModule, CommonModule],
+  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule],
   templateUrl: './products.html',
   styles: ``
 })
@@ -17,6 +19,7 @@ export class ProductsComponent {
   resultsPage: ResultsPage = <ResultsPage>{};
   currentPage: number = 1;
   openedProducts: Set<number> = new Set();
+  searchTerm: string = '';
 
   constructor(
     private productService: productService,
@@ -25,6 +28,20 @@ export class ProductsComponent {
 
   getProducts(): void {
     this.productService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+      this.resultsPage = <ResultsPage>dataPackage.data;
+      this.cdr.markForCheck();
+    });
+  }
+
+  onSearch(): void {
+    if (!this.searchTerm.trim()) {
+      this.currentPage = 1;
+      this.getProducts();
+      return;
+    }
+
+    this.currentPage = 1;
+    this.productService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });

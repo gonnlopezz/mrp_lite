@@ -57,10 +57,17 @@ export class ManufacturingOrdersComponent {
   }
 
   onSearch(): void {
-    // Implementar búsqueda cuando sea necesario
-    // Por ahora, recarga la página 1
+    if (!this.searchTerm.trim()) {
+      this.currentPage = 1;
+      this.getOrders();
+      return;
+    }
+
     this.currentPage = 1;
-    this.getOrders();
+    this.orderService.search(this.searchTerm, this.currentPage, 10).subscribe(dataPackage => {
+      this.resultsPage = <ResultsPage>dataPackage.data;
+      this.cdr.markForCheck();
+    });
   }
 
   toggleDetails(id: number): void {
@@ -77,7 +84,7 @@ export class ManufacturingOrdersComponent {
 
 
   getOrders(): void {
-    this.orderService.byPage(this.currentPage, 8).subscribe(dataPackage => {
+    this.orderService.byPage(this.currentPage, 10).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });

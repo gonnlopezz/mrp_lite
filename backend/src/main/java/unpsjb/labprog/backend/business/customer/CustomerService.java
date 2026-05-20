@@ -26,6 +26,10 @@ public class CustomerService {
         return repository.findAll(PageRequest.of(page, size));
     }
 
+    public Page<Customer> search(String term, int page, int size) {
+        return repository.search(term, PageRequest.of(page, size));
+    }
+
     public Customer findById(int id) {
         return repository.findById(id).orElse(null);
     }
@@ -33,7 +37,7 @@ public class CustomerService {
     public Customer findByCuit(String cuit) {
         return repository.findByCuit(cuit);
     }
-
+    
 
     @Transactional
     public Customer save(Customer e) {

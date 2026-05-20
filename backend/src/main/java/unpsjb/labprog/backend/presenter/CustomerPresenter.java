@@ -31,6 +31,14 @@ public class CustomerPresenter {
         return Response.ok(service.findByPage(page, size));
     }
 
+    @RequestMapping(value = "/search/{term}", method = RequestMethod.GET)
+    public ResponseEntity<Object> search(
+            @PathVariable("term") String term,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Response.ok(service.search(term, page, size));
+    }
+
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Object> findById(@PathVariable("id") int id) {
         return Response.ok(service.findById(id));
@@ -40,7 +48,6 @@ public class CustomerPresenter {
     public ResponseEntity<Object> findByCuit(@PathVariable("cuit") String cuit) {
         return Response.ok(service.findByCuit(cuit));
     }
-
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody Customer aCustomer) {

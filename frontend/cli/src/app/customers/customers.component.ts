@@ -4,18 +4,21 @@ import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { Customer } from './customer';
 
 @Component({
   selector: 'app-customers',
-  imports: [PaginationComponent, RouterModule, CommonModule],
+  imports: [PaginationComponent, RouterModule, CommonModule, FormsModule],
   templateUrl: './customers.html',
   styles: ``
 })
 export class CustomersComponent {
   resultsPage: ResultsPage = <ResultsPage>{};
   currentPage: number = 1;
+  searchTerm: string = '';
 
   constructor(
     private customerService: CustomerService,
@@ -25,6 +28,20 @@ export class CustomersComponent {
 
   getCustomers(): void {
     this.customerService.byPage(this.currentPage, 10).subscribe(dataPackage => {
+      this.resultsPage = <ResultsPage>dataPackage.data;
+      this.cdr.markForCheck();
+    });
+  }
+
+  onSearch(): void {
+    if (!this.searchTerm.trim()) {
+      this.currentPage = 1;
+      this.getCustomers();
+      return;
+    }
+
+    this.currentPage = 1;
+    this.customerService.search(this.searchTerm, this.currentPage, 10).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });

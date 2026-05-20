@@ -35,4 +35,8 @@ export class CustomerService {
     return this.http.delete<DataPackage>(`${this.customersUrl}/id/${id}`);
   }
 
+  search(searchTerm: string, page: number = 1, size: number = 10): Observable<DataPackage> {
+    return this.http.get<DataPackage>(`${this.customersUrl}/search/${searchTerm}?page=${page - 1}&size=${size}`);
+  }
+
 }

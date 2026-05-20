@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { Workshop } from './workshop';
 import { WorkshopService } from './workshop.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 import { ResultsPage } from '../results-page';
@@ -10,7 +11,7 @@ import { PaginationComponent } from '../pagination/pagination.component';
 
 @Component({
   selector: 'app-workshops',
-  imports: [RouterModule, CommonModule, PaginationComponent],
+  imports: [RouterModule, CommonModule, FormsModule, PaginationComponent],
   templateUrl: './workshops.html',
   styles: ``
 })
@@ -18,6 +19,7 @@ export class WorkshopsComponent {
   resultsPage: ResultsPage = <ResultsPage>{};
   currentPage: number = 1;
   openedWorkshops: Set<number> = new Set();
+  searchTerm: string = '';
 
   constructor(
     private workshopService: WorkshopService,
@@ -26,6 +28,20 @@ export class WorkshopsComponent {
 
   getWorkshops(): void {
     this.workshopService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+      this.resultsPage = <ResultsPage>dataPackage.data;
+      this.cdr.markForCheck();
+    });
+  }
+
+  onSearch(): void {
+    if (!this.searchTerm.trim()) {
+      this.currentPage = 1;
+      this.getWorkshops();
+      return;
+    }
+
+    this.currentPage = 1;
+    this.workshopService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });

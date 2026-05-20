@@ -33,10 +33,10 @@ public class PlanningProcessService {
     PlanningProcessRepository repository;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductRepository productService;
 
     @Autowired
-    WorkshopRepository workshopRepository;
+    WorkshopRepository workshopService;
 
     @Transactional
     public PlanningProcess save(PlanningRequestDTO request) {
@@ -49,7 +49,7 @@ public class PlanningProcessService {
 
         PlanningProcess process = new PlanningProcess();
         Workshop workshop;
-        Product product = productRepository.findByName(productName)
+        Product product = productService.findByName(productName)
                 .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
 
         List<EquipmentType> requiredTypes = product.getTasks().stream()
@@ -59,7 +59,7 @@ public class PlanningProcessService {
                 .collect(Collectors.toList());
 
         if (workshopCode != null) {
-            workshop = workshopRepository.findByCode(workshopCode)
+            workshop = workshopService.findByCode(workshopCode)
                     .orElseThrow(() -> new EntityNotFoundException("Taller no encontrado."));
 
             boolean canHandle = requiredTypes.stream()
@@ -68,7 +68,7 @@ public class PlanningProcessService {
 
             if (!canHandle) throw new BusinessException("El taller no cuenta con los equipos necesarios para fabricar el producto");
         } else {
-            workshop = workshopRepository.findByEquipmentTypes(requiredTypes, requiredTypes.size())
+            workshop = workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size())
                     .orElseThrow(() -> new BusinessException( "No se encontró un taller con el equipamiento requerido para el producto"));
         }
 

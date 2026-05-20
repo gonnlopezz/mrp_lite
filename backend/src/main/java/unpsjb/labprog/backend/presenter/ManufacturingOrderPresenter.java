@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
-import unpsjb.labprog.backend.business.order.OrderService;
+import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
 
 @RestController
 @RequestMapping("orders")
 public class ManufacturingOrderPresenter {
     @Autowired
-    OrderService service;
+    ManufacturingOrderService service;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Object> findAll() {
@@ -29,6 +29,14 @@ public class ManufacturingOrderPresenter {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return Response.ok(service.findByPage(page, size));
+    }
+
+    @RequestMapping(value = "/search/{term}", method = RequestMethod.GET)
+    public ResponseEntity<Object> search(
+            @PathVariable String term,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Response.ok(service.search(term, page, size));
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)

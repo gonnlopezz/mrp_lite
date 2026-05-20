@@ -36,4 +36,8 @@ export class WorkshopService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.workshopsUrl}/id/${id}`);
   }
+
+  search(searchTerm: string, page: number = 1, size: number = 6): Observable<DataPackage> {
+    return this.http.get<DataPackage>(`${this.workshopsUrl}/search/${searchTerm}?page=${page - 1}&size=${size}`);
+  }
 }

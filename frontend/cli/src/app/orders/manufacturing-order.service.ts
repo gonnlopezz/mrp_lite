@@ -20,6 +20,10 @@ export class OrderService {
     byPage(page: number, size: number): Observable<DataPackage> {
       return this.http.get<DataPackage>(`${this.ordersUrl}/page?page=${page - 1}&size=${size}`);
     }
+
+    search(searchTerm: string, page: number, size: number): Observable<DataPackage> {
+      return this.http.get<DataPackage>(`${this.ordersUrl}/search/${searchTerm}?page=${page - 1}&size=${size}`);
+    }
   
     get(id: string): Observable<DataPackage> {
       return this.http.get<DataPackage>(`${this.ordersUrl}/id/${id}`);

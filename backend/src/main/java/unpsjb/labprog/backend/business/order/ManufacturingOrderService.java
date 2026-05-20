@@ -12,9 +12,9 @@ import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
 
 @Service
-public class OrderService {
+public class ManufacturingOrderService {
     @Autowired
-    OrderRepository repository;
+    ManufacturingOrderRepository repository;
 
     public List<ManufacturingOrder> findAll() {
         List<ManufacturingOrder> result = new ArrayList<>();
@@ -24,6 +24,10 @@ public class OrderService {
 
     public Page<ManufacturingOrder> findByPage(int page, int size) {
         return repository.findAll(PageRequest.of(page, size));
+    }
+
+    public Page<ManufacturingOrder> search(String term, int page, int size) {
+        return repository.search(term, PageRequest.of(page, size));
     }
 
     public ManufacturingOrder findById(long id) {

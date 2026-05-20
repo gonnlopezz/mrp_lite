@@ -31,10 +31,19 @@ public class ProductPresenter {
         return Response.ok(service.findByPage(page, size));
     }
 
+    @RequestMapping(value = "/search/{term}", method = RequestMethod.GET)
+    public ResponseEntity<Object> search(
+            @PathVariable String term,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Response.ok(service.search(term, page, size));
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/name/{name}")
     public ResponseEntity<Object> findByName(@PathVariable("name") String name) {
         return Response.ok(service.findByName(name));
     }
+
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Object> findById(@PathVariable("id") int id) {
