@@ -1,6 +1,15 @@
 const assert = require('assert');
 const { Given, When, Then } = require('cucumber');
 
+Given('que existe el pedido para el cliente {string} con fecha de entrega {string}', async function (aCustomerCuit, aFechaEntrega) {
+    const [dia, mes, año] = aFechaEntrega.split('-');
+    const fechaISO = `${año}-${mes}-${dia}`;
+    
+    const response = await fetch(`http://backend:8080/orders/cuit/${aCustomerCuit}/deliveryDate/${fechaISO}`);
+    const dataPackage = await response.json(); 
+    console.log(dataPackage.data);
+    this.pedido = dataPackage.data;
+});
 
 When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto' , async function (fechaPedido, fechaEntrega, cantidad) {
 

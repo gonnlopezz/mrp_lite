@@ -3,7 +3,7 @@ const { Given, When, Then } = require('cucumber');
 
 
 Given('el criterio de selección es alfabeticamente por código', function () {
-
+    return true;
 });
 
 When('se solicita planificar el producto en el taller el día {string}', async function (date) {
@@ -28,6 +28,7 @@ When('se solicita planificar el producto en el taller el día {string}', async f
     this.responseBody = data.data;
 });
 
+
 When('se solicita planificar el producto el día {string}', async function (date) {
     const [dia, mes, año] = date.split('-');
     const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
@@ -51,6 +52,29 @@ When('se solicita planificar el producto el día {string}', async function (date
     this.responseBody = data.data;
 });
 
+
+When('se solicita planificar el pedido el día {string}', async function (date) {
+    const [dia, mes, año] = date.split('-');
+    const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
+
+    const response = await fetch('http://backend:8080/plannings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            startDate: fechaISO,
+            productName: this.pedido.product.name,
+            workshopCode: ""
+        })
+    });
+
+
+    const data = await response.json();
+    this.resultado = {
+        status: response.status,
+        respuesta: data.message
+    };
+    this.responseBody = data.data;
+});
 
 
 Then('se generaron las siguientes planificaciones', function (dataTable) {

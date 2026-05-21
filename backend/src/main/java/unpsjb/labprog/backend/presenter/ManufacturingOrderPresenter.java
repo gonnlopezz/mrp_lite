@@ -1,6 +1,9 @@
 package unpsjb.labprog.backend.presenter;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +45,13 @@ public class ManufacturingOrderPresenter {
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Object> findById(@PathVariable("id") int id) {
         return Response.ok(service.findById(id));
+    }
+
+    @RequestMapping(value = "/cuit/{cuit}/deliveryDate/{deliveryDate}", method = RequestMethod.GET)
+    public ResponseEntity<Object> findByCustomerAndDeliveryDate(
+            @PathVariable long cuit,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deliveryDate) {
+        return Response.ok(service.findByCustomerCuitAndDeliveryDate(cuit, deliveryDate));
     }
 
     @RequestMapping(method = RequestMethod.POST)

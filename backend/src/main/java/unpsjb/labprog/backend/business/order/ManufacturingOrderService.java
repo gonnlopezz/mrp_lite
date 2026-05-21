@@ -1,5 +1,6 @@
 package unpsjb.labprog.backend.business.order;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,10 @@ public class ManufacturingOrderService {
 
     public ManufacturingOrder findById(long id) {
         return repository.findById(id).orElse(null);
+    }
+
+    public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate) {
+        return repository.findByCustomerCuitAndDeliveryDate(cuit, deliveryDate);
     }
 
     @Transactional

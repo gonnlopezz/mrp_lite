@@ -1,5 +1,7 @@
 package unpsjb.labprog.backend.business.order;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +16,9 @@ public interface ManufacturingOrderRepository extends CrudRepository<Manufacturi
     @Query("SELECT o FROM ManufacturingOrder o " +
             "Where o.customer.companyName ILIKE CONCAT('%', :term, '%') " +
             "OR o.product.name ILIKE CONCAT('%', :term, '%')")
-    Page<ManufacturingOrder> search(String term, Pageable pageable);
+    public Page<ManufacturingOrder> search(String term, Pageable pageable);
+
+    @Query("SELECT o FROM ManufacturingOrder o " +
+            "WHERE o.customer.cuit = :cuit AND o.deliveryDate = :deliveryDate")
+    public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate);
 }
