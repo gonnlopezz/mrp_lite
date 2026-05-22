@@ -82,7 +82,7 @@ public class PlanningProcessService {
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
 
-        List<EquipmentType> requiredTypes = getRequiredEquipmentsFor(product);
+        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
 
         Workshop workshop = resolveWorkshop(workshopCode, requiredTypes);
 
@@ -91,9 +91,7 @@ public class PlanningProcessService {
         Collection<Equipment> equipments = workshop.getEquipments();
 
         for (Task t : product.getTasks()) {
-            Equipment eq = equipments.stream()
-                    .filter(e -> e.getType().equals(t.getType()))
-                    .findFirst().orElse(null);
+            Equipment eq = getRequiredEquipmentFor(t, equipments);
 
             if (eq == null)
                 throw new BusinessException("Equipo no encontrado para la tarea");
@@ -112,7 +110,7 @@ public class PlanningProcessService {
 
     private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline,
             Map<Long, LocalDateTime> equipmentFreeTime) {
-        List<EquipmentType> requiredTypes = getRequiredEquipmentsFor(product);
+        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
 
         Workshop workshop = resolveWorkshop(null, requiredTypes);
         Collection<Equipment> equipments = workshop.getEquipments();
@@ -125,9 +123,7 @@ public class PlanningProcessService {
         LocalDateTime currentProductEnd = deadline;
 
         for (Task t : reversedTasks) {
-            Equipment eq = equipments.stream()
-                    .filter(e -> e.getType().equals(t.getType()))
-                    .findFirst().orElse(null);
+            Equipment eq = getRequiredEquipmentFor(t, equipments);
 
             if (eq == null)
                 throw new BusinessException("Equipo no encontrado para la tarea");
@@ -174,14 +170,15 @@ public class PlanningProcessService {
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
         if (workshopCode != null) {
             Workshop workshop = workshopService.findByCode(workshopCode);
-            
+
             Set<EquipmentType> availableTypes = workshop.getEquipments().stream()
                     .map(Equipment::getType)
                     .collect(Collectors.toSet());
 
-            if (!availableTypes.containsAll(requiredTypes)) 
-                throw new BusinessException("El taller " + workshop.getCode() + " no cuenta con los equipos necesarios para fabricar el producto");
-            
+            if (!availableTypes.containsAll(requiredTypes))
+                throw new BusinessException("El taller " + workshop.getCode()
+                        + " no cuenta con los equipos necesarios para fabricar el producto");
+
             return workshop;
         }
 
@@ -197,12 +194,19 @@ public class PlanningProcessService {
                 .orElse(requestedTime);
     }
 
-    private List<EquipmentType> getRequiredEquipmentsFor(Product aProduct) {
+    private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
         List<EquipmentType> result = aProduct.getTasks().stream()
                 .map(Task::getType)
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toList());
+        return result;
+    }
+
+    private Equipment getRequiredEquipmentFor(Task aTask, Collection<Equipment> equipments) {
+        Equipment result = equipments.stream()
+                .filter(e -> e.getType().equals(aTask.getType()))
+                .findFirst().orElse(null);
         return result;
     }
 
