@@ -5,19 +5,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
 import unpsjb.labprog.backend.business.product.ProductService;
@@ -61,110 +59,133 @@ public class PlanningProcessService {
         ManufacturingOrder order = orderService.findById(request.getOrder().getId());
         Product product = productService.findById(order.getProduct().getId());
 
-        LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
+        LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
 
-        PlanningProcess result = productPlanningBackwards(product, deadline);
-        return repository.save(result);
+        PlanningProcess masterProcess = new PlanningProcess();
+        masterProcess.setEndDate(finalDeliveryDate);
+        List<Planning> allPlannings = new ArrayList<>();
+
+        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
+
+        for (int i = 0; i < order.getQuantity(); i++) {
+            PlanningProcess tempBlock = productPlanningBackwards(product, finalDeliveryDate, equipmentFreeTime);
+
+            allPlannings.addAll(0, tempBlock.getPlannings());
+
+            masterProcess.setStart(tempBlock.getStart());
+        }
+
+        masterProcess.setPlannings(allPlannings);
+        return repository.save(masterProcess);
     }
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
-
-        PlanningProcess process = new PlanningProcess();
-        Workshop workshop;
         Product product = productService.findByName(productName);
 
-        List<EquipmentType> requiredTypes = product.getTasks().stream()
-                .map(Task::getType)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
+        List<EquipmentType> requiredTypes = getRequiredEquipmentsFor(product);
 
-        if (workshopCode != null) {
-            workshop = workshopService.findByCode(workshopCode);
+        Workshop workshop = resolveWorkshop(workshopCode, requiredTypes);
 
-            boolean canHandle = requiredTypes.stream()
-                    .allMatch(type -> workshop.getEquipments().stream()
-                            .anyMatch(e -> e.getType().equals(type)));
-
-            if (!canHandle)
-                throw new BusinessException("El taller no cuenta con los equipos necesarios para fabricar el producto");
-        } else {
-            workshop = workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size());
-        }
-
-        Collection<Planning> plannings = new ArrayList<>();
+        List<Planning> plannings = new ArrayList<>();
         LocalDateTime currentTime = start;
         Collection<Equipment> equipments = workshop.getEquipments();
-
-        process.setStart(currentTime);
 
         for (Task t : product.getTasks()) {
             Equipment eq = equipments.stream()
                     .filter(e -> e.getType().equals(t.getType()))
                     .findFirst().orElse(null);
 
-            long taskDuration = t.getDuration() / (eq != null ? eq.getCapacity() : 1);
+            if (eq == null)
+                throw new BusinessException("Equipo no encontrado para la tarea");
+
+            long taskDuration = t.getDuration() / eq.getCapacity();
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
             LocalDateTime end = availableTime.plusMinutes(taskDuration);
 
-            Planning p = new Planning();
-            p.setTask(t);
-            p.setPeriod(new Period(availableTime, end, t.getDuration()));
-            p.setEquipment(eq);
-            plannings.add(p);
+            plannings.add(createPlanning(t, eq, availableTime, end));
 
             currentTime = end;
         }
 
-        process.setEndDate(currentTime);
-        process.setPlannings(plannings);
-        return process;
+        return createPlanningProcess(plannings, start, currentTime);
     }
 
-    private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline) {
-        PlanningProcess process = new PlanningProcess();
+    private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline,
+            Map<Long, LocalDateTime> equipmentFreeTime) {
+        List<EquipmentType> requiredTypes = getRequiredEquipmentsFor(product);
 
-        List<EquipmentType> requiredTypes = product.getTasks().stream()
-                .map(Task::getType)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
-
-        Workshop workshop = workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size());
+        Workshop workshop = resolveWorkshop(null, requiredTypes);
         Collection<Equipment> equipments = workshop.getEquipments();
 
         List<Task> reversedTasks = new ArrayList<>(product.getTasks());
         Collections.reverse(reversedTasks);
-        
+
         Collection<Planning> plannings = new ArrayList<>();
-        LocalDateTime currentEnd = deadline;
+
+        LocalDateTime currentProductEnd = deadline;
 
         for (Task t : reversedTasks) {
             Equipment eq = equipments.stream()
                     .filter(e -> e.getType().equals(t.getType()))
                     .findFirst().orElse(null);
 
-            long taskDuration = t.getDuration() / (eq != null ? eq.getCapacity() : 1);
+            if (eq == null)
+                throw new BusinessException("Equipo no encontrado para la tarea");
 
-            LocalDateTime start = currentEnd.minusMinutes(taskDuration);
+            long taskDuration = t.getDuration() / eq.getCapacity();
 
-            Planning p = new Planning();
-            p.setTask(t);
-            p.setPeriod(new Period(start, currentEnd, t.getDuration()));
-            p.setEquipment(eq);
-            plannings.add(p);
+            LocalDateTime eqAvailableUntil = equipmentFreeTime.getOrDefault(eq.getId(), deadline);
 
-            currentEnd = start;
+            LocalDateTime end = currentProductEnd.isBefore(eqAvailableUntil) ? currentProductEnd : eqAvailableUntil;
+            LocalDateTime start = end.minusMinutes(taskDuration);
+
+            plannings.add(createPlanning(t, eq, start, end));
+
+            currentProductEnd = start;
+
+            equipmentFreeTime.put(eq.getId(), start);
         }
 
         List<Planning> orderedPlannings = plannings.stream()
                 .sorted(Comparator.comparing(p -> p.getPeriod().getStart()))
                 .collect(Collectors.toList());
 
-        process.setStart(orderedPlannings.get(0).getPeriod().getStart());
-        process.setEndDate(deadline);
-        process.setPlannings(orderedPlannings);
-        return process;
+        return createPlanningProcess(orderedPlannings, deadline, currentProductEnd);
+
+    }
+
+    private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
+        PlanningProcess result = new PlanningProcess();
+        result.setStart(start);
+        result.setEndDate(end);
+        result.setPlannings(plannings);
+        return result;
+
+    }
+
+    private Planning createPlanning(Task aTask, Equipment aEquipment, LocalDateTime startTime, LocalDateTime endTime) {
+        Planning result = new Planning();
+        result.setTask(aTask);
+        result.setPeriod(new Period(startTime, endTime, aTask.getDuration()));
+        result.setEquipment(aEquipment);
+        return result;
+    }
+
+    private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
+        if (workshopCode != null) {
+            Workshop workshop = workshopService.findByCode(workshopCode);
+            
+            Set<EquipmentType> availableTypes = workshop.getEquipments().stream()
+                    .map(Equipment::getType)
+                    .collect(Collectors.toSet());
+
+            if (!availableTypes.containsAll(requiredTypes)) 
+                throw new BusinessException("El taller " + workshop.getCode() + " no cuenta con los equipos necesarios para fabricar el producto");
+            
+            return workshop;
+        }
+
+        return workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size());
     }
 
     private LocalDateTime getNextAvailableSlot(Equipment equipment, LocalDateTime requestedTime) {
@@ -174,6 +195,15 @@ public class PlanningProcessService {
         return repository.findMaxEndTimeForEquipment(equipment.getId())
                 .map(maxEndTime -> maxEndTime.isAfter(requestedTime) ? maxEndTime : requestedTime)
                 .orElse(requestedTime);
+    }
+
+    private List<EquipmentType> getRequiredEquipmentsFor(Product aProduct) {
+        List<EquipmentType> result = aProduct.getTasks().stream()
+                .map(Task::getType)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        return result;
     }
 
     public List<PlanningProcess> findAll() {

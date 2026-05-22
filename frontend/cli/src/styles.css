@@ -355,3 +355,16 @@ app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hov
   border-color: var(--mrp-link);
   transform: translateY(-1px);
 }
+
+/* Timeline */
+
+.timeline-container {
+  width: 100%;
+  overflow-x: auto; /* Esto hace que aparezca la barrita abajo */
+  white-space: nowrap;
+  padding-bottom: 10px; /* Para que la barra no pise el gráfico */
+}
+
+.timeline-content {
+  min-width: 2000px; /* Obliga al gráfico a estirarse, ajustá este número según la cantidad de días */
+}

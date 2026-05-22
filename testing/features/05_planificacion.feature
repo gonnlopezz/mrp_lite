@@ -85,4 +85,4 @@ Escenario: Planificación de un producto sin indicar el taller, pero solo uno pu
     Dado el producto con nombre "Canasto de basura chico 1,5mts"
     Y que existe el taller "BETA"
     Cuando se solicita planificar el producto en el taller el día "01-01-2025"
-    Entonces se espera el siguiente 409 con "El taller no cuenta con los equipos necesarios para fabricar el producto"
+    Entonces se espera el siguiente 409 con "El taller BETA no cuenta con los equipos necesarios para fabricar el producto"

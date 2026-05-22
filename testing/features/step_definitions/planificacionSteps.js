@@ -95,3 +95,18 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
         assert.strictEqual(tarea, esperada.tarea, `Error en tarea (Fila ${index + 1})`);
     });
 });
+
+Then('se generaron {int} planificaciones para el equipo {string}', function(totalPlannings, equipmentCode) {
+    
+    const planificacionesReal = this.responseBody.plannings;
+
+    assert.ok(planificacionesReal, "El backend no devolvió planificaciones");
+
+    const planificacionesDelEquipo = planificacionesReal.filter(
+        (plan) => plan.equipment.code === equipmentCode
+    );
+
+    assert.strictEqual(
+        planificacionesDelEquipo.length, totalPlannings, `Se esperaban ${totalPlannings} planificaciones para ${equipmentCode}, pero se encontraron ${planificacionesDelEquipo.length}`
+    );
+});

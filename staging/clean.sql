@@ -6,3 +6,4 @@ truncate table product restart identity cascade;
 truncate table task restart identity cascade;
 truncate table planning restart identity cascade;
 truncate table planning_process restart identity cascade;       
+truncate table manufacturing_order restart identity cascade;

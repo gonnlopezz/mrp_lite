@@ -17,16 +17,18 @@
         </ol>
     </nav>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden timeline-container">
 
-        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div
+            class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div *ngIf="workshop">
                 <h5 class="mb-0 fw-bold text-steel tracking-tight">
                     <i class="fas fa-calendar-alt me-2 text-primary"></i> Planificación — {{ workshop.name }}
                 </h5>
                 <p class="text-muted small mb-0 d-none d-sm-block">
                     <span class="font-monospace text-primary fw-bold">{{ workshop.code }}</span>
-                    &nbsp;·&nbsp; {{ planningProcesses?.length || 0 }} {{ planningProcesses?.length === 1 ? 'producto' : 'productos' }} en planificación
+                    &nbsp;·&nbsp; {{ planningProcesses?.length || 0 }} {{ planningProcesses?.length === 1 ? 'producto' :
+                    'productos' }} en planificación
                 </p>
             </div>
             <a routerLink="/workshops" class="btn btn-outline-secondary btn-sm transition-base">
@@ -50,7 +52,9 @@
 
         <!-- Chart -->
         <div [hidden]="loading || !planningProcesses?.length" class="p-3">
-            <div #chartDiv style="width: 100%;"></div>
+            <div style="width: 100%; overflow-x: auto; padding-bottom: 10px;">
+                <div #chartDiv style="min-width: 2500px;"></div>
+            </div>
         </div>
 
     </div>

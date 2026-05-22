@@ -71,6 +71,7 @@ export class PlanningComponent implements OnInit {
 
         const rows: any[] = [];
         const colors: string[] = [];
+        const uniqueEquipments = new Set<string>(); // Para contar cuántas filas reales habrá
 
         this.planningProcesses.forEach((process, processIndex) => {
             const color = processPalette[processIndex % processPalette.length];
@@ -87,32 +88,37 @@ export class PlanningComponent implements OnInit {
                 const taskName = planning.task?.name || 'Tarea';
                 const equipCode = planning.equipment?.code || 'S/E';
 
+                uniqueEquipments.add(equipCode); // Guardamos el equipo único
+
                 const tooltip = `
                     <div style="padding:12px; font-size:13px;">
-                        <b>${taskName}</b><br/>
-                        Equipo: ${equipCode}<br/>
-                        <b>Duración</b>: ${planning.task.duration} min<br/>
+                        <b style="color: ${color};">${processLabel}</b><br/>
+                        <b>Tarea:</b> ${taskName}<br/>
+                        <b>Equipo:</b> ${equipCode}<br/>
+                        <b>Duración:</b> ${planning.task.duration} min<br/>
+                        <b>Inicio:</b> ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}<br/>
                     </div>`;
 
-                rows.push([equipCode, { v: processLabel, f: taskName }, tooltip, start, end]);
+                // Dejamos el formato 'f' vacío para que las barras queden de colores limpios
+                rows.push([equipCode, { v: processLabel, f: '' }, tooltip, start, end]);
             });
         });
 
         dataTable.addRows(rows);
 
-        const totalPlannings = this.planningProcesses.reduce(
-            (acc, p) => acc + p.plannings.length, 0
-        );
+        // Calculamos el alto real: 50px por fila de equipo + 50px de margen para las horas
+        const calculatedHeight = Math.max(150, (uniqueEquipments.size * 50) + 50);
 
         const options = {
-            height: Math.max(400, totalPlannings * 45),
-            width: '100%',               
+            height: calculatedHeight,
+            // Eliminamos "width: '100%'" de acá para que respete el min-width del HTML
             colors,
             tooltip: { isHtml: true },
             timeline: {
                 showRowLabels: true,
                 groupByRowLabel: true,
                 colorByRowLabel: false,
+                rowLabelStyle: { fontSize: 13, color: '#475569' }
             },
         };
 

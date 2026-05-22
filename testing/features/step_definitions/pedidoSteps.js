@@ -7,7 +7,6 @@ Given('que existe el pedido para el cliente {string} con fecha de entrega {strin
     
     const response = await fetch(`http://backend:8080/orders/cuit/${aCustomerCuit}/deliveryDate/${fechaISO}`);
     const dataPackage = await response.json(); 
-    console.log(dataPackage.data);
     this.pedido = dataPackage.data;
 });
 

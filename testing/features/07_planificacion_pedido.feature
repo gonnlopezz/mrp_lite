@@ -20,15 +20,15 @@ Característica: Proceso de planificación progresivo
     Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
     Y se generaron las siguientes planificaciones
       | inicio           | fin              | equipo        | tarea               |
-      | 2025-01-04 18:10 | 2025-01-04 19:10 | A01_amoladora | cortar planchas     |
-      | 2025-01-04 19:10 | 2025-01-04 19:30 | A01_amoladora | cortar perfiles     |
-      | 2025-01-04 19:30 | 2025-01-04 21:00 | A02_soldadora | armado              |
-      | 2025-01-04 19:40 | 2025-01-04 20:40 | A01_amoladora | cortar planchas     |
-      | 2025-01-04 20:40 | 2025-01-04 21:00 | A01_amoladora | cortar perfiles     |
-      | 2025-01-04 21:00 | 2025-01-04 22:30 | A02_soldadora | armado              |
-      | 2025-01-04 21:10 | 2025-01-04 22:10 | A01_amoladora | cortar planchas     |
-      | 2025-01-04 22:10 | 2025-01-04 22:30 | A01_amoladora | cortar perfiles     |
-      | 2025-01-04 22:30 | 2025-01-05 00:00 | A02_soldadora | armado              |
+      | 2025-02-04 18:10 | 2025-02-04 19:10 | A01_amoladora | cortar planchas     |
+      | 2025-02-04 19:10 | 2025-02-04 19:30 | A01_amoladora | cortar perfiles     |
+      | 2025-02-04 19:30 | 2025-02-04 21:00 | A02_soldadora | armado              |
+      | 2025-02-04 19:40 | 2025-02-04 20:40 | A01_amoladora | cortar planchas     |
+      | 2025-02-04 20:40 | 2025-02-04 21:00 | A01_amoladora | cortar perfiles     |
+      | 2025-02-04 21:00 | 2025-02-04 22:30 | A02_soldadora | armado              |
+      | 2025-02-04 21:10 | 2025-02-04 22:10 | A01_amoladora | cortar planchas     |
+      | 2025-02-04 22:10 | 2025-02-04 22:30 | A01_amoladora | cortar perfiles     |
+      | 2025-02-04 22:30 | 2025-02-05 00:00 | A02_soldadora | armado              |
 
 
   Escenario: Planificación de un pedido con muchos productos para estar terminado en la fecha de entrega.
@@ -37,3 +37,34 @@ Característica: Proceso de planificación progresivo
     Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
     Y se generaron 40 planificaciones para el equipo "A01_amoladora"
     Y se generaron 20 planificaciones para el equipo "A02_soldadora"
+
+Escenario: Planificación de un pedido con el taller primera opción completamente ocupado.
+    Dado que existe el pedido para el cliente "27982145634" con fecha de entrega "10-02-2025"
+    Cuando se solicita planificar el pedido el día "09-02-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-02-09 21:10 | 2025-02-09 22:10 | G01_amoladora | cortar planchas     |
+      | 2025-02-09 22:10 | 2025-02-09 22:30 | G01_amoladora | cortar perfiles     |
+      | 2025-02-09 22:30 | 2025-02-10 00:00 | G02_soldadora | armado              |
+
+
+  Esquema del escenario: Generar nuevos pedidos de fabricación para el proceso de planificación
+    Dada el producto con nombre "<producto>"
+    Y el cliente con <cuit>
+    Cuando se solicita generar un pedido para ese cliente fecha de pedido "<fechaPedido>" para entregar en la fecha "<fechaEntrega>" la cantidad de <cantidad> del producto
+    Entonces se espera el siguiente <status> con "<respuesta>"
+    Ejemplos:
+      | cuit        | fechaPedido  | fechaEntrega | cantidad | producto                        | status | respuesta                                    |
+      | 20654239875 | 2025-03-01   | 2025-03-05   |        4 | Canasto de basura chico 1,5mts  |    200 | Pedido de fabricación generado correctamente |
+      | 20654239875 | 2025-03-01   | 2025-03-05   |        3 | Pieza chica en U                |    200 | Pedido de fabricación generado correctamente |
+      
+  Escenario: Planificación de todos los pedidos pendientes.
+    Dado que existe el pedido para el cliente "27982145634" con fecha de entrega "10-02-2025"
+    Cuando se solicita planificar el pedido el día "09-02-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-02-09 21:10 | 2025-02-09 22:10 | G01_amoladora | cortar planchas     |
+      | 2025-02-09 22:10 | 2025-02-09 22:30 | G01_amoladora | cortar perfiles     |
+      | 2025-02-09 22:30 | 2025-02-10 00:00 | G02_soldadora | armado              |
