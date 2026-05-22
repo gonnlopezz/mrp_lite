@@ -104,7 +104,7 @@
               </div>
 
               <!-- Cantidad -->
-              <div class="col-12">
+              <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Cantidad</label>
                 <input type="number" class="form-control form-control-sm bg-white" required name="quantity" min="1"
                   [(ngModel)]="order.quantity" #quantityInput="ngModel"
@@ -115,6 +115,13 @@
                     <i class="fa fa-exclamation-triangle"></i> La cantidad debe ser mayor a 0.
                   </div>
                 </div>
+              </div>
+
+              <!-- Estado (Read-only) -->
+              <div class="col-md-6">
+                <label class="label-caps mb-1 d-block">Estado</label>
+                <input type="text" class="form-control form-control-sm bg-light" disabled
+                  [value]="order.state || 'PENDIENTE'">
               </div>
 
             <hr class="my-4" style="border-top: 1px solid #f1f5f9; opacity: 1;">

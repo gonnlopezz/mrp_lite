@@ -10,12 +10,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.PlanningProcess;
 
 @Service
 public class ManufacturingOrderService {
     @Autowired
     ManufacturingOrderRepository repository;
+
+    @Autowired
+    PlanningProcessRepository planningProcessRepository;
 
     public List<ManufacturingOrder> findAll() {
         List<ManufacturingOrder> result = new ArrayList<>();
@@ -37,6 +42,10 @@ public class ManufacturingOrderService {
 
     public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate) {
         return repository.findByCustomerCuitAndDeliveryDate(cuit, deliveryDate);
+    }
+
+    public List<PlanningProcess> findPlanningProcesses(long orderId) {
+        return planningProcessRepository.findByOrderId(orderId) ;
     }
 
     @Transactional

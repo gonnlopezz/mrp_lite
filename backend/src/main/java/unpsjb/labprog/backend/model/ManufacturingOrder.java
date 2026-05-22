@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,6 +31,10 @@ public class ManufacturingOrder {
 
     @Column(nullable = false)
     private int quantity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_state", nullable = false)
+    private OrderState state = OrderState.PENDIENTE;
 
     @ManyToOne
     private Customer customer;

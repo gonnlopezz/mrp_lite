@@ -5,6 +5,8 @@ import { WorkshopService } from '../workshops/workshop.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Workshop } from '../workshops/workshop';
 import { Equipment } from '../equipments/equipment';
+import { manufacturingOrder } from '../orders/manufacturingOrder';
+import { OrderService } from '../orders/manufacturing-order.service';
 declare var google: any;
 
 @Component({
@@ -13,47 +15,73 @@ declare var google: any;
     imports: [CommonModule, RouterLink],
     templateUrl: './plannings.html',
 })
-
 export class PlanningComponent implements OnInit {
     @ViewChild('chartDiv') chartDiv!: ElementRef;
 
-    @Input() title: string = '';
     planningProcesses: PlanningProcess[] = [];
     loading = true;
-    workshop!: Workshop;
+
+    isOrderContext = false;
+    entityName = ''; 
+    entityCode = '';
 
     constructor(
         private workshopService: WorkshopService,
+        private orderService: OrderService, // Inyectamos el servicio
         private route: ActivatedRoute
     ) { }
 
     ngOnInit(): void {
-        this.getWorkshop();
-        google.charts.load('current', { packages: ['timeline'] });
+        this.isOrderContext = this.route.snapshot.url[0].path.includes('orders');
 
+        this.loadEntityDetails();
+
+        google.charts.load('current', { packages: ['timeline'] });
         google.charts.setOnLoadCallback(() => {
             this.loadPlanning();
         });
     }
 
+    loadEntityDetails(): void {
+        const id = this.route.snapshot.paramMap.get('id');
+        if (!id || id === 'new') return;
+
+        if (this.isOrderContext) {
+            this.orderService.get(id).subscribe((dataPackage: any) => {
+                const order = <manufacturingOrder>dataPackage.data;
+                this.entityName = `Pedido de ${order.customer?.companyName}`;
+                this.entityCode = `Orden #${order.id}`;
+            });
+        } else {
+            this.workshopService.get(id).subscribe((dataPackage: any) => {
+                const workshop = <Workshop>dataPackage.data;
+                this.entityName = workshop.name;
+                this.entityCode = workshop.code;
+            });
+        }
+    }
+
     loadPlanning(): void {
         const id = this.route.snapshot.paramMap.get('id')!;
-        this.workshopService.getPlannings(id).subscribe(
-            dataPackage => {
-                this.planningProcesses = <PlanningProcess[]>dataPackage.data;
 
+        const request$ = this.isOrderContext
+            ? this.orderService.getPlannings(id)
+            : this.workshopService.getPlannings(id);
+
+        request$.subscribe({
+            next: (dataPackage: any) => {
+                this.planningProcesses = <PlanningProcess[]>dataPackage.data;
                 if (this.planningProcesses && this.planningProcesses.length > 0) {
                     setTimeout(() => this.generateTimelineChart(), 100);
                 }
                 this.loading = false;
             },
-            (error) => {
+            error: (error: any) => {
                 console.error('Error al cargar planificación:', error);
                 this.loading = false;
             }
-        );
+        });
     }
-
     generateTimelineChart(): void {
         if (!this.planningProcesses || this.planningProcesses.length === 0 || !this.chartDiv) return;
 
@@ -88,7 +116,7 @@ export class PlanningComponent implements OnInit {
                 const taskName = planning.task?.name || 'Tarea';
                 const equipCode = planning.equipment?.code || 'S/E';
 
-                uniqueEquipments.add(equipCode); // Guardamos el equipo único
+                uniqueEquipments.add(equipCode); 
 
                 const tooltip = `
                     <div style="padding:12px; font-size:13px;">
@@ -106,7 +134,6 @@ export class PlanningComponent implements OnInit {
 
         dataTable.addRows(rows);
 
-        // Calculamos el alto real: 50px por fila de equipo + 50px de margen para las horas
         const calculatedHeight = Math.max(150, (uniqueEquipments.size * 50) + 50);
 
         const options = {
@@ -126,14 +153,4 @@ export class PlanningComponent implements OnInit {
         chart.draw(dataTable, options);
     }
 
-    getWorkshop(): void {
-        const id = this.route.snapshot.paramMap.get('id');
-        if (id === 'new' || !id) {
-            this.workshop = <Workshop>{ code: "", name: "", equipments: <Equipment[]>[] };
-        } else {
-            this.workshopService.get(id).subscribe(dataPackage => {
-                this.workshop = <Workshop>dataPackage.data;
-            });
-        }
-    }
 }

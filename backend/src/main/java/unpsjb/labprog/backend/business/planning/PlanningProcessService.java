@@ -26,6 +26,7 @@ import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Equipment;
 import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.OrderState;
 import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.Planning;
 import unpsjb.labprog.backend.model.PlanningProcess;
@@ -60,9 +61,8 @@ public class PlanningProcessService {
         Product product = productService.findById(order.getProduct().getId());
 
         LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
+        LocalDateTime start = finalDeliveryDate;
 
-        PlanningProcess masterProcess = new PlanningProcess();
-        masterProcess.setEndDate(finalDeliveryDate);
         List<Planning> allPlannings = new ArrayList<>();
 
         Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
@@ -72,11 +72,16 @@ public class PlanningProcessService {
 
             allPlannings.addAll(0, tempBlock.getPlannings());
 
-            masterProcess.setStart(tempBlock.getStart());
+            start = tempBlock.getStart();
         }
 
-        masterProcess.setPlannings(allPlannings);
-        return repository.save(masterProcess);
+        order.setState(OrderState.PLANIFICADO);
+        orderService.save(order);
+
+        PlanningProcess result = createPlanningProcess(allPlannings, start, finalDeliveryDate);
+        result.setOrder(order);
+        
+        return repository.save(result);
     }
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
@@ -93,9 +98,8 @@ public class PlanningProcessService {
         for (Task t : product.getTasks()) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
 
-            long taskDuration = t.getDuration() / eq.getCapacity();
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
-            LocalDateTime end = availableTime.plusMinutes(taskDuration);
+            LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, eq));
 
             plannings.add(createPlanning(t, eq, availableTime, end));
 
@@ -122,12 +126,10 @@ public class PlanningProcessService {
         for (Task t : reversedTasks) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
 
-            long taskDuration = t.getDuration() / eq.getCapacity();
-
             LocalDateTime eqAvailableUntil = equipmentFreeTime.getOrDefault(eq.getId(), deadline);
 
             LocalDateTime end = currentProductEnd.isBefore(eqAvailableUntil) ? currentProductEnd : eqAvailableUntil;
-            LocalDateTime start = end.minusMinutes(taskDuration);
+            LocalDateTime start = end.minusMinutes(calculateTaskDurationFor(t, eq));
 
             plannings.add(createPlanning(t, eq, start, end));
 
@@ -205,6 +207,11 @@ public class PlanningProcessService {
         if (result == null)
             throw new BusinessException("Equipo no encontrado para la tarea");
 
+        return result;
+    }
+
+    private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
+        long result = aTask.getDuration() / aEquipment.getCapacity();
         return result;
     }
 

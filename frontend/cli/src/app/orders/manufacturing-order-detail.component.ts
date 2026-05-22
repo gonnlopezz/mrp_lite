@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { manufacturingOrder } from './manufacturingOrder';
+import { manufacturingOrder, orderState } from './manufacturingOrder';
 import { Customer } from '../customers/customer';
 import { Product } from '../products/product';
 import { CommonModule, Location } from '@angular/common';
@@ -56,6 +56,7 @@ export class ManufacturingOrderDetailComponent implements OnInit {
                 orderDate: new Date(),
                 deliveryDate: new Date(),
                 quantity: 1,
+                state: orderState.PENDIENTE,
                 customer: null as unknown as Customer,
                 product: null as unknown as Product
             };

@@ -25,4 +25,6 @@ public interface PlanningProcessRepository
             "WHERE e IN (SELECT eq FROM Workshop w JOIN w.equipments eq WHERE w.id = :workshopId)")
     public List<PlanningProcess> findAllByWorkshopId(@Param("workshopId") Integer workshopId);
 
+    List<PlanningProcess> findByOrderId(Long orderId);
+
 }

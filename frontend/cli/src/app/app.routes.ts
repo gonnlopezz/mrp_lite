@@ -22,5 +22,6 @@ export const routes: Routes = [
     {path: "products/:id", component: ProductsDetailComponent},
     {path: "workshops/:id/plannings", component: PlanningComponent},
     {path: "orders", component: ManufacturingOrdersComponent},
-    {path: "orders/:id", component: ManufacturingOrderDetailComponent}
+    {path: "orders/:id", component: ManufacturingOrderDetailComponent},
+    {path: "orders/:id/plannings", component: PlanningComponent}
 ];

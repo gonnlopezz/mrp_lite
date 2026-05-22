@@ -70,18 +70,6 @@ export class ManufacturingOrdersComponent {
     });
   }
 
-  toggleDetails(id: number): void {
-    if (this.openedOrders.has(id)) {
-      this.openedOrders.delete(id);
-    } else {
-      this.openedOrders.add(id);
-    }
-  }
-
-  isOpen(id: number): boolean {
-    return this.openedOrders.has(id);
-  }
-
 
   getOrders(): void {
     this.orderService.byPage(this.currentPage, 10).subscribe(dataPackage => {

@@ -54,6 +54,11 @@ public class ManufacturingOrderPresenter {
         return Response.ok(service.findByCustomerCuitAndDeliveryDate(cuit, deliveryDate));
     }
 
+    @RequestMapping(value = "/id/{id}/plannings", method = RequestMethod.GET)
+    public ResponseEntity<Object> findPlanningProcesses(@PathVariable("id") int id) {       
+        return Response.ok(service.findPlanningProcesses(id));
+    }   
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody ManufacturingOrder aOrder) {
         if (aOrder.getId() != 0) {

@@ -6,6 +6,14 @@ export interface manufacturingOrder {
     orderDate: Date;
     deliveryDate: Date;
     quantity: number;
+    state: orderState;
     customer: Customer;
     product: Product;
 }
+
+export enum orderState {
+    PENDIENTE,
+    PLANIFICADO,
+    NO_PLANIFICABLE,
+    FINALIZADO
+    }
