@@ -19,6 +19,7 @@ export class PlanningComponent implements OnInit {
     @ViewChild('chartDiv') chartDiv!: ElementRef;
 
     planningProcesses: PlanningProcess[] = [];
+    order?: manufacturingOrder;
     loading = true;
 
     isOrderContext = false;
@@ -27,7 +28,7 @@ export class PlanningComponent implements OnInit {
 
     constructor(
         private workshopService: WorkshopService,
-        private orderService: OrderService, // Inyectamos el servicio
+        private orderService: OrderService,
         private route: ActivatedRoute
     ) { }
 
@@ -49,6 +50,7 @@ export class PlanningComponent implements OnInit {
         if (this.isOrderContext) {
             this.orderService.get(id).subscribe((dataPackage: any) => {
                 const order = <manufacturingOrder>dataPackage.data;
+                this.order = order;
                 this.entityName = `Pedido de ${order.customer?.companyName}`;
                 this.entityCode = `Orden #${order.id}`;
             });

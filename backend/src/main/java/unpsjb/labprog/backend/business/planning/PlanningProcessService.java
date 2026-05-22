@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,11 +57,11 @@ public class PlanningProcessService {
 
     @Transactional
     public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
+        List<PlanningProcess> result = new ArrayList<>();
         ManufacturingOrder order = orderService.findById(request.getOrder().getId());
         Product product = productService.findById(order.getProduct().getId());
 
         LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
-        List<PlanningProcess> result = new ArrayList<>();
         Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
 
         for (int i = 0; i < order.getQuantity(); i++) {
@@ -103,8 +102,7 @@ public class PlanningProcessService {
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline,
-        Map<Long, LocalDateTime> equipmentFreeTime) {
+    private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
 
         Workshop workshop = resolveWorkshop(null, requiredTypes);

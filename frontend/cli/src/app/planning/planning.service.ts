@@ -22,7 +22,7 @@ export class PlanningService {
   }
 
   save(request: any): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.planningUrl, request);
+    return this.http.post<DataPackage>(`${this.planningUrl}/order`, request);
   }
 
   getByPage(page: number, size: number): Observable<DataPackage> {

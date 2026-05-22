@@ -113,7 +113,7 @@ export class WorkshopsDetailComponent {
   }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigateByUrl('/workshops', { skipLocationChange: true });
   }
 
  

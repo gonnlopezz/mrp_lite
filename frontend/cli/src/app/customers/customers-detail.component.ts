@@ -28,7 +28,7 @@ export class CustomersDetailComponent {
   ) { }
 
   goBack(): void {
-    this.location.back();
+    this.router.navigateByUrl('/customers', { skipLocationChange: true });
   }
 
   ngOnInit(): void {

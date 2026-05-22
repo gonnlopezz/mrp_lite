@@ -39,7 +39,7 @@ export class ManufacturingOrderDetailComponent implements OnInit {
     ) { }
 
     goBack(): void {
-        this.location.back();
+        this.router.navigateByUrl('/orders', { skipLocationChange: true });
     }
 
     ngOnInit(): void {
@@ -177,7 +177,7 @@ export class ManufacturingOrderDetailComponent implements OnInit {
             this.cdr.markForCheck();
 
             this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-                this.router.navigate(['/orders']);
+                this.router.navigate(['/orders', + this.order.id]);
                 this.toastr.success('¡Pedido guardado con éxito!', 'Éxito');
             });
         });

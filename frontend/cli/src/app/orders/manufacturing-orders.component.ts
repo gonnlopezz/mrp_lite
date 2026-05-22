@@ -8,6 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
+import { PlanningService } from '../planning/planning.service';
 
 @Component({
   selector: 'app-orders',
@@ -23,6 +24,7 @@ export class ManufacturingOrdersComponent {
 
   constructor(
     private orderService: OrderService,
+    private planningService: PlanningService,
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal) { }
 
@@ -44,6 +46,43 @@ export class ManufacturingOrdersComponent {
         });
       }
     }).catch(() => {
+    });
+  }
+
+
+
+  tryPlanningOrder(orderId: number): void {
+    const modalRef = this.modalService.open(ConfirmModalComponent, {
+      centered: true,
+      backdrop: 'static'
+    });
+
+    modalRef.componentInstance.title = 'Planificar Pedido';
+    modalRef.componentInstance.message = 'Se realizará las planificaciones para cada producto. ¿Desea continuar?';
+    modalRef.componentInstance.btnOkText = 'Sí, Planificar';
+    modalRef.componentInstance.isDelete = false;
+
+    modalRef.result.then((result) => {
+      if (result) {
+        this.planningOrder(orderId);
+      }
+    }).catch(() => {
+    });
+
+  }
+
+  private planningOrder(orderId: number): void {
+    const currentDate = new Date().toISOString().split('T')[0] + 'T00:00:00';
+    const payload = {
+      order: {
+        id: orderId
+      },
+      startDate: currentDate
+    };
+
+    this.planningService.save(payload).subscribe({
+      next: (response) => this.onSearch(),
+      error: (err) => console.error(err)
     });
   }
 

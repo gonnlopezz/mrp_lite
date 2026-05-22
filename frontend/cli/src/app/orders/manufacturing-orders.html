@@ -84,12 +84,17 @@
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-1">
 
-                                    <button routerLink="/orders/{{order.id}}/plannings"
-                                        *ngIf="order.state === 'PLANIFICADO'" class="btn-icon hover-success"
-                                        title="Ver planificación del pedido">
-                                        <i class="fas fa-calendar-alt"></i>
+                                    <button *ngIf="order.state === 'PENDIENTE'" (click)="tryPlanningOrder(order.id)"
+                                        class="btn-icon hover-primary" title="Generar planificación">
+                                        <i class="fas fa-play-circle"></i>
                                     </button>
 
+                                    <button *ngIf="order.state === 'PLANIFICADO'"
+                                        routerLink="/orders/{{order.id}}/plannings" class="btn-icon hover-success"
+                                        title="Ver planificación">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </button>
+                                    
                                     <button routerLink="/orders/{{order.id}}" class="btn-icon hover-primary"
                                         title="Editar pedido">
                                         <i class="fas fa-pencil-alt"></i>
