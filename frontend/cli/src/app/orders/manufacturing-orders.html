@@ -30,9 +30,11 @@
                         <span class="input-group-text bg-white border-end-0 text-muted">
                             <i class="fas fa-search"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0 ps-0 bg-white"
-                            placeholder="Buscar por cliente o producto..." [(ngModel)]="searchTerm"
-                            (keyup)="onSearch()">
+                        <input type="text" class="form-control border-start-0 border-end-0 ps-0 bg-white"
+                            placeholder="Buscar pedido por cliente o producto..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
+                        <button class="btn btn-outline-secondary border-start-0" type="button" (click)="onSearch()">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
                 </div>
             </div>

@@ -86,8 +86,7 @@
 
                                     <div class="d-flex flex-wrap gap-2">
                                         <div *ngFor="let task of product.tasks" class="equipment-card">
-                                            <span class="text-steel fw-semibold small">{{ task.name }}</span>
-                                            <span class="text-muted small">{{ task.description }}</span>
+                                            <span class="text-steel fw-semibold small">{{ task.name }} | {{ task.duration }} minutos</span>
                                         </div>
 
                                         <div *ngIf="!product.tasks || product.tasks.length === 0"
