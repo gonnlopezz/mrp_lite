@@ -21,9 +21,11 @@ export class PlanningComponent implements OnInit {
     planningProcesses: PlanningProcess[] = [];
     order?: manufacturingOrder;
     loading = true;
+    availableDates: string[] = []; // Guardará formatos "2026-05-22"
+    selectedDate: string = '';
 
     isOrderContext = false;
-    entityName = ''; 
+    entityName = '';
     entityCode = '';
 
     constructor(
@@ -73,9 +75,24 @@ export class PlanningComponent implements OnInit {
         request$.subscribe({
             next: (dataPackage: any) => {
                 this.planningProcesses = <PlanningProcess[]>dataPackage.data;
-                if (this.planningProcesses && this.planningProcesses.length > 0) {
+
+                // Extraemos las fechas disponibles para el filtro// 1. EXTRAER FECHAS PRIMERO
+                const dates = new Set<string>();
+                this.planningProcesses.forEach(p => p.plannings.forEach(pl => {
+                    dates.add(pl.period.start.split('T')[0]);
+                }));
+                this.availableDates = Array.from(dates).sort();
+
+                // 2. SETEAR LA FECHA POR DEFECTO SI ESTÁ VACÍA
+                if (this.availableDates.length > 0 && !this.selectedDate) {
+                    this.selectedDate = this.availableDates[0];
+                }
+
+                // 3. SOLO DIBUJAR SI YA TENEMOS UNA FECHA SELECCIONADA
+                if (this.selectedDate) {
                     setTimeout(() => this.generateTimelineChart(), 100);
                 }
+
                 this.loading = false;
             },
             error: (error: any) => {
@@ -113,12 +130,17 @@ export class PlanningComponent implements OnInit {
                 const start = new Date(planning.period.start);
                 const end = new Date(planning.period.endDate);
 
+                const startDateStr = planning.period.start.split('T')[0];
+
+                // 💡 FILTRO AQUÍ: Solo agregamos si la fecha coincide
+                if (startDateStr !== this.selectedDate) return;
+
                 if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
 
                 const taskName = planning.task?.name || 'Tarea';
                 const equipCode = planning.equipment?.code || 'S/E';
 
-                uniqueEquipments.add(equipCode); 
+                uniqueEquipments.add(equipCode);
 
                 const tooltip = `
                     <div style="padding:12px; font-size:13px;">
@@ -153,6 +175,28 @@ export class PlanningComponent implements OnInit {
 
         const chart = new google.visualization.Timeline(this.chartDiv.nativeElement);
         chart.draw(dataTable, options);
+    }
+
+    // Método para navegar
+    changeDate(direction: 'prev' | 'next'): void {
+        const currentIndex = this.availableDates.indexOf(this.selectedDate);
+
+        if (direction === 'prev' && currentIndex > 0) {
+            this.selectedDate = this.availableDates[currentIndex - 1];
+        } else if (direction === 'next' && currentIndex < this.availableDates.length - 1) {
+            this.selectedDate = this.availableDates[currentIndex + 1];
+        }
+
+        this.generateTimelineChart();
+    }
+
+    // Helpers para desactivar flechas si no hay más fechas
+    isFirstDate(): boolean {
+        return this.availableDates.indexOf(this.selectedDate) === 0;
+    }
+
+    isLastDate(): boolean {
+        return this.availableDates.indexOf(this.selectedDate) === this.availableDates.length - 1;
     }
 
 }
