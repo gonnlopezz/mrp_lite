@@ -9,6 +9,7 @@ import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { PlanningService } from '../planning/planning.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-orders',
@@ -26,7 +27,9 @@ export class ManufacturingOrdersComponent {
     private orderService: OrderService,
     private planningService: PlanningService,
     private cdr: ChangeDetectorRef,
-    private modalService: NgbModal) { }
+    private modalService: NgbModal,
+    private toastr: ToastrService
+  ) { }
 
   delete(id: number): void {
     const modalRef = this.modalService.open(ConfirmModalComponent, {
@@ -81,7 +84,10 @@ export class ManufacturingOrdersComponent {
     };
 
     this.planningService.save(payload).subscribe({
-      next: (response) => this.onSearch(),
+      next: (response) => {
+        this.onSearch();
+        this.toastr.success('¡Pedido planificado con éxito!', 'Éxito');
+      },
       error: (err) => console.error(err)
     });
   }

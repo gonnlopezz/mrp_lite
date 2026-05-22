@@ -90,6 +90,7 @@ public class PlanningProcessService {
 
         for (Task t : product.getTasks()) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
+            
 
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, eq));
