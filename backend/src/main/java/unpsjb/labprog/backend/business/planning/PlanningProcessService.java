@@ -93,9 +93,6 @@ public class PlanningProcessService {
         for (Task t : product.getTasks()) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
 
-            if (eq == null)
-                throw new BusinessException("Equipo no encontrado para la tarea");
-
             long taskDuration = t.getDuration() / eq.getCapacity();
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
             LocalDateTime end = availableTime.plusMinutes(taskDuration);
@@ -124,9 +121,6 @@ public class PlanningProcessService {
 
         for (Task t : reversedTasks) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
-
-            if (eq == null)
-                throw new BusinessException("Equipo no encontrado para la tarea");
 
             long taskDuration = t.getDuration() / eq.getCapacity();
 
@@ -207,6 +201,10 @@ public class PlanningProcessService {
         Equipment result = equipments.stream()
                 .filter(e -> e.getType().equals(aTask.getType()))
                 .findFirst().orElse(null);
+
+        if (result == null)
+            throw new BusinessException("Equipo no encontrado para la tarea");
+
         return result;
     }
 
