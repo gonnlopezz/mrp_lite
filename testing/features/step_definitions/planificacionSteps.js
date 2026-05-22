@@ -73,17 +73,34 @@ When('se solicita planificar el pedido el día {string}', async function (date) 
 
 
 Then('se generaron las siguientes planificaciones', function (dataTable) {
-
     const planificacionesEsperadas = dataTable.hashes();
-    const planificacionesReal = this.responseBody.plannings;
+    
+    let procesosRaw = this.responseBody.data ? this.responseBody.data : this.responseBody;
+    
+    const procesos = Array.isArray(procesosRaw) ? procesosRaw : [procesosRaw];
 
-    assert.ok(planificacionesReal, "El backend no devolvió planificaciones");
-    assert.strictEqual(planificacionesReal.length, planificacionesEsperadas.length,
-        `La cantidad de tareas planificadas no es la correcta`);
+    let planificacionesReal = [];
+    procesos.forEach(proceso => {
+        if (proceso && proceso.plannings) {
+            planificacionesReal.push(...proceso.plannings);
+        }
+    });
+
+    planificacionesReal.sort((a, b) => {
+        const dateA = new Date(a.period.start);
+        const dateB = new Date(b.period.start);
+        
+        if (dateA.getTime() === dateB.getTime()) {
+            return a.equipment.code.localeCompare(b.equipment.code); // Desempate
+        }
+        return dateA - dateB;
+    });
+
+    assert.strictEqual(planificacionesReal.length, planificacionesEsperadas.length, 
+        `La cantidad de tareas no coincide. Esperadas: ${planificacionesEsperadas.length}, Reales: ${planificacionesReal.length}`);
 
     planificacionesEsperadas.forEach((esperada, index) => {
         const real = planificacionesReal[index];
-
         const inicio = real.period.start.replace('T', ' ').substring(0, 16);
         const fin = real.period.endDate.replace('T', ' ').substring(0, 16);
         const equipo = real.equipment.code;
@@ -96,17 +113,21 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
     });
 });
 
-Then('se generaron {int} planificaciones para el equipo {string}', function(totalPlannings, equipmentCode) {
+Then('se generaron {int} planificaciones para el equipo {string}', function (cantidadEsperada, codigoEquipo) {
+    let procesosRaw = this.responseBody.data ? this.responseBody.data : this.responseBody;
     
-    const planificacionesReal = this.responseBody.plannings;
+    const procesos = Array.isArray(procesosRaw) ? procesosRaw : [procesosRaw];
 
-    assert.ok(planificacionesReal, "El backend no devolvió planificaciones");
+    let planificacionesReal = [];
+    procesos.forEach(proceso => {
+        if (proceso && proceso.plannings) {
+            planificacionesReal.push(...proceso.plannings);
+        }
+    });
 
-    const planificacionesDelEquipo = planificacionesReal.filter(
-        (plan) => plan.equipment.code === equipmentCode
-    );
-
-    assert.strictEqual(
-        planificacionesDelEquipo.length, totalPlannings, `Se esperaban ${totalPlannings} planificaciones para ${equipmentCode}, pero se encontraron ${planificacionesDelEquipo.length}`
-    );
+    const tareasDelEquipo = planificacionesReal.filter(tarea => tarea.equipment.code === codigoEquipo);
+    
+    const assert = require('assert');
+    assert.strictEqual(tareasDelEquipo.length, cantidadEsperada, 
+        `Se esperaban ${cantidadEsperada} tareas para ${codigoEquipo}, pero se encontraron ${tareasDelEquipo.length}`);
 });

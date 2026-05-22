@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,33 +57,26 @@ public class PlanningProcessService {
     }
 
     @Transactional
-    public PlanningProcess saveFromOrder(PlanningFromOrderRequestDTO request) {
+    public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
         ManufacturingOrder order = orderService.findById(request.getOrder().getId());
         Product product = productService.findById(order.getProduct().getId());
 
         LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
-        LocalDateTime start = finalDeliveryDate;
-
-        List<Planning> allPlannings = new ArrayList<>();
-
+        List<PlanningProcess> result = new ArrayList<>();
         Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
 
         for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess tempBlock = productPlanningBackwards(product, finalDeliveryDate, equipmentFreeTime);
-
-            allPlannings.addAll(0, tempBlock.getPlannings());
-
-            start = tempBlock.getStart();
+            PlanningProcess unitProcess = productPlanningBackwards(product, finalDeliveryDate, equipmentFreeTime);
+            unitProcess.setOrder(order);
+            result.add(unitProcess);
         }
 
         order.setState(OrderState.PLANIFICADO);
         orderService.save(order);
 
-        PlanningProcess result = createPlanningProcess(allPlannings, start, finalDeliveryDate);
-        result.setOrder(order);
-        
-        return repository.save(result);
+        return (List<PlanningProcess>) repository.saveAll(result); 
     }
+
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
@@ -110,7 +104,7 @@ public class PlanningProcessService {
     }
 
     private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline,
-            Map<Long, LocalDateTime> equipmentFreeTime) {
+        Map<Long, LocalDateTime> equipmentFreeTime) {
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
 
         Workshop workshop = resolveWorkshop(null, requiredTypes);
@@ -119,7 +113,7 @@ public class PlanningProcessService {
         List<Task> reversedTasks = new ArrayList<>(product.getTasks());
         Collections.reverse(reversedTasks);
 
-        Collection<Planning> plannings = new ArrayList<>();
+        List<Planning> plannings = new LinkedList<>();
 
         LocalDateTime currentProductEnd = deadline;
 
@@ -131,18 +125,14 @@ public class PlanningProcessService {
             LocalDateTime end = currentProductEnd.isBefore(eqAvailableUntil) ? currentProductEnd : eqAvailableUntil;
             LocalDateTime start = end.minusMinutes(calculateTaskDurationFor(t, eq));
 
-            plannings.add(createPlanning(t, eq, start, end));
+            plannings.add(0, createPlanning(t, eq, start, end));
 
             currentProductEnd = start;
 
             equipmentFreeTime.put(eq.getId(), start);
         }
 
-        List<Planning> orderedPlannings = plannings.stream()
-                .sorted(Comparator.comparing(p -> p.getPeriod().getStart()))
-                .collect(Collectors.toList());
-
-        return createPlanningProcess(orderedPlannings, deadline, currentProductEnd);
+        return createPlanningProcess(plannings, deadline, currentProductEnd);
 
     }
 
