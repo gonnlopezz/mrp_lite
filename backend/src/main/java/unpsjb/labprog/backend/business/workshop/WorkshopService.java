@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.business.planning.PlanningProcessService;
+import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
+import unpsjb.labprog.backend.exception.BusinessException;
+import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.PlanningProcess;
 import unpsjb.labprog.backend.model.Workshop;
 
@@ -20,7 +22,7 @@ public class WorkshopService {
     WorkshopRepository repository;
 
     @Autowired
-    PlanningProcessService planningProcessService;
+    PlanningProcessRepository planningProcessRepository;
 
     public List<Workshop> findAll() {
         List<Workshop> result = new ArrayList<>();
@@ -46,7 +48,11 @@ public class WorkshopService {
 
     public List<PlanningProcess> getPlanningProcesses(Integer workshopId) {
         findById(workshopId);
-        return planningProcessService.findByWorkshop(workshopId);
+        return planningProcessRepository.findAllByWorkshopId(workshopId);
+    }
+
+    public Workshop findByEquipmentTypes(List<EquipmentType> types, int count) {
+        return repository.findByEquipmentTypes(types, count).orElseThrow(() -> new BusinessException( "No se encontró un taller con el equipamiento requerido para el producto"));
     }
 
     @Transactional

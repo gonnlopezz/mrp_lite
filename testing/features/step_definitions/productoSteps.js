@@ -28,7 +28,7 @@ Given('se fabrica haciendo la siguiente lista de tareas', async function (tabla)
 
         return {
             name: fila.nombreTarea,
-            orderTask: parseInt(fila.orden),
+            taskOrder: parseInt(fila.orden),
             duration: parseInt(fila.tiempo),
             type: {
                 id: realType.id,

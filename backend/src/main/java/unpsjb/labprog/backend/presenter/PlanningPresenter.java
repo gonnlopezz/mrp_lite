@@ -3,6 +3,7 @@ package unpsjb.labprog.backend.presenter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.planning.PlanningProcessService;
+import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
 
@@ -47,11 +49,24 @@ public class PlanningPresenter {
             return Response.ok(service.save(request), "Producto planificado con éxito");
         } catch (BusinessException e) {
             return Response.conflict(e.getMessage()); // 409
-        } 
-         catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             return Response.notFound(e.getMessage()); // 404
         } catch (Exception e) {
             return Response.error(e.getMessage()); // 400 para el resto
+        }
+
+    }
+
+    @PostMapping("/order")
+    public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
+        try {
+            return Response.ok(service.saveFromOrder(request), "Pedido planificado con éxito");
+        } catch (EntityNotFoundException e) {
+            return Response.notFound(e.getMessage());
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
         }
     }
 

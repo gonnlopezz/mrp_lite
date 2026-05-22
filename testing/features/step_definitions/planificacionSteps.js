@@ -57,22 +57,17 @@ When('se solicita planificar el pedido el día {string}', async function (date) 
     const [dia, mes, año] = date.split('-');
     const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
 
-    const response = await fetch('http://backend:8080/plannings', {
+    const response = await fetch('http://backend:8080/plannings/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            startDate: fechaISO,
-            productName: this.pedido.product.name,
-            workshopCode: ""
+            order: this.pedido,
+            startDate: fechaISO
         })
     });
 
-
     const data = await response.json();
-    this.resultado = {
-        status: response.status,
-        respuesta: data.message
-    };
+    this.resultado = { status: response.status, respuesta: data.message };
     this.responseBody = data.data;
 });
 

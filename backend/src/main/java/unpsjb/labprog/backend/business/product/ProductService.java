@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.business.equipment.EquipmentTypeRepository;
 import unpsjb.labprog.backend.model.Product;
 
@@ -43,8 +44,8 @@ public class ProductService {
         return repository.findById(id).orElse(null);
     }
 
-    public Optional<Product> findByName(String name) {
-        return repository.findByName(name);
+    public Product findByName(String name) {
+        return repository.findByName(name).orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
 
     }
 

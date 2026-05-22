@@ -74,7 +74,7 @@ Escenario: Planificación de un producto sin indicar el taller, pero solo uno pu
     Dado el producto con nombre "Soporte metálico mediano"
     Y que no existe el taller "TALLER_INEXISTENTE"
     Cuando se solicita planificar el producto en el taller el día "01-01-2025"
-    Entonces se espera el siguiente 404 con "Taller no encontrado."
+    Entonces se espera el siguiente 404 con "Taller no encontrado"
 
   Escenario: Planificación automática falla porque ningún taller tiene los equipos necesarios
     Dado el producto con nombre "Soporte en U para estantería"
