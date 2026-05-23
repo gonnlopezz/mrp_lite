@@ -29,6 +29,14 @@ public interface WorkshopRepository
         Optional<Workshop> findByEquipmentTypes(List<EquipmentType> types, int count);
 
         @Query("SELECT w FROM Workshop w " +
+                        "JOIN w.equipments e " +
+                        "WHERE e.type IN :types " +
+                        "GROUP BY w.id " +
+                        "HAVING COUNT(DISTINCT e.type) = :count " +
+                        "ORDER BY w.code ASC")
+        List<Workshop> findAllByEquipmentTypes(List<EquipmentType> types, int count);
+
+        @Query("SELECT w FROM Workshop w " +
                         "WHERE w.code ILIKE CONCAT('%', :term, '%') " +
                         "OR w.name ILIKE CONCAT('%', :term, '%')")
         Page<Workshop> search(String term, Pageable pageable);

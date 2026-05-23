@@ -52,7 +52,14 @@ public class WorkshopService {
     }
 
     public Workshop findByEquipmentTypes(List<EquipmentType> types, int count) {
-        return repository.findByEquipmentTypes(types, count).orElseThrow(() -> new BusinessException( "No se encontró un taller con el equipamiento requerido para el producto"));
+        return repository.findByEquipmentTypes(types, count).orElseThrow(
+                () -> new BusinessException("No se encontró un taller con el equipamiento requerido para el producto"));
+    }
+
+    public List<Workshop> findAllByEquipmentTypes(List<EquipmentType> types, int count) {
+        List<Workshop> result = repository.findAllByEquipmentTypes(types, count);
+        if (result.isEmpty()) throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
+        return result;
     }
 
     @Transactional

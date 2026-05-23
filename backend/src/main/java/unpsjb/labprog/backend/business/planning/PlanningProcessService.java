@@ -76,7 +76,6 @@ public class PlanningProcessService {
         return (List<PlanningProcess>) repository.saveAll(result); 
     }
 
-
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
 
@@ -91,7 +90,6 @@ public class PlanningProcessService {
         for (Task t : product.getTasks()) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
             
-
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, eq));
 
@@ -106,8 +104,8 @@ public class PlanningProcessService {
     private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
 
-        Workshop workshop = resolveWorkshop(null, requiredTypes);
-        Collection<Equipment> equipments = workshop.getEquipments();
+            Workshop workshop = resolveWorkshop(null, requiredTypes);
+            Collection<Equipment> equipments = workshop.getEquipments();
 
         List<Task> reversedTasks = new ArrayList<>(product.getTasks());
         Collections.reverse(reversedTasks);
@@ -132,16 +130,14 @@ public class PlanningProcessService {
         }
 
         return createPlanningProcess(plannings, deadline, currentProductEnd);
-
     }
-
+    
     private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
         PlanningProcess result = new PlanningProcess();
         result.setStart(start);
         result.setEndDate(end);
         result.setPlannings(plannings);
         return result;
-
     }
 
     private Planning createPlanning(Task aTask, Equipment aEquipment, LocalDateTime startTime, LocalDateTime endTime) {
@@ -167,7 +163,9 @@ public class PlanningProcessService {
             return workshop;
         }
 
-        return workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size());
+        List<Workshop> result = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
+
+        return result.get(0);
     }
 
     private LocalDateTime getNextAvailableSlot(Equipment equipment, LocalDateTime requestedTime) {

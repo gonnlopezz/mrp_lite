@@ -132,7 +132,6 @@ export class PlanningComponent implements OnInit {
 
                 const startDateStr = planning.period.start.split('T')[0];
 
-                // 💡 FILTRO AQUÍ: Solo agregamos si la fecha coincide
                 if (startDateStr !== this.selectedDate) return;
 
                 if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
@@ -162,7 +161,6 @@ export class PlanningComponent implements OnInit {
 
         const options = {
             height: calculatedHeight,
-            // Eliminamos "width: '100%'" de acá para que respete el min-width del HTML
             colors,
             tooltip: { isHtml: true },
             timeline: {
@@ -177,7 +175,6 @@ export class PlanningComponent implements OnInit {
         chart.draw(dataTable, options);
     }
 
-    // Método para navegar
     changeDate(direction: 'prev' | 'next'): void {
         const currentIndex = this.availableDates.indexOf(this.selectedDate);
 
@@ -190,7 +187,6 @@ export class PlanningComponent implements OnInit {
         this.generateTimelineChart();
     }
 
-    // Helpers para desactivar flechas si no hay más fechas
     isFirstDate(): boolean {
         return this.availableDates.indexOf(this.selectedDate) === 0;
     }
