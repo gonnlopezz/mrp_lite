@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,30 +58,55 @@ public class PlanningProcessService {
 
     @Transactional
     public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
-        List<PlanningProcess> result = new ArrayList<>();
         ManufacturingOrder order = orderService.findById(request.getOrder().getId());
         Product product = productService.findById(order.getProduct().getId());
 
         LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
-        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
+        LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
 
-        for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess unitProcess = productPlanningBackwards(product, finalDeliveryDate, equipmentFreeTime);
-            unitProcess.setOrder(order);
-            result.add(unitProcess);
-        }
+        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
+        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
+
+        List<PlanningProcess> finalProcesses = availableWorkshops.stream()
+                .map(workshop -> simulateWorkshopPlanning(workshop, product, order, finalDeliveryDate, requestedStart))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("No se encontró un taller con el equipamiento y la ventana temporal requerida"));
 
         order.setState(OrderState.PLANIFICADO);
         orderService.save(order);
 
-        return (List<PlanningProcess>) repository.saveAll(result); 
+        return (List<PlanningProcess>) repository.saveAll(finalProcesses);
     }
+
+    private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
+            Workshop workshop, 
+            Product product, 
+            ManufacturingOrder order, 
+            LocalDateTime finalDeliveryDate, 
+            LocalDateTime requestedStart) {
+        
+        List<PlanningProcess> candidateProcesses = new ArrayList<>();
+        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
+
+        for (int i = 0; i < order.getQuantity(); i++) {
+            PlanningProcess unitProcess = productPlanningBackwards(product, workshop, finalDeliveryDate, equipmentFreeTime);
+            unitProcess.setOrder(order);
+
+            if (unitProcess.getStart().isBefore(requestedStart)) {
+                return Optional.empty();
+            }
+            candidateProcesses.add(unitProcess);
+        }
+
+        return Optional.of(candidateProcesses);
+    }
+    
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
-
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-
         Workshop workshop = resolveWorkshop(workshopCode, requiredTypes);
 
         List<Planning> plannings = new ArrayList<>();
@@ -89,49 +115,79 @@ public class PlanningProcessService {
 
         for (Task t : product.getTasks()) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
-            
             LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, eq));
 
             plannings.add(createPlanning(t, eq, availableTime, end));
-
             currentTime = end;
         }
 
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    private PlanningProcess productPlanningBackwards(Product product, LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
-        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-
-            Workshop workshop = resolveWorkshop(null, requiredTypes);
-            Collection<Equipment> equipments = workshop.getEquipments();
+    private PlanningProcess productPlanningBackwards(Product product, Workshop workshop, LocalDateTime deadline,
+            Map<Long, LocalDateTime> equipmentFreeTime) {
+        Collection<Equipment> equipments = workshop.getEquipments();
 
         List<Task> reversedTasks = new ArrayList<>(product.getTasks());
         Collections.reverse(reversedTasks);
 
         List<Planning> plannings = new LinkedList<>();
-
         LocalDateTime currentProductEnd = deadline;
+        LocalDateTime overallStart = deadline;
 
         for (Task t : reversedTasks) {
             Equipment eq = getRequiredEquipmentFor(t, equipments);
+            long durationMinutes = calculateTaskDurationFor(t, eq);
 
-            LocalDateTime eqAvailableUntil = equipmentFreeTime.getOrDefault(eq.getId(), deadline);
 
-            LocalDateTime end = currentProductEnd.isBefore(eqAvailableUntil) ? currentProductEnd : eqAvailableUntil;
-            LocalDateTime start = end.minusMinutes(calculateTaskDurationFor(t, eq));
+            LocalDateTime end = findAvailableEndBackwards(eq, currentProductEnd, durationMinutes, equipmentFreeTime);
+            LocalDateTime start = end.minusMinutes(durationMinutes);
 
             plannings.add(0, createPlanning(t, eq, start, end));
 
             currentProductEnd = start;
+            overallStart = start;
 
             equipmentFreeTime.put(eq.getId(), start);
         }
 
-        return createPlanningProcess(plannings, deadline, currentProductEnd);
+        return createPlanningProcess(plannings, overallStart, deadline);
     }
-    
+
+    private LocalDateTime findAvailableEndBackwards(Equipment eq, LocalDateTime maxEnd, long durationMinutes,
+            Map<Long, LocalDateTime> equipmentFreeTime) {
+        LocalDateTime targetEnd = maxEnd;
+        if (equipmentFreeTime.containsKey(eq.getId()) && equipmentFreeTime.get(eq.getId()).isBefore(targetEnd)) {
+            targetEnd = equipmentFreeTime.get(eq.getId());
+        }
+
+        List<Planning> existingPlannings = eq.getPlannings();
+        if (existingPlannings == null || existingPlannings.isEmpty()) {
+            return targetEnd;
+        }
+
+        boolean hasOverlap = true;
+        while (hasOverlap) {
+            hasOverlap = false;
+            LocalDateTime targetStart = targetEnd.minusMinutes(durationMinutes);
+
+            for (Planning p : existingPlannings) {
+                if (p.getPeriod() == null)
+                    continue;
+                LocalDateTime bStart = p.getPeriod().getStart();
+                LocalDateTime bEnd = p.getPeriod().getEndDate();
+
+                if (targetStart.isBefore(bEnd) && targetEnd.isAfter(bStart)) {
+                    targetEnd = bStart;
+                    hasOverlap = true;
+                    break;
+                }
+            }
+        }
+        return targetEnd;
+    }
+
     private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
         PlanningProcess result = new PlanningProcess();
         result.setStart(start);
@@ -151,7 +207,6 @@ public class PlanningProcessService {
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
         if (workshopCode != null) {
             Workshop workshop = workshopService.findByCode(workshopCode);
-
             Set<EquipmentType> availableTypes = workshop.getEquipments().stream()
                     .map(Equipment::getType)
                     .collect(Collectors.toSet());
@@ -164,6 +219,8 @@ public class PlanningProcessService {
         }
 
         List<Workshop> result = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
+        if (result.isEmpty())
+            throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
 
         return result.get(0);
     }
@@ -178,12 +235,11 @@ public class PlanningProcessService {
     }
 
     private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
-        List<EquipmentType> result = aProduct.getTasks().stream()
+        return aProduct.getTasks().stream()
                 .map(Task::getType)
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toList());
-        return result;
     }
 
     private Equipment getRequiredEquipmentFor(Task aTask, Collection<Equipment> equipments) {
@@ -198,8 +254,7 @@ public class PlanningProcessService {
     }
 
     private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-        long result = aTask.getDuration() / aEquipment.getCapacity();
-        return result;
+        return aTask.getDuration() / aEquipment.getCapacity();
     }
 
     public List<PlanningProcess> findAll() {
@@ -218,6 +273,13 @@ public class PlanningProcessService {
 
     public PlanningProcess findById(long id) {
         return repository.findById(id).orElse(null);
+    }
+
+    public List<PlanningProcess> findFiltered(Long workshopId, Long orderId) {
+        if (workshopId == null && orderId == null)
+            return this.findAll();
+
+        return repository.findProcessesByFilters(workshopId, orderId);
     }
 
     @Transactional

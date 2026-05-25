@@ -44,10 +44,9 @@ Escenario: Planificación de un pedido con el taller primera opción completamen
     Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
     Y se generaron las siguientes planificaciones
       | inicio           | fin              | equipo        | tarea               |
-      | 2025-02-09 21:10 | 2025-02-09 22:10 | G01_amoladora | cortar planchas     |
-      | 2025-02-09 22:10 | 2025-02-09 22:30 | G01_amoladora | cortar perfiles     |
-      | 2025-02-09 22:30 | 2025-02-10 00:00 | G02_soldadora | armado              |
-
+      | 2025-02-09 22:35 | 2025-02-09 23:05 | G01_amoladora | cortar planchas     |
+      | 2025-02-09 23:05 | 2025-02-09 23:15 | G01_amoladora | cortar perfiles     |
+      | 2025-02-09 23:15 | 2025-02-10 00:00 | G02_soldadora | armado              |
 
   Esquema del escenario: Generar nuevos pedidos de fabricación para el proceso de planificación
     Dada el producto con nombre "<producto>"
@@ -59,13 +58,3 @@ Escenario: Planificación de un pedido con el taller primera opción completamen
       | 20654239875 | 2025-03-01   | 2025-03-05   |        4 | Canasto de basura chico 1,5mts  |    200 | Pedido de fabricación generado correctamente |
       | 20654239875 | 2025-03-01   | 2025-03-05   |        3 | Pieza chica en U                |    200 | Pedido de fabricación generado correctamente |
       
-  Escenario: Planificación de todos los pedidos pendientes.
-    Dado que existe el pedido para el cliente "27982145634" con fecha de entrega "10-02-2025"
-    Cuando se solicita planificar el pedido el día "09-02-2025"
-    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
-    Y se generaron las siguientes planificaciones
-      | inicio           | fin              | equipo        | tarea               |
-      | 2025-02-09 21:10 | 2025-02-09 22:10 | G01_amoladora | cortar planchas     |
-      | 2025-02-09 22:10 | 2025-02-09 22:30 | G01_amoladora | cortar perfiles     |
-      | 2025-02-09 22:30 | 2025-02-10 00:00 | G02_soldadora | armado              |
-

@@ -91,6 +91,25 @@
                         </li>
                     </ul>
                 </li>
+
+                <li class="nav-item dropdown me-2" ngbDropdown #planningDrop="ngbDropdown"
+                    (mouseenter)="planningDrop.open()" (mouseleave)="planningDrop.close()">
+                    <a class="nav-link dropdown-toggle fw-medium" id="planningDropdown" ngbDropdownToggle role="button">
+                        Planificación
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-modern border-0 shadow-lg" ngbDropdownMenu>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" routerLink="planning-dashboard">
+                                <i class="fas fa-list-ul me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" routerLink="orders/new">
+                                <i class="fas fa-plus me-2"></i> Nuevo
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

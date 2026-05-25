@@ -28,4 +28,17 @@ export class PlanningService {
   getByPage(page: number, size: number): Observable<DataPackage> {
     return this.http.get<DataPackage>(`${this.planningUrl}/page?page=${page - 1}&size=${size}`);
   }
+
+  getPlanningsFiltered(workshopId: string | number, orderId: string | number): Observable<DataPackage> {
+    let params = '?';
+    if (workshopId) params += `workshopId=${workshopId}&`;
+    if (orderId) params += `orderId=${orderId}`;
+
+    if (params.endsWith('&') || params.endsWith('?')) {
+      params = params.slice(0, -1);
+    }
+
+    return this.http.get<DataPackage>(`${this.planningUrl}/filtered${params}`);
+  }
+
 }

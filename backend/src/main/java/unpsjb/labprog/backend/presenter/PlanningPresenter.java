@@ -40,6 +40,14 @@ public class PlanningPresenter {
         return Response.ok(service.findById(id));
     }
 
+    @RequestMapping(value = "/filtered", method = RequestMethod.GET)
+    public ResponseEntity<Object> getPlanningsFiltered(
+            @RequestParam(value = "workshopId", required = false) Long workshopId,
+            @RequestParam(value = "orderId", required = false) Long orderId) {
+
+        return Response.ok(service.findFiltered(workshopId, orderId));
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> createPlanning(@RequestBody PlanningRequestDTO request) {
         if (request.getWorkshopCode() != null && request.getWorkshopCode().isBlank()) {

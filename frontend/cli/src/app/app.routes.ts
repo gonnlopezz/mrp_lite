@@ -10,6 +10,7 @@ import { ProductsDetailComponent } from './products/products-detail.component';
 import { PlanningComponent } from './planning/plannings.component';
 import { ManufacturingOrdersComponent } from './orders/manufacturing-orders.component';
 import { ManufacturingOrderDetailComponent } from './orders/manufacturing-order-detail.component';
+import { PlanningDashboardComponent } from './planning/planning-dashboard.component';
 
 export const routes: Routes = [
     {path: "", component: HomeComponent},
@@ -23,5 +24,6 @@ export const routes: Routes = [
     {path: "workshops/:id/plannings", component: PlanningComponent},
     {path: "orders", component: ManufacturingOrdersComponent},
     {path: "orders/:id", component: ManufacturingOrderDetailComponent},
-    {path: "orders/:id/plannings", component: PlanningComponent}
+    {path: "orders/:id/plannings", component: PlanningComponent},
+    {path: "planning-dashboard", component: PlanningDashboardComponent}
 ];
