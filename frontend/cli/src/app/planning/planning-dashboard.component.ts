@@ -16,6 +16,7 @@ import { Product } from '../products/product';
 import { PlanningProcess } from '../planning/planning';
 import { ColorMode, ChartRow, WorkshopChartBlock, DayOrderSummary, DayProductSummary } from './planning-dashboard';
 import { productService } from '../products/product.service';
+import { RouterModule } from '@angular/router';
 
 const PROCESS_PALETTE = [
   '#3366cc', '#dc3912', '#ff9900', '#109618',
@@ -27,9 +28,9 @@ declare var google: any;
 @Component({
   selector: 'app-planning-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './planning-dashboard.html',
-  providers: [PlanningChartService]                        
+  providers: [PlanningChartService]
 })
 export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
@@ -60,7 +61,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     private orderService: OrderService,
     private productService: productService,
     private planningService: PlanningService,
-    private chartService: PlanningChartService,       
+    private chartService: PlanningChartService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -244,9 +245,11 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
           equipmentCode: planning.equipment?.code ?? 'S/E',
           rowLabel: processLabel,
           tooltip: this.buildTooltip(
-            processLabel, planning.task?.name ?? 'Tarea',
+            processLabel,
+            planning.task?.name ?? 'Tarea',
             planning.equipment?.code ?? 'S/E',
-            planning.task?.duration ?? 0, start, end, color
+            start, end,    // <-- ya no pasamos duration
+            color
           ),
           start, end, color
         };
@@ -349,19 +352,25 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   private buildTooltip(
-    processLabel: string, taskName: string, equipCode: string,
-    duration: number, start: Date, end: Date, color: string
+    processLabel: string,
+    taskName: string,
+    equipCode: string,
+    start: Date,
+    end: Date,
+    color: string
   ): string {
     const fmt = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const durationMinutes = Math.round((end.getTime() - start.getTime()) / 60000);
+
     return `
-      <div style="padding:10px; font-size:13px; min-width:180px; font-family:sans-serif;">
-        <b style="color:${color};">${processLabel}</b><br/>
-        <b>Tarea:</b> ${taskName}<br/>
-        <b>Equipo:</b> ${equipCode}<br/>
-        <b>Duración:</b> ${duration} min<br/>
-        <b>Inicio:</b> ${fmt(start)}<br/>
-        <b>Fin:</b> ${fmt(end)}<br/>
-      </div>`;
+    <div style="padding:10px; font-size:13px; min-width:180px; font-family:sans-serif;">
+      <b style="color:${color};">${processLabel}</b><br/>
+      <b>Tarea:</b> ${taskName}<br/>
+      <b>Equipo:</b> ${equipCode}<br/>
+      <b>Duración:</b> ${durationMinutes} min<br/>
+      <b>Inicio:</b> ${fmt(start)}<br/>
+      <b>Fin:</b> ${fmt(end)}<br/>
+    </div>`;
   }
 
   // ─── Getters de template ─────────────────────────────────────────────────
