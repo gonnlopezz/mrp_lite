@@ -188,23 +188,22 @@ public class PlanningProcessService {
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
         if (workshopCode != null) {
-            Workshop workshop = workshopService.findByCode(workshopCode);
-            Set<EquipmentType> availableTypes = workshop.getEquipments().stream()
-                    .map(Equipment::getType)
-                    .collect(Collectors.toSet());
+            Workshop result = workshopService.findByCode(workshopCode);
+            long matchingTypesCount = workshopService.countMatchingEquipmentTypes(workshopCode, requiredTypes);
 
-            if (!availableTypes.containsAll(requiredTypes))
-                throw new BusinessException("El taller " + workshop.getCode()
+            if (matchingTypesCount != requiredTypes.size()) {
+                throw new BusinessException("El taller " + workshopCode
                         + " no cuenta con los equipos necesarios para fabricar el producto");
+            }
 
-            return workshop;
+            return result;
         }
 
-        List<Workshop> result = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
-        if (result.isEmpty())
+        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
+        if (workshops.isEmpty())
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
-
-        return result.get(0);
+        Workshop result = workshops.get(0);
+        return result;
     }
 
     private LocalDateTime getNextAvailableSlot(Equipment equipment, LocalDateTime requestedTime) {

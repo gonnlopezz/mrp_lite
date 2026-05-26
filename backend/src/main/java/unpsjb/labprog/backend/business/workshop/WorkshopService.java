@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -60,6 +61,10 @@ public class WorkshopService {
         List<Workshop> result = repository.findAllByEquipmentTypes(types, count);
         if (result.isEmpty()) throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
         return result;
+    }
+
+    public long countMatchingEquipmentTypes(String code, List<EquipmentType> types) {
+        return repository.countMatchingEquipmentTypes(code, types);
     }
 
     @Transactional

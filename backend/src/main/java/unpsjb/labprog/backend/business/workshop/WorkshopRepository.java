@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import unpsjb.labprog.backend.model.EquipmentType;
@@ -19,14 +20,11 @@ public interface WorkshopRepository
         @Query("Select e FROM Workshop e Where e.code = ?1")
         Optional<Workshop> findByCode(String code);
 
-        @Query("SELECT w FROM Workshop w " +
+        @Query("SELECT COUNT(DISTINCT e.type) FROM Workshop w " +
                         "JOIN w.equipments e " +
-                        "WHERE e.type IN :types " +
-                        "GROUP BY w.id " +
-                        "HAVING COUNT(DISTINCT e.type) = :count " +
-                        "ORDER BY w.code ASC " +
-                        "LIMIT 1")
-        Optional<Workshop> findByEquipmentTypes(List<EquipmentType> types, int count);
+                        "WHERE w.code = :code AND e.type IN :types")
+        long countMatchingEquipmentTypes(@Param("code") String code, @Param("types") List<EquipmentType> types);
+
 
         @Query("SELECT w FROM Workshop w " +
                         "JOIN w.equipments e " +
