@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,15 +66,11 @@ public class PlanningProcessService {
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
 
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
+        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(requiredTypes,
+                requiredTypes.size());
 
-        List<PlanningProcess> finalProcesses = availableWorkshops.stream()
-                .map(workshop -> simulateWorkshopPlanning(workshop, product, order, finalDeliveryDate, requestedStart))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst()
-                .orElseThrow(() -> new BusinessException("No se encontró un taller con el equipamiento y la ventana temporal requerida"));
-
+        List<PlanningProcess> finalProcesses = searchValidPlanning(availableWorkshops, product, order,
+                finalDeliveryDate, requestedStart);
         order.setState(OrderState.PLANIFICADO);
         orderService.save(order);
 
@@ -81,28 +78,28 @@ public class PlanningProcessService {
     }
 
     private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
-            Workshop workshop, 
-            Product product, 
-            ManufacturingOrder order, 
-            LocalDateTime finalDeliveryDate, 
+            Workshop aWorkshop,
+            Product aProduct,
+            ManufacturingOrder order,
+            LocalDateTime finalDeliveryDate,
             LocalDateTime requestedStart) {
-        
-        List<PlanningProcess> candidateProcesses = new ArrayList<>();
+
+        List<PlanningProcess> result = new ArrayList<>();
         Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
 
         for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess unitProcess = productPlanningBackwards(product, workshop, finalDeliveryDate, equipmentFreeTime);
+            PlanningProcess unitProcess = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
+                    equipmentFreeTime);
             unitProcess.setOrder(order);
 
-            if (unitProcess.getStart().isBefore(requestedStart)) {
+            if (unitProcess.getStart().isBefore(requestedStart))
                 return Optional.empty();
-            }
-            candidateProcesses.add(unitProcess);
+
+            result.add(unitProcess);
         }
 
-        return Optional.of(candidateProcesses);
+        return Optional.of(result);
     }
-    
 
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
@@ -114,22 +111,22 @@ public class PlanningProcessService {
         Collection<Equipment> equipments = workshop.getEquipments();
 
         for (Task t : product.getTasks()) {
-            Equipment eq = getRequiredEquipmentFor(t, equipments);
-            LocalDateTime availableTime = getNextAvailableSlot(eq, currentTime);
-            LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, eq));
+            Equipment equipment = getRequiredEquipmentFor(t, equipments);
+            LocalDateTime availableTime = getNextAvailableSlot(equipment, currentTime);
+            LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, equipment));
 
-            plannings.add(createPlanning(t, eq, availableTime, end));
+            plannings.add(createPlanning(t, equipment, availableTime, end));
             currentTime = end;
         }
 
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    private PlanningProcess productPlanningBackwards(Product product, Workshop workshop, LocalDateTime deadline,
+    private PlanningProcess productPlanningBackwards(Product aProduct, Workshop aWorkshop, LocalDateTime deadline,
             Map<Long, LocalDateTime> equipmentFreeTime) {
-        Collection<Equipment> equipments = workshop.getEquipments();
+        Collection<Equipment> equipments = aWorkshop.getEquipments();
 
-        List<Task> reversedTasks = new ArrayList<>(product.getTasks());
+        List<Task> reversedTasks = new ArrayList<>(aProduct.getTasks());
         Collections.reverse(reversedTasks);
 
         List<Planning> plannings = new LinkedList<>();
@@ -137,71 +134,56 @@ public class PlanningProcessService {
         LocalDateTime overallStart = deadline;
 
         for (Task t : reversedTasks) {
-            Equipment eq = getRequiredEquipmentFor(t, equipments);
-            long durationMinutes = calculateTaskDurationFor(t, eq);
+            Equipment equipment = getRequiredEquipmentFor(t, equipments);
+            long durationMinutes = calculateTaskDurationFor(t, equipment);
 
-
-            LocalDateTime end = findAvailableEndBackwards(eq, currentProductEnd, durationMinutes, equipmentFreeTime);
+            LocalDateTime end = findAvailableEndBackwards(equipment, currentProductEnd, durationMinutes,
+                    equipmentFreeTime);
             LocalDateTime start = end.minusMinutes(durationMinutes);
 
-            plannings.add(0, createPlanning(t, eq, start, end));
+            plannings.add(0, createPlanning(t, equipment, start, end));
 
             currentProductEnd = start;
             overallStart = start;
 
-            equipmentFreeTime.put(eq.getId(), start);
+            equipmentFreeTime.put(equipment.getId(), start);
         }
 
         return createPlanningProcess(plannings, overallStart, deadline);
     }
 
-    private LocalDateTime findAvailableEndBackwards(Equipment eq, LocalDateTime maxEnd, long durationMinutes,
+    private LocalDateTime findAvailableEndBackwards(Equipment aEquipment, LocalDateTime maxEnd, long durationMinutes,
             Map<Long, LocalDateTime> equipmentFreeTime) {
-        LocalDateTime targetEnd = maxEnd;
-        if (equipmentFreeTime.containsKey(eq.getId()) && equipmentFreeTime.get(eq.getId()).isBefore(targetEnd)) {
-            targetEnd = equipmentFreeTime.get(eq.getId());
+
+        LocalDateTime result = maxEnd;
+        if (equipmentFreeTime.containsKey(aEquipment.getId())
+                && equipmentFreeTime.get(aEquipment.getId()).isBefore(result))
+            result = equipmentFreeTime.get(aEquipment.getId());
+
+        List<Planning> existingPlannings = aEquipment.getPlannings();
+        if (existingPlannings == null || existingPlannings.isEmpty())
+            return result;
+
+        for (Planning p : existingPlannings) {
+            LocalDateTime targetStart = result.minusMinutes(durationMinutes);
+            LocalDateTime bStart = p.getPeriod().getStart();
+            LocalDateTime bEnd = p.getPeriod().getEndDate();
+
+            if (targetStart.isBefore(bEnd) && result.isAfter(bStart))
+                result = bStart;
         }
 
-        List<Planning> existingPlannings = eq.getPlannings();
-        if (existingPlannings == null || existingPlannings.isEmpty()) {
-            return targetEnd;
-        }
-
-        boolean hasOverlap = true;
-        while (hasOverlap) {
-            hasOverlap = false;
-            LocalDateTime targetStart = targetEnd.minusMinutes(durationMinutes);
-
-            for (Planning p : existingPlannings) {
-                if (p.getPeriod() == null)
-                    continue;
-                LocalDateTime bStart = p.getPeriod().getStart();
-                LocalDateTime bEnd = p.getPeriod().getEndDate();
-
-                if (targetStart.isBefore(bEnd) && targetEnd.isAfter(bStart)) {
-                    targetEnd = bStart;
-                    hasOverlap = true;
-                    break;
-                }
-            }
-        }
-        return targetEnd;
-    }
-
-    private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
-        PlanningProcess result = new PlanningProcess();
-        result.setStart(start);
-        result.setEndDate(end);
-        result.setPlannings(plannings);
         return result;
     }
 
-    private Planning createPlanning(Task aTask, Equipment aEquipment, LocalDateTime startTime, LocalDateTime endTime) {
-        Planning result = new Planning();
-        result.setTask(aTask);
-        result.setPeriod(new Period(startTime, endTime, aTask.getDuration()));
-        result.setEquipment(aEquipment);
-        return result;
+    private List<PlanningProcess> searchValidPlanning(
+            List<Workshop> workshops, Product product, ManufacturingOrder order,
+            LocalDateTime deliveryDate, LocalDateTime requestedStart) {
+        return workshops.stream()
+                .flatMap(w -> simulateWorkshopPlanning(w, product, order, deliveryDate, requestedStart).stream())
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(
+                        "No se encontró un taller con el equipamiento y la ventana temporal requerida"));
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
@@ -250,6 +232,22 @@ public class PlanningProcessService {
         if (result == null)
             throw new BusinessException("Equipo no encontrado para la tarea");
 
+        return result;
+    }
+
+    private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
+        PlanningProcess result = new PlanningProcess();
+        result.setStart(start);
+        result.setEndDate(end);
+        result.setPlannings(plannings);
+        return result;
+    }
+
+    private Planning createPlanning(Task aTask, Equipment aEquipment, LocalDateTime startTime, LocalDateTime endTime) {
+        Planning result = new Planning();
+        result.setTask(aTask);
+        result.setPeriod(new Period(startTime, endTime, aTask.getDuration()));
+        result.setEquipment(aEquipment);
         return result;
     }
 

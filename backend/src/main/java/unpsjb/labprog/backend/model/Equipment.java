@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,7 @@ public class Equipment {
     private EquipmentType type;
 
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
+    @OrderBy("period.endDate DESC")
     private List<Planning> plannings = new ArrayList<>();
 
 }
