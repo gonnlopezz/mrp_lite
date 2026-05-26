@@ -8,7 +8,9 @@ import { PlanningService } from './planning.service';
 import { Workshop } from '../workshops/workshop';
 import { manufacturingOrder } from '../orders/manufacturingOrder';
 import { PlanningProcess } from '../planning/planning';
-import { ChartRow, ColorMode, DayOrderSummary, WorkshopChartBlock } from './planning-dasboard';
+import { ChartRow, ColorMode, DayOrderSummary, DayProductSummary, WorkshopChartBlock } from './planning-dasboard';
+import { Product } from '../products/product';
+import { productService } from '../products/product.service';
 
 
 declare var google: any;
@@ -29,6 +31,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   @ViewChildren('chartDiv') chartDivs!: QueryList<ElementRef>;
 
   private equipmentWorkshopMap = new Map<number, { code: string; name: string }>();
+  private taskProductMap = new Map<number, string>();
+  private dayTimeRange: { min: Date; max: Date } | null = null;
 
   workshops: Workshop[] = [];
   orders: manufacturingOrder[] = [];
@@ -40,29 +44,30 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   colorMode: ColorMode = 'by-process';
 
   availableDates: string[] = [];
-  ordersOfTheDay: DayOrderSummary[] = [];
   workshopBlocks: WorkshopChartBlock[] = [];
 
   loading = false;
   googleChartsLoaded = false;
+  renderingCharts = false;
 
   constructor(
     private workshopService: WorkshopService,
     private orderService: OrderService,
     private planningService: PlanningService,
+    private productService: productService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-  // Los selects se cargan UNA sola vez
-  this.loadSelectData();
+    // Los selects se cargan UNA sola vez
+    this.loadSelectData();
 
-  google.charts.load('current', { packages: ['timeline'] });
-  google.charts.setOnLoadCallback(() => {
-    this.googleChartsLoaded = true;
-    this.fetchAndRender();
-  });
-}
+    google.charts.load('current', { packages: ['timeline'] });
+    google.charts.setOnLoadCallback(() => {
+      this.googleChartsLoaded = true;
+      this.fetchAndRender();
+    });
+  }
 
   ngAfterViewInit(): void {
     // Se dispara cada vez que el *ngFor agrega/quita divs del DOM
@@ -83,44 +88,43 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   loadSelectData(): void {
-  forkJoin({
-    workshops: this.workshopService.all(),
-    orders:    this.orderService.all()
-  }).subscribe({
-    next: ({ workshops, orders }) => {
-      this.workshops = workshops.data as Workshop[];
-      this.orders    = orders.data as manufacturingOrder[];
-      // El mapa se puede construir aquí ya que no depende de planificaciones
-      this.buildEquipmentWorkshopMap();
-    },
-    error: (err) => console.error('Error cargando filtros:', err)
-  });
-}
-
-  fetchAndRender(): void {
-  if (!this.googleChartsLoaded) return;
-
-  this.loading = true;
-
-  this.planningService
-    .getPlanningsFiltered(this.selectedWorkshopId, this.selectedOrderId)
-    .subscribe({
-      next: (dataPackage: any) => {
-        this.planningProcesses = dataPackage.data as PlanningProcess[];
-
-        this.computeAvailableDates();
-        this.computeOrdersOfTheDay();
-        this.computeWorkshopBlocks();
-
-        this.loading = false;
-        this.renderAllCharts();
+    forkJoin({
+      workshops: this.workshopService.all(),
+      orders: this.orderService.all(),
+      products: this.productService.all()   // <-- agregar
+    }).subscribe({
+      next: ({ workshops, orders, products }) => {
+        this.workshops = workshops.data as Workshop[];
+        this.orders = orders.data as manufacturingOrder[];
+        this.buildEquipmentWorkshopMap();
+        this.buildTaskProductMap(products.data as Product[]);  // <-- agregar
       },
-      error: (err) => {
-        console.error('Error cargando planificaciones:', err);
-        this.loading = false;
-      }
+      error: (err) => console.error('Error cargando filtros:', err)
     });
-}
+  }
+  fetchAndRender(): void {
+    if (!this.googleChartsLoaded) return;
+
+    this.loading = true;
+
+    this.planningService
+      .getPlanningsFiltered(this.selectedWorkshopId, this.selectedOrderId)
+      .subscribe({
+        next: (dataPackage: any) => {
+          this.planningProcesses = dataPackage.data as PlanningProcess[];
+
+          this.computeAvailableDates();
+          this.computeWorkshopBlocks();
+
+          this.loading = false;
+          this.renderAllCharts();
+        },
+        error: (err) => {
+          console.error('Error cargando planificaciones:', err);
+          this.loading = false;
+        }
+      });
+  }
 
   // ─── Extrae las fechas únicas con planificaciones ────────────────────────
 
@@ -148,54 +152,6 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // ─── Calcula el resumen de órdenes activas en la fecha seleccionada ──────
-
-  private computeOrdersOfTheDay(): void {
-    if (!this.selectedDate || this.planningProcesses.length === 0) {
-      this.ordersOfTheDay = [];
-      return;
-    }
-
-    const ordersMap = new Map<number, DayOrderSummary>();
-
-    this.planningProcesses.forEach(process => {
-      const order = process.order;
-      if (!order?.id) return;
-
-      const activeWorkshopNames = (process.plannings ?? [])
-        .filter(p => p.period?.start?.split('T')[0] === this.selectedDate)
-        .map(p => {
-          const ws = this.equipmentWorkshopMap.get(p.equipment?.id);
-          return ws?.name ?? null;
-        })
-        .filter((name): name is string => !!name);
-
-      if (activeWorkshopNames.length === 0) return;
-
-      if (!ordersMap.has(order.id)) {
-        ordersMap.set(order.id, {
-          orderId: order.id,
-          orderLabel: `Orden #${order.id}`,
-          customerName: order.customer?.companyName ?? 'Cliente',
-          productName: order.product?.name ?? 'Producto no especificado',
-          processCount: 1,
-          workshopNames: [...new Set(activeWorkshopNames)]
-        });
-      } else {
-        const existing = ordersMap.get(order.id)!;
-        existing.processCount++;
-        activeWorkshopNames.forEach(name => {
-          if (!existing.workshopNames.includes(name)) {
-            existing.workshopNames.push(name);
-          }
-        });
-      }
-    });
-
-    this.ordersOfTheDay = Array.from(ordersMap.values());
-  }
-  // ─── Arma los bloques de chart: uno por taller visible ──────────────────
-
   private computeWorkshopBlocks(): void {
     if (!this.selectedDate || this.planningProcesses.length === 0) {
       this.workshopBlocks = [];
@@ -219,8 +175,6 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
         const equipmentId = planning.equipment?.id;
         const workshop = this.equipmentWorkshopMap.get(equipmentId);
-
-        // Si el equipo no pertenece a ningún taller conocido, lo ignoramos
         if (!workshop) return;
 
         const equipCode = planning.equipment?.code ?? 'S/E';
@@ -234,24 +188,116 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
         const row: ChartRow = {
           equipmentCode: equipCode,
           rowLabel: processLabel,
-          tooltip,
-          start,
-          end,
-          color
+          tooltip, start, end, color
         };
 
         if (!blocksMap.has(workshop.code)) {
           blocksMap.set(workshop.code, {
             workshopName: workshop.name,
             workshopCode: workshop.code,
-            rows: []
+            rows: [],
+            ordersOfTheDay: [],
+            productsOfTheDay: []
           });
         }
         blocksMap.get(workshop.code)!.rows.push(row);
       });
     });
 
+    // Una vez armados los bloques, calculamos el resumen de cada uno
+    blocksMap.forEach((block, workshopCode) => {
+      const { orders, products } = this.computeSummaryForWorkshop(workshopCode);
+      block.ordersOfTheDay = orders;
+      block.productsOfTheDay = products;
+    });
+
     this.workshopBlocks = Array.from(blocksMap.values());
+    this.computeDayTimeRange();
+  }
+
+  private computeSummaryForWorkshop(workshopCode: string): {
+    orders: DayOrderSummary[];
+    products: DayProductSummary[];
+  } {
+    const ordersMap = new Map<number, DayOrderSummary>();
+    const productsMap = new Map<string, DayProductSummary>();
+
+    this.planningProcesses.forEach(process => {
+      const activeHerePlannings = process.plannings?.filter(p => {
+        const dateStr = p.period?.start?.split('T')[0];
+        const workshop = this.equipmentWorkshopMap.get(p.equipment?.id);
+        return dateStr === this.selectedDate && workshop?.code === workshopCode;
+      }) ?? [];
+
+      if (activeHerePlannings.length === 0) return;
+
+      if (process.order?.id) {
+        // Proceso con orden — el producto viene de la orden
+        const order = process.order;
+        if (!ordersMap.has(order.id)) {
+          ordersMap.set(order.id, {
+            orderId: order.id,
+            orderLabel: `Orden #${order.id}`,
+            customerName: order.customer?.companyName ?? 'Cliente',
+            productName: order.product?.name ?? 'Producto no especificado',
+            processCount: 1,
+            workshopNames: [workshopCode]
+          });
+        } else {
+          ordersMap.get(order.id)!.processCount++;
+        }
+
+      } else {
+        // Proceso sin orden — buscamos el producto via taskId
+        const taskId = activeHerePlannings[0].task?.id;
+        const productName = taskId ? this.taskProductMap.get(taskId) : null;
+        if (!productName) return;
+
+        if (!productsMap.has(productName)) {
+          productsMap.set(productName, { productName, processCount: 1 });
+        } else {
+          productsMap.get(productName)!.processCount++;
+        }
+      }
+    });
+
+    return {
+      orders: Array.from(ordersMap.values()),
+      products: Array.from(productsMap.values())
+    };
+  }
+
+
+  private computeDayTimeRange(): void {
+    const allStarts: Date[] = [];
+    const allEnds: Date[] = [];
+
+    this.workshopBlocks.forEach(block => {
+      block.rows.forEach(row => {
+        allStarts.push(row.start);
+        allEnds.push(row.end);
+      });
+    });
+
+    if (allStarts.length === 0) {
+      this.dayTimeRange = null;
+      return;
+    }
+
+    this.dayTimeRange = {
+      min: new Date(Math.min(...allStarts.map(d => d.getTime()))),
+      max: new Date(Math.max(...allEnds.map(d => d.getTime())))
+    };
+  }
+
+
+  private buildTaskProductMap(products: Product[]): void {
+    this.taskProductMap.clear();
+    products.forEach(product => {
+      product.tasks?.forEach(task => {
+        this.taskProductMap.set(task.id, product.name);
+      });
+    });
   }
 
   private buildEquipmentWorkshopMap(): void {
@@ -325,7 +371,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     }
 
     // Al cambiar fecha solo recalculamos los derivados, no volvemos a llamar al backend
-    this.computeOrdersOfTheDay();
+    this.renderingCharts = true;        
     this.computeWorkshopBlocks();
     this.cdr.detectChanges();
     this.renderAllCharts();
@@ -354,12 +400,14 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
   // La lógica real de dibujo se mueve aquí
   private drawCharts(divs: ElementRef[]): void {
-    this.workshopBlocks.forEach((block, index) => {
-      const divRef = divs[index];
-      if (!divRef) return;
-      this.renderChartForBlock(block, divRef.nativeElement);
-    });
-  }
+  this.workshopBlocks.forEach((block, index) => {
+    const divRef = divs[index];
+    if (!divRef) return;
+    this.renderChartForBlock(block, divRef.nativeElement);
+  });
+  this.renderingCharts = false;       // Charts dibujados, listo
+  this.cdr.detectChanges();
+}
 
   private renderChartForBlock(block: WorkshopChartBlock, container: HTMLElement): void {
     if (block.rows.length === 0) {
@@ -415,29 +463,35 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   private buildChartOptions(rows: ChartRow[], colors: string[]): object {
-    const uniqueEquipments = new Set(rows.map(r => r.equipmentCode)).size;
+  const uniqueEquipments = new Set(rows.map(r => r.equipmentCode)).size;
 
-    // 41px por fila de equipo + 50px de encabezado del chart es lo que Google Charts necesita
-    const ROW_HEIGHT = 41;
-    const HEADER_HEIGHT = 50;
-    const MIN_HEIGHT = 120;
+  const ROW_HEIGHT    = 41;
+  const HEADER_HEIGHT = 50;
+  const MIN_HEIGHT    = 120;
 
-    const height = Math.max(MIN_HEIGHT, uniqueEquipments * ROW_HEIGHT + HEADER_HEIGHT);
+  const height = Math.max(MIN_HEIGHT, uniqueEquipments * ROW_HEIGHT + HEADER_HEIGHT);
 
-    return {
-      height,
-      colors,
-      tooltip: { isHtml: true },
-      timeline: {
-        showRowLabels: true,
-        groupByRowLabel: true,
-        colorByRowLabel: false,
-        rowLabelStyle: { fontSize: 12, color: '#475569' },
-        barLabelStyle: { fontSize: 11 }
-      },
-      animation: { duration: 0 }
-    };
-  }
+  return {
+    height,
+    colors,
+    tooltip: { isHtml: true },
+    timeline: {
+      showRowLabels:   true,
+      groupByRowLabel: true,
+      colorByRowLabel: false,
+      rowLabelStyle:   { fontSize: 12, color: '#475569' },
+      barLabelStyle:   { fontSize: 11 }
+    },
+    animation: { duration: 0 },
+    // Escala compartida: todos los charts usan el mismo eje X
+    ...(this.dayTimeRange && {
+      hAxis: {
+        minValue: this.dayTimeRange.min,
+        maxValue: this.dayTimeRange.max
+      }
+    })
+  };
+}
 
   // ─── Getters de template ─────────────────────────────────────────────────
 
@@ -457,4 +511,14 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   get hasData(): boolean {
     return this.planningProcesses.length > 0 && !!this.selectedDate;
   }
+
+  resetFilters(): void {
+  this.selectedWorkshopId = '';
+  this.selectedOrderId    = '';
+  this.onFiltersChange();
+}
+
+get hasActiveFilters(): boolean {
+  return this.selectedWorkshopId !== '' || this.selectedOrderId !== '';
+}
 }
