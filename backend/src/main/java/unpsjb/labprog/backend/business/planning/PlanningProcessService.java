@@ -181,7 +181,7 @@ public class PlanningProcessService {
                 .flatMap(w -> simulateWorkshopPlanning(w, product, order, deliveryDate, requestedStart).stream())
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(
-                        "No se encontró un taller con el equipamiento y la ventana temporal requerida"));
+                        "No se encontró un taller con el equipamiento necesario para fabricar el producto dentro del plazo requerido"));
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
