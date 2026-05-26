@@ -88,14 +88,14 @@ public class PlanningProcessService {
         Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
 
         for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess unitProcess = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
+            PlanningProcess process = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
                     equipmentFreeTime);
-            unitProcess.setOrder(order);
+            process.setOrder(order);
 
-            if (unitProcess.getStart().isBefore(requestedStart))
+            if (process.getStart().isBefore(requestedStart))
                 return Optional.empty();
 
-            result.add(unitProcess);
+            result.add(process);
         }
 
         return Optional.of(result);

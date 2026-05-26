@@ -17,12 +17,16 @@ declare var google: any;
 })
 export class PlanningComponent implements OnInit {
     @ViewChild('chartDiv') chartDiv!: ElementRef;
+    private chart: any;
 
     planningProcesses: PlanningProcess[] = [];
     order?: manufacturingOrder;
     loading = true;
     availableDates: string[] = []; // Guardará formatos "2026-05-22"
     selectedDate: string = '';
+
+    private chartReady = false;
+    private dataReady = false;
 
     isOrderContext = false;
     entityName = '';
@@ -34,6 +38,8 @@ export class PlanningComponent implements OnInit {
         private route: ActivatedRoute
     ) { }
 
+    
+
     ngOnInit(): void {
         this.isOrderContext = this.route.snapshot.url[0].path.includes('orders');
 
@@ -43,6 +49,11 @@ export class PlanningComponent implements OnInit {
         google.charts.setOnLoadCallback(() => {
             this.loadPlanning();
         });
+    }
+
+    ngAfterViewInit() {
+        this.chartReady = true;
+        if (this.dataReady) this.generateTimelineChart();
     }
 
     loadEntityDetails(): void {
@@ -170,9 +181,11 @@ export class PlanningComponent implements OnInit {
                 rowLabelStyle: { fontSize: 13, color: '#475569' }
             },
         };
-
-        const chart = new google.visualization.Timeline(this.chartDiv.nativeElement);
-        chart.draw(dataTable, options);
+        if (this.chart) {
+            this.chart.clearChart();
+        }
+        this.chart = new google.visualization.Timeline(this.chartDiv.nativeElement);
+        this.chart.draw(dataTable, options);
     }
 
     changeDate(direction: 'prev' | 'next'): void {
@@ -193,6 +206,10 @@ export class PlanningComponent implements OnInit {
 
     isLastDate(): boolean {
         return this.availableDates.indexOf(this.selectedDate) === this.availableDates.length - 1;
+    }
+
+    ngOnDestroy(): void {
+        if (this.chart) this.chart.clearChart();
     }
 
 }
