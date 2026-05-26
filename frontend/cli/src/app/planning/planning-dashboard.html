@@ -1,4 +1,6 @@
 <div class="container py-4">
+
+    <!-- ── Breadcrumb ─────────────────────────────────────────────────────── -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
             <li class="breadcrumb-item">
@@ -6,155 +8,211 @@
                     <i class="fas fa-home me-1"></i> Home
                 </a>
             </li>
-            <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">Tablero de Planificación
+            <li class="breadcrumb-item active fw-semibold text-primary" aria-current="page">
+                Tablero de Planificación
             </li>
         </ol>
     </nav>
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+
+        <!-- ── Header: título + filtros ──────────────────────────────────────── -->
         <div class="card-header bg-white border-bottom py-4 px-4">
             <div class="row align-items-center g-3">
+
                 <div class="col-md-4">
-                    <h4 class="mb-1 fw-bold text-dark tracking-tight">
+                    <h4 class="mb-1 fw-bold text-dark">
                         <i class="fas fa-industry me-2 text-primary"></i> Control de Planta
                     </h4>
-                    <p class="text-muted small mb-0">Visualización de cargas de trabajo de los talleres.</p>
+                    <p class="text-muted small mb-0">Visualización de cargas de trabajo por taller.</p>
                 </div>
 
                 <div class="col-md-8">
-                    <div class="row g-2 justify-content-end">
-                        <div class="col-sm-5">
-                            <label class="form-label small fw-bold text-secondary mb-1">Filtrar por Taller</label>
+                    <div class="row g-2 justify-content-end align-items-end">
+
+                        <!-- Filtro taller -->
+                        <div class="col-sm-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Taller</label>
                             <select class="form-select form-select-sm rounded-3" [(ngModel)]="selectedWorkshopId"
                                 (change)="onFiltersChange()">
                                 <option value="">-- Todos los Talleres --</option>
-                                <option *ngFor="let w of workshops" [value]="w.id">{{ w.name }} ({{ w.code }})</option>
+                                <option *ngFor="let w of workshops" [value]="w.id">
+                                    {{ w.name }} ({{ w.code }})
+                                </option>
                             </select>
                         </div>
-                        <div class="col-sm-5">
-                            <label class="form-label small fw-bold text-secondary mb-1">Filtrar por Pedido</label>
+
+                        <!-- Filtro pedido -->
+                        <div class="col-sm-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Pedido</label>
                             <select class="form-select form-select-sm rounded-3" [(ngModel)]="selectedOrderId"
                                 (change)="onFiltersChange()">
                                 <option value="">-- Todos los Pedidos --</option>
-                                <option *ngFor="let o of orders" [value]="o.id">Orden #{{ o.id }} - {{
-                                    o.customer?.companyName || 'Cliente' }}</option>
+                                <option *ngFor="let o of orders" [value]="o.id">
+                                    Orden #{{ o.id }} — {{ o.customer?.companyName || 'Cliente' }}
+                                </option>
                             </select>
                         </div>
+
+                        <!-- Toggle modo de color -->
+                        <div class="col-sm-4">
+                            <label class="form-label small fw-bold text-secondary mb-1">Colorear por</label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-sm"
+                                    [class.btn-primary]="colorMode === 'by-process'"
+                                    [class.btn-outline-primary]="colorMode !== 'by-process'"
+                                    (click)="setColorMode('by-process')">
+                                    <i class="fas fa-cogs me-1"></i> Proceso
+                                </button>
+                                <button type="button" class="btn btn-sm" [class.btn-primary]="colorMode === 'by-order'"
+                                    [class.btn-outline-primary]="colorMode !== 'by-order'"
+                                    (click)="setColorMode('by-order')">
+                                    <i class="fas fa-file-invoice me-1"></i> Pedido
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- ── Body ───────────────────────────────────────────────────────────── -->
         <div class="card-body p-4 bg-light-subtle">
 
+            <!-- Loading -->
             <div class="text-center py-5" *ngIf="loading">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Procesando datos...</span>
+                    <span class="visually-hidden">Cargando...</span>
                 </div>
-                <p class="text-muted mt-3 font-monospace small">Consultando cronogramas en tiempo real...</p>
+                <p class="text-muted mt-3 small font-monospace">Consultando cronogramas...</p>
             </div>
 
-            <div [hidden]="loading">
+            <ng-container *ngIf="!loading">
 
-                <div [hidden]="!planningProcesses || planningProcesses.length === 0">
+                <!-- ── Sin datos ──────────────────────────────────────────────────── -->
+                <div *ngIf="!hasData" class="text-center py-5 border rounded-4 bg-white shadow-sm">
+                    <i class="fas fa-calendar-times text-secondary fa-3x mb-3"></i>
+                    <h5 class="text-dark fw-semibold">Sin asignaciones registradas</h5>
+                    <p class="text-muted small px-3">
+                        No se encontraron procesos de planificación para la combinación seleccionada.
+                    </p>
+                </div>
 
-                    <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                <!-- ── Con datos ──────────────────────────────────────────────────── -->
+                <div *ngIf="hasData">
 
-                        <div class="row align-items-center border-bottom pb-3 mb-3 g-3">
-                            <div class="col-md-7">
-                                <span
-                                    class="badge bg-primary-subtle text-primary mb-1 text-uppercase tracking-wider font-monospace"
-                                    style="font-size: 0.72rem;">Monitoreo de Planta</span>
-                                <h5 class="text-dark fw-bold mb-0">
-                                    Cronograma de Carga: <span class="text-primary">{{ currentWorkshopName }}</span>
-                                </h5>
-                            </div>
-                            <div class="col-md-5">
-                                <div
-                                    class="d-flex gap-2 align-items-center justify-content-md-end justify-content-center">
-                                    <button class="btn btn-sm btn-outline-primary rounded-circle px-2"
-                                        (click)="changeDate('prev')" [disabled]="isFirstDate()">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </button>
-                                    <div class="text-center mx-2" style="min-width: 160px;">
-                                        <div *ngIf="selectedDate; else loadingDate">
-                                            <span class="fw-bold text-dark d-block" style="font-size: 0.95rem;">
-                                                {{ selectedDate | date:'EEEE, dd/MM' : '' : 'es' }}
-                                            </span>
-                                            <small class="text-muted font-monospace d-block"
-                                                style="font-size: 0.75rem;">
-                                                {{ selectedDate }}
-                                            </small>
-                                        </div>
+                    <!-- Carrusel de fechas -->
+                    <div class="bg-white rounded-4 shadow-sm border p-3 mb-4">
+                        <div class="d-flex align-items-center justify-content-between">
 
-                                        <ng-template #loadingDate>
-                                            <span class="text-muted small italic d-block py-1">Cargando fecha...</span>
-                                        </ng-template>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary rounded-circle px-2"
-                                        (click)="changeDate('next')" [disabled]="isLastDate()">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                            <button class="btn btn-sm btn-outline-primary rounded-circle px-2"
+                                (click)="changeDate('prev')" [disabled]="isFirstDate">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
 
-                        <div class="bg-light p-3 rounded-3 mb-4">
-                            <div class="d-flex flex-wrap gap-2 align-items-center">
-                                <span class="text-secondary small fw-bold me-2">
-                                    <i class="fas fa-industry me-1"></i> Órdenes hoy:
+                            <div class="text-center">
+                                <span class="fw-bold text-dark d-block" style="font-size: 1rem;">
+                                    {{ selectedDate | date:'dd/MM/yyyy' }}
                                 </span>
+                                <small class="text-muted font-monospace">
+                                    {{ availableDates.indexOf(selectedDate) + 1 }} de {{ availableDates.length }}
+                                    {{ availableDates.length === 1 ? 'fecha' : 'fechas' }} con planificaciones
+                                </small>
+                            </div>
 
-                                <div *ngFor="let item of ordersOfTheDay"
-                                    class="d-flex align-items-center bg-white border border-secondary-subtle rounded-3 px-3 py-1.5 shadow-2xs gap-3">
+                            <button class="btn btn-sm btn-outline-primary rounded-circle px-2"
+                                (click)="changeDate('next')" [disabled]="isLastDate">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
 
-                                    <div class="d-flex align-items-center text-dark">
-                                        <i class="fas fa-file-invoice text-primary me-2"></i>
-                                        <span class="fw-bold small">Orden #{{ item.order.id }}</span>
-                                    </div>
+                        </div>
+                    </div>
 
-                                    <div class="border-start h-100 my-1 text-black-10"></div>
+                    <!-- Órdenes del día -->
+                    <div class="bg-white rounded-4 shadow-sm border p-3 mb-4">
+                        <p class="text-secondary small fw-bold mb-2">
+                            <i class="fas fa-clipboard-list me-1"></i>
+                            Órdenes activas este día
+                        </p>
 
-                                    <div class="small">
-                                        <span class="text-slate fw-semibold d-block" style="font-size: 0.82rem;">
-                                            <i class="fas fa-user text-muted me-1" style="font-size: 0.75rem;"></i>{{
-                                            item.customerName }}
-                                        </span>
-                                        <span class="text-primary font-monospace block fw-medium"
-                                            style="font-size: 0.78rem;">
-                                            <i class="fas fa-cube text-muted me-1" style="font-size: 0.75rem;"></i>{{
-                                            item.resolvedProductName }}
-                                        </span>
-                                    </div>
+                        <!-- Sin órdenes -->
+                        <span *ngIf="ordersOfTheDay.length === 0" class="text-muted small fst-italic">
+                            No hay órdenes de producción asignadas en esta fecha.
+                        </span>
 
-                                    <span class="badge bg-dark-subtle text-dark rounded-pill font-monospace"
-                                        style="font-size: 0.7rem;">
-                                        {{ item.subProcessesCount }} u.
+                        <!-- Lista de órdenes -->
+                        <div class="d-flex flex-wrap gap-2">
+                            <div *ngFor="let item of ordersOfTheDay"
+                                class="d-flex align-items-center gap-2 bg-light border rounded-3 px-3 py-2">
+
+                                <!-- ID de orden -->
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file-invoice text-primary me-2"></i>
+                                    <span class="fw-bold small">Orden #{{ item.orderId }}</span>
+                                </div>
+
+                                <div class="vr"></div>
+
+                                <!-- Cliente y producto -->
+                                <div>
+                                    <span class="d-block text-dark" style="font-size: 0.82rem;">
+                                        <i class="fas fa-user text-muted me-1"></i>{{ item.customerName }}
+                                    </span>
+                                    <span class="d-block text-primary font-monospace" style="font-size: 0.78rem;">
+                                        <i class="fas fa-cube text-muted me-1"></i>{{ item.productName }}
                                     </span>
                                 </div>
 
-                                <span class="text-muted small italic" *ngIf="getOrdersOfTheDay().length === 0">
-                                    No hay órdenes de producción asignadas a las celdas en esta fecha.
+                                <!-- Talleres: visible solo cuando se filtra por pedido o hay más de uno -->
+                                <ng-container *ngIf="item.workshopNames.length > 0">
+                                    <div class="vr"></div>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <span *ngFor="let ws of item.workshopNames"
+                                            class="badge bg-primary-subtle text-primary" style="font-size: 0.72rem;">
+                                            <i class="fas fa-industry me-1"></i>{{ ws }}
+                                        </span>
+                                    </div>
+                                </ng-container>
+
+                                <div class="vr"></div>
+
+                                <!-- Contador de subprocesos -->
+                                <span class="badge bg-dark-subtle text-dark rounded-pill font-monospace"
+                                    style="font-size: 0.7rem;">
+                                    {{ item.processCount }} proc.
                                 </span>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── Bloque por taller ─────────────────────────────────────── -->
+                    <div *ngFor="let block of workshopBlocks; let i = index"
+                        class="bg-white rounded-4 shadow-sm border mb-3">
+
+                        <!-- Header del taller -->
+                        <div class="d-flex align-items-center gap-2 px-4 py-3 border-bottom">
+                            <span class="badge bg-primary font-monospace">{{ block.workshopCode }}</span>
+                            <span class="fw-semibold text-dark">{{ block.workshopName }}</span>
+                            <span class="text-muted small ms-auto">
+                                {{ block.rows.length }} tarea{{ block.rows.length === 1 ? '' : 's' }} planificada{{
+                                block.rows.length === 1 ? '' : 's' }}
+                            </span>
+                        </div>
+
+                        <!-- Contenedor del chart -->
+                        <div class="px-3 py-3">
+                            <div #chartDiv [attr.data-workshop]="block.workshopCode"
+                                style="width: 100%; overflow: hidden;">
                             </div>
                         </div>
 
-                        <div #chartDiv style="width: 100%; height: auto; min-height: 100px; overflow: hidden;"></div>
                     </div>
 
                 </div>
+            </ng-container>
 
-                <div [hidden]="planningProcesses && planningProcesses.length > 0"
-                    class="text-center py-5 border rounded-4 bg-white shadow-sm">
-                    <div class="mb-3">
-                        <i class="fas fa-calendar-times text-secondary fa-3x"></i>
-                    </div>
-                    <h5 class="text-dark fw-semibold">Sin asignaciones registradas</h5>
-                    <p class="text-muted small max-w-md mx-auto px-3">
-                        No se encontraron procesos de planificación que coincidan con la combinación seleccionada.
-                    </p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
