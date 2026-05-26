@@ -1,38 +1,39 @@
-import { Component, OnInit, AfterViewInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef } from '@angular/core';
+// planning-dashboard.component.ts
+import {
+  Component, OnInit, AfterViewInit,
+  ViewChildren, QueryList, ElementRef, ChangeDetectorRef
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { WorkshopService } from '../workshops/workshop.service';
 import { OrderService } from '../orders/manufacturing-order.service';
 import { PlanningService } from './planning.service';
+import { PlanningChartService } from './planning-chart.service';   // <-- nuevo
 import { Workshop } from '../workshops/workshop';
 import { manufacturingOrder } from '../orders/manufacturingOrder';
-import { PlanningProcess } from '../planning/planning';
-import { ChartRow, ColorMode, DayOrderSummary, DayProductSummary, WorkshopChartBlock } from './planning-dasboard';
 import { Product } from '../products/product';
+import { PlanningProcess } from '../planning/planning';
+import { ColorMode, ChartRow, WorkshopChartBlock, DayOrderSummary, DayProductSummary } from './planning-dashboard';
 import { productService } from '../products/product.service';
-
-
-declare var google: any;
 
 const PROCESS_PALETTE = [
   '#3366cc', '#dc3912', '#ff9900', '#109618',
   '#990099', '#0099c6', '#dd4477', '#66aa00'
 ];
 
+declare var google: any;
+
 @Component({
   selector: 'app-planning-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './planning-dashboard.html',
+  providers: [PlanningChartService]                        
 })
 export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
   @ViewChildren('chartDiv') chartDivs!: QueryList<ElementRef>;
-
-  private equipmentWorkshopMap = new Map<number, { code: string; name: string }>();
-  private taskProductMap = new Map<number, string>();
-  private dayTimeRange: { min: Date; max: Date } | null = null;
 
   workshops: Workshop[] = [];
   orders: manufacturingOrder[] = [];
@@ -45,23 +46,26 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
   availableDates: string[] = [];
   workshopBlocks: WorkshopChartBlock[] = [];
+  dayTimeRange: { min: Date; max: Date } | null = null;
 
-  loading = false;
+  loading: boolean = false;
+  renderingCharts: boolean = false;
   googleChartsLoaded = false;
-  renderingCharts = false;
+
+  private equipmentWorkshopMap = new Map<number, { code: string; name: string }>();
+  private taskProductMap = new Map<number, string>();
 
   constructor(
     private workshopService: WorkshopService,
     private orderService: OrderService,
-    private planningService: PlanningService,
     private productService: productService,
+    private planningService: PlanningService,
+    private chartService: PlanningChartService,       
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    // Los selects se cargan UNA sola vez
     this.loadSelectData();
-
     google.charts.load('current', { packages: ['timeline'] });
     google.charts.setOnLoadCallback(() => {
       this.googleChartsLoaded = true;
@@ -70,7 +74,6 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Se dispara cada vez que el *ngFor agrega/quita divs del DOM
     this.chartDivs.changes.subscribe((list: QueryList<ElementRef>) => {
       if (list.length > 0 && this.workshopBlocks.length > 0) {
         this.drawCharts(list.toArray());
@@ -78,33 +81,33 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
-
-
-  // ─── Entry point: se llama al iniciar y al cambiar filtros ───────────────
-
-  onFiltersChange(): void {
-    this.selectedDate = '';   // Resetea fecha al cambiar taller u orden
-    this.fetchAndRender();
-  }
+  // ─── Carga de selects ────────────────────────────────────────────────────
 
   loadSelectData(): void {
     forkJoin({
       workshops: this.workshopService.all(),
       orders: this.orderService.all(),
-      products: this.productService.all()   // <-- agregar
+      products: this.productService.all()
     }).subscribe({
       next: ({ workshops, orders, products }) => {
         this.workshops = workshops.data as Workshop[];
         this.orders = orders.data as manufacturingOrder[];
         this.buildEquipmentWorkshopMap();
-        this.buildTaskProductMap(products.data as Product[]);  // <-- agregar
+        this.buildTaskProductMap(products.data as Product[]);
       },
       error: (err) => console.error('Error cargando filtros:', err)
     });
   }
+
+  // ─── Fetch principal ─────────────────────────────────────────────────────
+
+  onFiltersChange(): void {
+    this.selectedDate = '';
+    this.fetchAndRender();
+  }
+
   fetchAndRender(): void {
     if (!this.googleChartsLoaded) return;
-
     this.loading = true;
 
     this.planningService
@@ -112,10 +115,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: (dataPackage: any) => {
           this.planningProcesses = dataPackage.data as PlanningProcess[];
-
           this.computeAvailableDates();
           this.computeWorkshopBlocks();
-
           this.loading = false;
           this.renderAllCharts();
         },
@@ -126,30 +127,93 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
       });
   }
 
-  // ─── Extrae las fechas únicas con planificaciones ────────────────────────
+  // ─── Carrusel ────────────────────────────────────────────────────────────
+
+  changeDate(direction: 'prev' | 'next'): void {
+    const index = this.availableDates.indexOf(this.selectedDate);
+    if (direction === 'prev' && index > 0)
+      this.selectedDate = this.availableDates[index - 1];
+    else if (direction === 'next' && index < this.availableDates.length - 1)
+      this.selectedDate = this.availableDates[index + 1];
+
+    this.renderingCharts = true;
+    this.computeWorkshopBlocks();
+    this.renderAllCharts();
+  }
+
+  // ─── Color mode ──────────────────────────────────────────────────────────
+
+  setColorMode(mode: ColorMode): void {
+    if (this.colorMode === mode) return;
+    this.colorMode = mode;
+    this.computeWorkshopBlocks();
+    this.renderAllCharts();
+  }
+
+  // ─── Filtros ─────────────────────────────────────────────────────────────
+
+  resetFilters(): void {
+    this.selectedWorkshopId = '';
+    this.selectedOrderId = '';
+    this.onFiltersChange();
+  }
+
+  // ─── Renderizado ─────────────────────────────────────────────────────────
+
+  renderAllCharts(): void {
+    if (!this.googleChartsLoaded || !this.hasData) return;
+    this.cdr.detectChanges();
+    // La suscripción en ngAfterViewInit se encarga del dibujo
+  }
+
+  private drawCharts(divs: ElementRef[]): void {
+    this.workshopBlocks.forEach((block, index) => {
+      const divRef = divs[index];
+      if (!divRef) return;
+      this.chartService.drawBlock(block, divRef.nativeElement, this.dayTimeRange);
+    });
+    this.renderingCharts = false;
+    this.cdr.detectChanges();
+  }
+
+  // ─── Mapas de lookup ─────────────────────────────────────────────────────
+
+  private buildEquipmentWorkshopMap(): void {
+    this.equipmentWorkshopMap.clear();
+    this.workshops.forEach(workshop =>
+      workshop.equipments?.forEach(equipment =>
+        this.equipmentWorkshopMap.set(equipment.id, {
+          code: workshop.code,
+          name: workshop.name
+        })
+      )
+    );
+  }
+
+  private buildTaskProductMap(products: Product[]): void {
+    this.taskProductMap.clear();
+    products.forEach(product =>
+      product.tasks?.forEach(task =>
+        this.taskProductMap.set(task.id, product.name)
+      )
+    );
+  }
+
+  // ─── Compute ─────────────────────────────────────────────────────────────
 
   private computeAvailableDates(): void {
     const dates = new Set<string>();
-
     this.planningProcesses.forEach(process =>
       process.plannings?.forEach(planning => {
         const dateStr = planning.period?.start?.split('T')[0];
         if (dateStr) dates.add(dateStr);
       })
     );
-
     this.availableDates = Array.from(dates).sort();
 
-    // Mantiene la fecha seleccionada si sigue siendo válida, si no toma la primera
-    if (this.availableDates.length === 0) {
-      this.selectedDate = '';
-      return;
-    }
-
-    const dateStillValid = this.availableDates.includes(this.selectedDate);
-    if (!dateStillValid) {
+    if (this.availableDates.length === 0) { this.selectedDate = ''; return; }
+    if (!this.availableDates.includes(this.selectedDate))
       this.selectedDate = this.availableDates[0];
-    }
   }
 
   private computeWorkshopBlocks(): void {
@@ -173,38 +237,30 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
         const end = new Date(planning.period.endDate);
         if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
 
-        const equipmentId = planning.equipment?.id;
-        const workshop = this.equipmentWorkshopMap.get(equipmentId);
+        const workshop = this.equipmentWorkshopMap.get(planning.equipment?.id);
         if (!workshop) return;
 
-        const equipCode = planning.equipment?.code ?? 'S/E';
-        const taskName = planning.task?.name ?? 'Tarea';
-        const duration = planning.task?.duration ?? 0;
-
-        const tooltip = this.buildTooltip(
-          processLabel, taskName, equipCode, duration, start, end, color
-        );
-
         const row: ChartRow = {
-          equipmentCode: equipCode,
+          equipmentCode: planning.equipment?.code ?? 'S/E',
           rowLabel: processLabel,
-          tooltip, start, end, color
+          tooltip: this.buildTooltip(
+            processLabel, planning.task?.name ?? 'Tarea',
+            planning.equipment?.code ?? 'S/E',
+            planning.task?.duration ?? 0, start, end, color
+          ),
+          start, end, color
         };
 
         if (!blocksMap.has(workshop.code)) {
           blocksMap.set(workshop.code, {
-            workshopName: workshop.name,
-            workshopCode: workshop.code,
-            rows: [],
-            ordersOfTheDay: [],
-            productsOfTheDay: []
+            workshopName: workshop.name, workshopCode: workshop.code,
+            rows: [], ordersOfTheDay: [], productsOfTheDay: []
           });
         }
         blocksMap.get(workshop.code)!.rows.push(row);
       });
     });
 
-    // Una vez armados los bloques, calculamos el resumen de cada uno
     blocksMap.forEach((block, workshopCode) => {
       const { orders, products } = this.computeSummaryForWorkshop(workshopCode);
       block.ordersOfTheDay = orders;
@@ -216,40 +272,36 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   private computeSummaryForWorkshop(workshopCode: string): {
-    orders: DayOrderSummary[];
-    products: DayProductSummary[];
+    orders: DayOrderSummary[]; products: DayProductSummary[];
   } {
     const ordersMap = new Map<number, DayOrderSummary>();
     const productsMap = new Map<string, DayProductSummary>();
 
     this.planningProcesses.forEach(process => {
-      const activeHerePlannings = process.plannings?.filter(p => {
+      const activeHere = process.plannings?.filter(p => {
         const dateStr = p.period?.start?.split('T')[0];
         const workshop = this.equipmentWorkshopMap.get(p.equipment?.id);
         return dateStr === this.selectedDate && workshop?.code === workshopCode;
       }) ?? [];
 
-      if (activeHerePlannings.length === 0) return;
+      if (activeHere.length === 0) return;
 
       if (process.order?.id) {
-        // Proceso con orden — el producto viene de la orden
         const order = process.order;
         if (!ordersMap.has(order.id)) {
           ordersMap.set(order.id, {
             orderId: order.id,
             orderLabel: `Orden #${order.id}`,
             customerName: order.customer?.companyName ?? 'Cliente',
-            productName: order.product?.name ?? 'Producto no especificado',
+            productName: order.product?.name ?? 'Sin producto',
             processCount: 1,
             workshopNames: [workshopCode]
           });
         } else {
           ordersMap.get(order.id)!.processCount++;
         }
-
       } else {
-        // Proceso sin orden — buscamos el producto via taskId
-        const taskId = activeHerePlannings[0].task?.id;
+        const taskId = activeHere[0].task?.id;
         const productName = taskId ? this.taskProductMap.get(taskId) : null;
         if (!productName) return;
 
@@ -267,86 +319,38 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     };
   }
 
-
   private computeDayTimeRange(): void {
-    const allStarts: Date[] = [];
-    const allEnds: Date[] = [];
-
-    this.workshopBlocks.forEach(block => {
-      block.rows.forEach(row => {
-        allStarts.push(row.start);
-        allEnds.push(row.end);
-      });
-    });
-
-    if (allStarts.length === 0) {
-      this.dayTimeRange = null;
-      return;
-    }
-
+    const allDates = this.workshopBlocks.flatMap(b =>
+      b.rows.flatMap(r => [r.start.getTime(), r.end.getTime()])
+    );
+    if (allDates.length === 0) { this.dayTimeRange = null; return; }
     this.dayTimeRange = {
-      min: new Date(Math.min(...allStarts.map(d => d.getTime()))),
-      max: new Date(Math.max(...allEnds.map(d => d.getTime())))
+      min: new Date(Math.min(...allDates)),
+      max: new Date(Math.max(...allDates))
     };
   }
 
-
-  private buildTaskProductMap(products: Product[]): void {
-    this.taskProductMap.clear();
-    products.forEach(product => {
-      product.tasks?.forEach(task => {
-        this.taskProductMap.set(task.id, product.name);
-      });
-    });
-  }
-
-  private buildEquipmentWorkshopMap(): void {
-    this.equipmentWorkshopMap.clear();
-    this.workshops.forEach(workshop => {
-      workshop.equipments?.forEach(equipment => {
-        this.equipmentWorkshopMap.set(equipment.id, {
-          code: workshop.code,
-          name: workshop.name
-        });
-      });
-    });
-  }
-
-  // ─── Construye el mapa de colores según el modo seleccionado ────────────
+  // ─── Helpers privados ────────────────────────────────────────────────────
 
   private buildColorMap(): Map<string, string> {
-    const colorMap = new Map<string, string>();
+    const map = new Map<string, string>();
     let index = 0;
-
     this.planningProcesses.forEach(process => {
       const key = this.colorKey(process);
-      if (!colorMap.has(key)) {
-        colorMap.set(key, PROCESS_PALETTE[index % PROCESS_PALETTE.length]);
-        index++;
-      }
+      if (!map.has(key)) map.set(key, PROCESS_PALETTE[index++ % PROCESS_PALETTE.length]);
     });
-
-    return colorMap;
+    return map;
   }
 
-  // La clave de color cambia según el modo: id del proceso o id de la orden
   private colorKey(process: PlanningProcess): string {
-    if (this.colorMode === 'by-order') {
-      return `order-${process.order?.id ?? 'unknown'}`;
-    }
-    return `process-${process.id}`;
+    return this.colorMode === 'by-order'
+      ? `order-${process.order?.id ?? 'unknown'}`
+      : `process-${process.id}`;
   }
-
-  // ─── Tooltip HTML reutilizable ───────────────────────────────────────────
 
   private buildTooltip(
-    processLabel: string,
-    taskName: string,
-    equipCode: string,
-    duration: number,
-    start: Date,
-    end: Date,
-    color: string
+    processLabel: string, taskName: string, equipCode: string,
+    duration: number, start: Date, end: Date, color: string
   ): string {
     const fmt = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     return `
@@ -360,140 +364,11 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
       </div>`;
   }
 
-  // ─── Cambia la fecha del carrusel ────────────────────────────────────────
-
-  changeDate(direction: 'prev' | 'next'): void {
-    const currentIndex = this.availableDates.indexOf(this.selectedDate);
-    if (direction === 'prev' && currentIndex > 0) {
-      this.selectedDate = this.availableDates[currentIndex - 1];
-    } else if (direction === 'next' && currentIndex < this.availableDates.length - 1) {
-      this.selectedDate = this.availableDates[currentIndex + 1];
-    }
-
-    // Al cambiar fecha solo recalculamos los derivados, no volvemos a llamar al backend
-    this.renderingCharts = true;        
-    this.computeWorkshopBlocks();
-    this.cdr.detectChanges();
-    this.renderAllCharts();
-  }
-
-  // ─── Cambia el modo de color y recalcula sin ir al backend ──────────────
-
-  onColorModeChange(): void {
-    this.computeWorkshopBlocks();
-    this.cdr.detectChanges();
-    this.renderAllCharts();
-  }
-
-  setColorMode(mode: ColorMode): void {
-    if (this.colorMode === mode) return;
-    this.colorMode = mode;
-    this.onColorModeChange();
-  }
-  // ─── Renderizado de charts (Paso 4, por ahora placeholder) ──────────────
-
-
-  renderAllCharts(): void {
-    if (!this.googleChartsLoaded || !this.hasData) return;
-    this.cdr.detectChanges();
-  }
-
-  // La lógica real de dibujo se mueve aquí
-  private drawCharts(divs: ElementRef[]): void {
-  this.workshopBlocks.forEach((block, index) => {
-    const divRef = divs[index];
-    if (!divRef) return;
-    this.renderChartForBlock(block, divRef.nativeElement);
-  });
-  this.renderingCharts = false;       // Charts dibujados, listo
-  this.cdr.detectChanges();
-}
-
-  private renderChartForBlock(block: WorkshopChartBlock, container: HTMLElement): void {
-    if (block.rows.length === 0) {
-      container.innerHTML = `
-      <div class="text-muted small text-center py-3">
-        No hay tareas planificadas para este taller en la fecha seleccionada.
-      </div>`;
-      return;
-    }
-
-
-
-
-    const { dataTable, colors } = this.buildDataTable(block.rows);
-    const options = this.buildChartOptions(block.rows, colors);
-    const chart = new google.visualization.Timeline(container);
-
-    chart.draw(dataTable, options);
-  }
-
-  private buildDataTable(rows: ChartRow[]): { dataTable: any; colors: string[] } {
-    const dataTable = new google.visualization.DataTable();
-
-    dataTable.addColumn({ type: 'string', id: 'Equipo' });
-    dataTable.addColumn({ type: 'string', id: 'Proceso' });
-    dataTable.addColumn({ type: 'string', role: 'tooltip', p: { html: true } });
-    dataTable.addColumn({ type: 'date', id: 'Inicio' });
-    dataTable.addColumn({ type: 'date', id: 'Fin' });
-
-    // Google Charts asigna colores por orden de aparición de rowLabel único.
-    // Para respetar nuestro colorMap, necesitamos que cada rowLabel
-    // tenga un color asociado en el mismo orden en que aparece.
-    const colorOrder: string[] = [];
-    const seenLabels = new Set<string>();
-
-    rows.forEach(row => {
-      dataTable.addRow([
-        row.equipmentCode,
-        { v: row.rowLabel, f: '' },
-        row.tooltip,
-        row.start,
-        row.end
-      ]);
-
-      // Registramos el color la primera vez que aparece ese label
-      if (!seenLabels.has(row.rowLabel)) {
-        seenLabels.add(row.rowLabel);
-        colorOrder.push(row.color);
-      }
-    });
-
-    return { dataTable, colors: colorOrder };
-  }
-
-  private buildChartOptions(rows: ChartRow[], colors: string[]): object {
-  const uniqueEquipments = new Set(rows.map(r => r.equipmentCode)).size;
-
-  const ROW_HEIGHT    = 41;
-  const HEADER_HEIGHT = 50;
-  const MIN_HEIGHT    = 120;
-
-  const height = Math.max(MIN_HEIGHT, uniqueEquipments * ROW_HEIGHT + HEADER_HEIGHT);
-
-  return {
-    height,
-    colors,
-    tooltip: { isHtml: true },
-    timeline: {
-      showRowLabels:   true,
-      groupByRowLabel: true,
-      colorByRowLabel: false,
-      rowLabelStyle:   { fontSize: 12, color: '#475569' },
-      barLabelStyle:   { fontSize: 11 }
-    },
-    animation: { duration: 0 },
-    // Escala compartida: todos los charts usan el mismo eje X
-    ...(this.dayTimeRange && {
-      hAxis: {
-        minValue: this.dayTimeRange.min,
-        maxValue: this.dayTimeRange.max
-      }
-    })
-  };
-}
-
   // ─── Getters de template ─────────────────────────────────────────────────
+
+  get hasData(): boolean {
+    return this.planningProcesses.length > 0 && !!this.selectedDate;
+  }
 
   get isFirstDate(): boolean {
     return this.availableDates.indexOf(this.selectedDate) === 0;
@@ -503,22 +378,11 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     return this.availableDates.indexOf(this.selectedDate) === this.availableDates.length - 1;
   }
 
-  get currentWorkshopLabel(): string {
-    const w = this.workshops.find(w => w.id.toString() === this.selectedWorkshopId);
-    return w ? `${w.name} (${w.code})` : 'Todos los Talleres';
+  get hasActiveFilters(): boolean {
+    return this.selectedWorkshopId !== '' || this.selectedOrderId !== '';
   }
 
-  get hasData(): boolean {
-    return this.planningProcesses.length > 0 && !!this.selectedDate;
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
-  resetFilters(): void {
-  this.selectedWorkshopId = '';
-  this.selectedOrderId    = '';
-  this.onFiltersChange();
-}
-
-get hasActiveFilters(): boolean {
-  return this.selectedWorkshopId !== '' || this.selectedOrderId !== '';
-}
 }
