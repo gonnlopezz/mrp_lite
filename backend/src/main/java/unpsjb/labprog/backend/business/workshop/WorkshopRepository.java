@@ -25,6 +25,14 @@ public interface WorkshopRepository
                         "WHERE w.code = :code AND e.type IN :types")
         long countMatchingEquipmentTypes(@Param("code") String code, @Param("types") List<EquipmentType> types);
 
+        @Query("SELECT w FROM Workshop w " +
+                        "JOIN w.equipments e " +
+                        "WHERE e.type IN :types " +
+                        "GROUP BY w.id " +
+                        "HAVING COUNT(DISTINCT e.type) = :count " +
+                        "ORDER BY w.code ASC " +
+                        "LIMIT 1")
+        Optional<Workshop> findByEquipmentTypes(List<EquipmentType> types, int count);
 
         @Query("SELECT w FROM Workshop w " +
                         "JOIN w.equipments e " +

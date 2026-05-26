@@ -4,14 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,21 +187,12 @@ public class PlanningProcessService {
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
         if (workshopCode != null) {
             Workshop result = workshopService.findByCode(workshopCode);
-            long matchingTypesCount = workshopService.countMatchingEquipmentTypes(workshopCode, requiredTypes);
 
-            if (matchingTypesCount != requiredTypes.size()) {
-                throw new BusinessException("El taller " + workshopCode
-                        + " no cuenta con los equipos necesarios para fabricar el producto");
-            }
+            workshopService.validateEquipmentSupport(workshopCode, requiredTypes);
 
             return result;
         }
-
-        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes, requiredTypes.size());
-        if (workshops.isEmpty())
-            throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
-        Workshop result = workshops.get(0);
-        return result;
+        return workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size());
     }
 
     private LocalDateTime getNextAvailableSlot(Equipment equipment, LocalDateTime requestedTime) {
