@@ -49,7 +49,7 @@ Escenario: Planificación de un pedido con el taller primera opción completamen
       | 2025-02-09 23:15 | 2025-02-10 00:00 | G02_soldadora | armado              |
 
   Esquema del escenario: Generar nuevos pedidos de fabricación para el proceso de planificación
-    Dada el producto con nombre "<producto>"
+    Dado el producto con nombre "<producto>"
     Y el cliente con <cuit>
     Cuando se solicita generar un pedido para ese cliente fecha de pedido "<fechaPedido>" para entregar en la fecha "<fechaEntrega>" la cantidad de <cantidad> del producto
     Entonces se espera el siguiente <status> con "<respuesta>"
@@ -57,4 +57,3 @@ Escenario: Planificación de un pedido con el taller primera opción completamen
       | cuit        | fechaPedido  | fechaEntrega | cantidad | producto                        | status | respuesta                                    |
       | 20654239875 | 2025-03-01   | 2025-03-05   |        4 | Canasto de basura chico 1,5mts  |    200 | Pedido de fabricación generado correctamente |
       | 20654239875 | 2025-03-01   | 2025-03-05   |        3 | Pieza chica en U                |    200 | Pedido de fabricación generado correctamente |
-      

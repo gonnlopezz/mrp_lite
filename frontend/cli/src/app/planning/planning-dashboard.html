@@ -155,57 +155,83 @@
                         <div class="d-flex align-items-center gap-2 px-4 py-3 border-bottom">
                             <span class="badge bg-primary font-monospace">{{ block.workshopCode }}</span>
                             <span class="fw-semibold text-dark">{{ block.workshopName }}</span>
-                            <span class="text-muted small ms-auto">
-                                {{ block.rows.length }} tarea{{ block.rows.length === 1 ? '' : 's' }} planificada{{
-                                block.rows.length === 1 ? '' : 's' }}
-                            </span>
+                            <div class="ms-auto d-flex gap-3">
+                                <span class="text-muted small" *ngIf="block.ordersOfTheDay.length > 0">
+                                    <i class="fas fa-file-invoice me-1"></i>
+                                    {{ block.ordersOfTheDay.length }}
+                                    {{ block.ordersOfTheDay.length === 1 ? 'pedido' : 'pedidos' }} planificado{{
+                                    block.ordersOfTheDay.length === 1 ? '' : 's' }}
+                                </span>
+
+                                <span class="text-muted small" *ngIf="getTotalProducts(block) > 0">
+                                    <i class="fas fa-cube me-1"></i>
+                                    {{ getTotalProducts(block) }}
+                                    {{ getTotalProducts(block) === 1 ? 'producto' : 'productos' }} planificado{{
+                                    getTotalProducts(block) === 1 ? '' : 's' }}
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Resumen de órdenes y productos del taller -->
                         <div class="px-4 pt-3 pb-1"
                             *ngIf="block.ordersOfTheDay.length > 0 || block.productsOfTheDay.length > 0">
-                            <div class="d-flex flex-wrap gap-2 align-items-center">
 
-                                <!-- Órdenes de fabricación -->
-                                <div *ngFor="let item of block.ordersOfTheDay"
-                                    class="d-flex align-items-center gap-2 bg-light border rounded-3 px-3 py-2">
-                                    <i class="fas fa-file-invoice text-primary"></i>
-                                    <div>
-                                        <span class="fw-bold small d-block">Orden #{{ item.orderId }}</span>
-                                        <span class="text-muted d-block" style="font-size: 0.78rem;">
-                                            {{ item.customerName }}
-                                        </span>
-                                    </div>
-                                    <div class="vr"></div>
-                                    <div>
-                                        <span class="text-primary font-monospace d-block" style="font-size: 0.78rem;">
+                            <div class="position-relative d-flex align-items-center gap-2">
+
+                                <!-- Flecha izquierda -->
+                                <button class="btn btn-sm btn-outline-secondary rounded-circle px-2 flex-shrink-0"
+                                    (click)="scrollOrders(ordersScroll, 'left')">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+
+                                <!-- Contenedor scrolleable sin scrollbar -->
+                                <div #ordersScroll class="d-flex gap-2 align-items-center flex-grow-1"
+                                    style="overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+
+                                    <!-- Órdenes -->
+                                    <div *ngFor="let item of block.ordersOfTheDay"
+                                        class="d-flex align-items-center gap-2 bg-light border rounded-3 px-3 py-2 flex-shrink-0">
+                                        <i class="fas fa-file-invoice text-primary"></i>
+                                        <div>
+                                            <span class="fw-bold small d-block">Orden #{{ item.orderId }}</span>
+                                            <span class="text-muted d-block" style="font-size: 0.78rem;">{{
+                                                item.customerName }}</span>
+                                        </div>
+                                        <div class="vr"></div>
+                                        <span class="text-primary font-monospace" style="font-size: 0.78rem;">
                                             <i class="fas fa-cube text-muted me-1"></i>{{ item.productName }}
                                         </span>
-                                    </div>
-                                    <div class="vr"></div>
-                                    <span class="badge bg-dark-subtle text-dark rounded-pill font-monospace"
-                                        style="font-size: 0.7rem;">
-                                        {{ item.processCount }} proc.
-                                    </span>
-                                </div>
-
-                                <!-- Productos planificados sin orden -->
-                                <div *ngFor="let item of block.productsOfTheDay"
-                                    class="d-flex align-items-center gap-2 bg-warning-subtle border border-warning-subtle rounded-3 px-3 py-2">
-                                    <i class="fas fa-cube text-warning"></i>
-                                    <div>
-                                        <span class="fw-bold small d-block">{{ item.productName }}</span>
-                                        <span class="text-muted d-block" style="font-size: 0.78rem;">
-                                            Sin orden de fabricación
+                                        <div class="vr"></div>
+                                        <span class="badge bg-dark-subtle text-dark rounded-pill font-monospace"
+                                            style="font-size: 0.7rem;">
+                                            {{ item.processCount }} proc.
                                         </span>
                                     </div>
-                                    <div class="vr"></div>
-                                    <span
-                                        class="badge bg-warning-subtle text-warning rounded-pill font-monospace border border-warning-subtle"
-                                        style="font-size: 0.7rem;">
-                                        {{ item.processCount }} proc.
-                                    </span>
+
+                                    <!-- Productos sin orden -->
+                                    <div *ngFor="let item of block.productsOfTheDay"
+                                        class="d-flex align-items-center gap-2 bg-warning-subtle border border-warning-subtle rounded-3 px-3 py-2 flex-shrink-0">
+                                        <i class="fas fa-cube text-warning"></i>
+                                        <div>
+                                            <span class="fw-bold small d-block">{{ item.productName }}</span>
+                                            <span class="text-muted d-block" style="font-size: 0.78rem;">Sin orden de
+                                                fabricación</span>
+                                        </div>
+                                        <div class="vr"></div>
+                                        <span
+                                            class="badge bg-warning-subtle text-warning rounded-pill font-monospace border border-warning-subtle"
+                                            style="font-size: 0.7rem;">
+                                            {{ item.processCount }} proc.
+                                        </span>
+                                    </div>
+
                                 </div>
+
+                                <!-- Flecha derecha -->
+                                <button class="btn btn-sm btn-outline-secondary rounded-circle px-2 flex-shrink-0"
+                                    (click)="scrollOrders(ordersScroll, 'right')">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
 
                             </div>
                         </div>

@@ -248,7 +248,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
             processLabel,
             planning.task?.name ?? 'Tarea',
             planning.equipment?.code ?? 'S/E',
-            start, end,    // <-- ya no pasamos duration
+            start, end,  
             color
           ),
           start, end, color
@@ -297,6 +297,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
             orderLabel: `Orden #${order.id}`,
             customerName: order.customer?.companyName ?? 'Cliente',
             productName: order.product?.name ?? 'Sin producto',
+            quantity: order.quantity ?? 0,
             processCount: 1,
             workshopNames: [workshopCode]
           });
@@ -391,7 +392,22 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     return this.selectedWorkshopId !== '' || this.selectedOrderId !== '';
   }
 
+  getTotalProducts(block: WorkshopChartBlock): number {
+  return block.ordersOfTheDay.reduce((acc, item) => acc + item.quantity, 0);
+}
+
+  // ─── Scroll ─────────────────────────────────────────────────
+
+
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  scrollOrders(container: HTMLElement, direction: 'left' | 'right'): void {
+    const scrollAmount = 300;
+    container.scrollBy({
+      left: direction === 'right' ? scrollAmount : -scrollAmount,
+      behavior: 'smooth'
+    });
   }
 }

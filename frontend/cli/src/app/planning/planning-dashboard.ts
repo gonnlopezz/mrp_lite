@@ -5,6 +5,7 @@ export interface DayOrderSummary {
   orderLabel:    string;
   customerName:  string;
   productName:   string;
+  quantity:      number;
   processCount:  number;
   workshopNames: string[];
 }

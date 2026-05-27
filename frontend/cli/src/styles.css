@@ -368,3 +368,7 @@ app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hov
 .timeline-content {
   min-width: 2000px; /* Obliga al gráfico a estirarse, ajustá este número según la cantidad de días */
 }
+
+.orders-scroll::-webkit-scrollbar {
+  display: none;
+}
