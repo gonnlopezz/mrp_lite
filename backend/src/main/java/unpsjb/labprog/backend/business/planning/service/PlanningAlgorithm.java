@@ -45,7 +45,7 @@ public class PlanningAlgorithm {
      * Planificación hacia adelante: se asignan las tareas en el orden dado,
      * buscando el próximo slot disponible para cada tarea
      */
-    public PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
+    public PlanningProcess planningForward(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
         Workshop workshop = resolveWorkshop(workshopCode, requiredTypes);
@@ -64,6 +64,20 @@ public class PlanningAlgorithm {
         }
 
         return createPlanningProcess(plannings, start, currentTime);
+    }
+
+    public List<PlanningProcess> planningBackward(
+            ManufacturingOrder order,
+            Product product,
+            LocalDateTime deliveryDate,
+            LocalDateTime requestedStart) {
+
+        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
+        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(
+                requiredTypes, requiredTypes.size());
+
+        List<PlanningProcess> result = searchValidPlanning(availableWorkshops, product, order, deliveryDate, requestedStart);
+        return result;
     }
 
     public List<PlanningProcess> searchValidPlanning(

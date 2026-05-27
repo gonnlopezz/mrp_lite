@@ -41,7 +41,8 @@ public class PlanningProcessService {
     @Transactional
     public PlanningProcess save(PlanningRequestDTO request) {
         LocalDateTime normalizedStart = request.getStartDate().toLocalDate().atStartOfDay();
-        PlanningProcess process = algorithm.productPlanning(request.getProductName(), request.getWorkshopCode(), normalizedStart);
+        PlanningProcess process = algorithm.planningForward(request.getProductName(), request.getWorkshopCode(),
+                normalizedStart);
         return repository.save(process);
     }
 
@@ -53,17 +54,13 @@ public class PlanningProcessService {
         LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
 
-        List<EquipmentType> requiredTypes = algorithm.getRequiredEquipmentTypesFor(product);
-        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(requiredTypes,
-                requiredTypes.size());
+        List<PlanningProcess> finalProcesses = algorithm.planningBackward(order, product, finalDeliveryDate, requestedStart);
 
-        List<PlanningProcess> finalProcesses = algorithm.planningBackward();
         order.setState(OrderState.PLANIFICADO);
         orderService.save(order);
 
         return (List<PlanningProcess>) repository.saveAll(finalProcesses);
     }
-
 
     public List<PlanningProcess> findAll() {
         List<PlanningProcess> result = new ArrayList<>();
