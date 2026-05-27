@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DataPackage } from '../data-package';
-import { PlanningProcess } from './planning';
 
 @Injectable({
   providedIn: 'root'

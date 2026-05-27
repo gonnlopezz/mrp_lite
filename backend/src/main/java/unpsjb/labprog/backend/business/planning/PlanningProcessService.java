@@ -124,10 +124,9 @@ public class PlanningProcessService {
             Map<Long, LocalDateTime> equipmentFreeTime) {
         Collection<Equipment> equipments = aWorkshop.getEquipments();
 
-        List<Task> reversedTasks = new ArrayList<>(aProduct.getTasks());
-        Collections.reverse(reversedTasks);
+        List<Task> reversedTasks = reverseTasksOf(aProduct);
 
-        List<Planning> plannings = new LinkedList<>();
+        LinkedList<Planning> plannings = new LinkedList<>();
         LocalDateTime currentProductEnd = deadline;
         LocalDateTime overallStart = deadline;
 
@@ -139,7 +138,7 @@ public class PlanningProcessService {
                     equipmentFreeTime);
             LocalDateTime start = end.minusMinutes(durationMinutes);
 
-            plannings.add(0, createPlanning(t, equipment, start, end));
+            plannings.addFirst(createPlanning(t, equipment, start, end));
 
             currentProductEnd = start;
             overallStart = start;
@@ -213,13 +212,15 @@ public class PlanningProcessService {
     }
 
     private Equipment getRequiredEquipmentFor(Task aTask, Collection<Equipment> equipments) {
-        Equipment result = equipments.stream()
+        return equipments.stream()
                 .filter(e -> e.getType().equals(aTask.getType()))
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("Equipo no encontrado para la tarea: " + aTask.getName()));
+    }
 
-        if (result == null)
-            throw new BusinessException("Equipo no encontrado para la tarea");
-
+    private List<Task> reverseTasksOf(Product product) {
+        List<Task> result = new ArrayList<>(product.getTasks());
+        Collections.reverse(result);
         return result;
     }
 
@@ -240,7 +241,8 @@ public class PlanningProcessService {
     }
 
     private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-        return aTask.getDuration() / aEquipment.getCapacity();
+        long result = (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
+        return result;
     }
 
     public List<PlanningProcess> findAll() {

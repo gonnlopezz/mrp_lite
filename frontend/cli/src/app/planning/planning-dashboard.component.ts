@@ -155,7 +155,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   resetFilters(): void {
     this.selectedWorkshopId = '';
     this.selectedOrderId = '';
-    this.selectedDate= '';
+    this.selectedDate = '';
     this.onFiltersChange();
   }
 
@@ -248,8 +248,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
             processLabel,
             planning.task?.name ?? 'Tarea',
             planning.equipment?.code ?? 'S/E',
-            start, end,  
-            color
+            start, end, color,
+            process.order?.id ? `Orden #${process.order.id}` : undefined
           ),
           start, end, color
         };
@@ -358,19 +358,20 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     equipCode: string,
     start: Date,
     end: Date,
-    color: string
+    color: string,
+    orderLabel?: string
   ): string {
     const fmt = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const durationMinutes = Math.round((end.getTime() - start.getTime()) / 60000);
 
     return `
-    <div style="padding:10px; font-size:13px; min-width:180px; font-family:sans-serif;">
+    <div style="padding: 12px; font-size: 13px; min-width: 220px; font-family: sans-serif; white-space: nowrap;">
       <b style="color:${color};">${processLabel}</b><br/>
+      ${orderLabel ? `<b>Orden:</b> ${orderLabel}<br/>` : ''}
       <b>Tarea:</b> ${taskName}<br/>
       <b>Equipo:</b> ${equipCode}<br/>
       <b>Duración:</b> ${durationMinutes} min<br/>
-      <b>Inicio:</b> ${fmt(start)}<br/>
-      <b>Fin:</b> ${fmt(end)}<br/>
+      <b>Inicio:</b> ${fmt(start)} &nbsp;|&nbsp; <b>Fin:</b> ${fmt(end)}<br/>
     </div>`;
   }
 
@@ -393,8 +394,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   getTotalProducts(block: WorkshopChartBlock): number {
-  return block.ordersOfTheDay.reduce((acc, item) => acc + item.quantity, 0);
-}
+    return block.ordersOfTheDay.reduce((acc, item) => acc + item.quantity, 0);
+  }
 
   // ─── Scroll ─────────────────────────────────────────────────
 
