@@ -21,6 +21,7 @@ export class PlanningComponent implements OnInit {
 
     planningProcesses: PlanningProcess[] = [];
     order?: manufacturingOrder;
+    workshop?: Workshop;
     loading = true;
     availableDates: string[] = []; // Guardará formatos "2026-05-22"
     selectedDate: string = '';

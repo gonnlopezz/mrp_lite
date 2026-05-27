@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -99,11 +98,16 @@ public class PlanningProcessService {
     private List<PlanningProcess> searchValidPlanning(
             List<Workshop> workshops, Product product, ManufacturingOrder order,
             LocalDateTime deliveryDate, LocalDateTime requestedStart) {
-        return workshops.stream()
-                .flatMap(w -> simulateWorkshopPlanning(w, product, order, deliveryDate, requestedStart).stream())
-                .findFirst()
-                .orElseThrow(() -> new BusinessException(
-                        "No se encontró un taller con el equipamiento necesario para fabricar el producto dentro del plazo requerido"));
+
+        for (Workshop workshop : workshops) {
+            Optional<List<PlanningProcess>> result = simulateWorkshopPlanning(workshop, product, order, deliveryDate,
+                    requestedStart);
+            if (result.isPresent())
+                return result.get();
+        }
+
+        throw new BusinessException(
+                "No se encontró un taller con el equipamiento necesario para fabricar el producto dentro del plazo requerido");
     }
 
     private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
@@ -206,18 +210,22 @@ public class PlanningProcessService {
     }
 
     private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
-        return aProduct.getTasks().stream()
-                .map(Task::getType)
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
+        List<Task> tasks = aProduct.getTasks().stream().distinct().collect(Collectors.toList());
+        List<EquipmentType> result = new ArrayList<>();
+        for (Task t : tasks) {
+            EquipmentType type = t.getType();
+            if (!result.contains(type))
+                result.add(type);
+        }
+        return result;
     }
 
     private Equipment getRequiredEquipmentFor(Task aTask, Collection<Equipment> equipments) {
-        return equipments.stream()
-                .filter(e -> e.getType().equals(aTask.getType()))
-                .findFirst()
-                .orElseThrow(() -> new BusinessException("Equipo no encontrado para la tarea: " + aTask.getName()));
+        for (Equipment eq : equipments) {
+            if (eq.getType().equals(aTask.getType()))
+                return eq;
+        }
+        throw new BusinessException("Equipo no encontrado para la tarea: " + aTask.getName());
     }
 
     private List<Task> reverseTasksOf(Product product) {

@@ -113,7 +113,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     this.planningService
       .getPlanningsFiltered(this.selectedWorkshopId, this.selectedOrderId)
       .subscribe({
-        next: (dataPackage: any) => {
+        next: dataPackage => {
           this.planningProcesses = dataPackage.data as PlanningProcess[];
           this.computeAvailableDates();
           this.computeWorkshopBlocks();
@@ -164,7 +164,6 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   renderAllCharts(): void {
     if (!this.googleChartsLoaded || !this.hasData) return;
     this.cdr.detectChanges();
-    // La suscripción en ngAfterViewInit se encarga del dibujo
   }
 
   private drawCharts(divs: ElementRef[]): void {

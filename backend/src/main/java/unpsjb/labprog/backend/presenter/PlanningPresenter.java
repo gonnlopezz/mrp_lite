@@ -56,11 +56,11 @@ public class PlanningPresenter {
         try {
             return Response.ok(service.save(request), "Producto planificado con éxito");
         } catch (BusinessException e) {
-            return Response.conflict(e.getMessage()); // 409
+            return Response.conflict(e.getMessage());
         } catch (EntityNotFoundException e) {
-            return Response.notFound(e.getMessage()); // 404
+            return Response.notFound(e.getMessage());
         } catch (Exception e) {
-            return Response.error(e.getMessage()); // 400 para el resto
+            return Response.error(e.getMessage());
         }
 
     }
