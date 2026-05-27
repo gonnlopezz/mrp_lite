@@ -54,7 +54,41 @@ Escenario: Planificación de todos los pedidos pendientes.
     Cuando se solicita planificar el pedido el día "09-02-2025"
     Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
     Y se generaron las siguientes planificaciones
-      | inicio           | fin              | equipo        | tarea               |
-      | 2025-01-09 21:00 | 2025-01-09 22:10 | G01_amoladora | cortar planchas     |
-      | 2025-01-09 22:10 | 2025-01-09 22:30 | G01_amoladora | cortar perfiles     |
-      | 2025-01-09 22:30 | 2025-01-10 00:00 | G02_soldadora | armado              |
+      | inicio           | fin              | equipo        | tarea           |
+      | 2025-02-09 21:50 | 2025-02-09 22:20 | G01_amoladora | cortar planchas |
+      | 2025-02-09 22:20 | 2025-02-09 22:30 | G01_amoladora | cortar perfiles |
+      | 2025-02-09 22:30 | 2025-02-09 23:15 | G02_soldadora | armado          |
+
+
+  Escenario: Planificación de todos los pedidos pendientes. Y uso de huecos en equipos.
+    Dado que existen los pedidos pendientes de planificacion antes cargados
+    Cuando se solicita planificar el pedido el día "02-03-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea                  |
+      | 2025-03-05 18:55 | 2025-03-05 19:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 19:55 | 2025-03-05 20:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 20:55 | 2025-03-05 21:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 21:55 | 2025-03-05 22:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 19:25 | 2025-03-05 19:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 20:25 | 2025-03-05 20:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 21:25 | 2025-03-05 21:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 22:25 | 2025-03-05 22:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 19:35 | 2025-03-05 19:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 20:35 | 2025-03-05 20:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 21:35 | 2025-03-05 21:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 22:35 | 2025-03-05 22:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 19:50 | 2025-03-05 20:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 20:50 | 2025-03-05 21:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 21:50 | 2025-03-05 22:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 22:50 | 2025-03-05 23:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 20:00 | 2025-03-05 21:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 21:00 | 2025-03-05 22:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 22:00 | 2025-03-05 23:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 23:00 | 2025-03-06 00:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 19:20 | 2025-03-05 19:35 | G02_soldadora | unir ramas             |
+      | 2025-03-05 21:05 | 2025-03-05 21:20 | G02_soldadora | unir ramas             |
+      | 2025-03-05 22:20 | 2025-03-05 22:35 | G02_soldadora | unir ramas             |
+      | 2025-03-05 20:00 | 2025-03-05 21:20 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 21:20 | 2025-03-05 22:40 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 22:40 | 2025-03-06 00:00 | G03_taladro   | realizar perforaciones |

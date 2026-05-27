@@ -103,7 +103,6 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   // ─── Fetch principal ─────────────────────────────────────────────────────
 
   onFiltersChange(): void {
-    this.selectedDate = '';
     this.fetchAndRender();
   }
 
@@ -156,6 +155,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   resetFilters(): void {
     this.selectedWorkshopId = '';
     this.selectedOrderId = '';
+    this.selectedDate= '';
     this.onFiltersChange();
   }
 
@@ -389,7 +389,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
 
   get hasActiveFilters(): boolean {
-    return this.selectedWorkshopId !== '' || this.selectedOrderId !== '';
+    return this.selectedWorkshopId !== '' || this.selectedOrderId !== '' || this.selectedDate !== '';
   }
 
   getTotalProducts(block: WorkshopChartBlock): number {
