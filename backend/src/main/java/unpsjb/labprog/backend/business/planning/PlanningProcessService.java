@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -136,8 +135,7 @@ public class PlanningProcessService {
             LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
 
         List<Task> reversedTasks = reverseTasksOf(product);
-        LinkedList<Planning> plannings = scheduleBackwards(
-                reversedTasks, workshop.getEquipments(), deadline, equipmentFreeTime);
+        LinkedList<Planning> plannings = scheduleBackwards(reversedTasks, workshop.getEquipments(), deadline, equipmentFreeTime);
 
         LocalDateTime overallStart = plannings.getFirst().getPeriod().getStart();
         return createPlanningProcess(plannings, overallStart, deadline);
@@ -210,9 +208,8 @@ public class PlanningProcessService {
     }
 
     private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
-        List<Task> tasks = aProduct.getTasks().stream().distinct().collect(Collectors.toList());
         List<EquipmentType> result = new ArrayList<>();
-        for (Task t : tasks) {
+        for (Task t : aProduct.getTasks()) {
             EquipmentType type = t.getType();
             if (!result.contains(type))
                 result.add(type);
