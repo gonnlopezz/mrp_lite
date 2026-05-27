@@ -75,30 +75,6 @@ public class PlanningProcessService {
         return (List<PlanningProcess>) repository.saveAll(finalProcesses);
     }
 
-    private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
-            Workshop aWorkshop,
-            Product aProduct,
-            ManufacturingOrder order,
-            LocalDateTime finalDeliveryDate,
-            LocalDateTime requestedStart) {
-
-        List<PlanningProcess> result = new ArrayList<>();
-        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
-
-        for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess process = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
-                    equipmentFreeTime);
-            process.setOrder(order);
-
-            if (process.getStart().isBefore(requestedStart))
-                return Optional.empty();
-
-            result.add(process);
-        }
-
-        return Optional.of(result);
-    }
-
     private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
@@ -120,35 +96,39 @@ public class PlanningProcessService {
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    private PlanningProcess productPlanningBackwards(Product aProduct, Workshop aWorkshop, LocalDateTime deadline,
-            Map<Long, LocalDateTime> equipmentFreeTime) {
-        Collection<Equipment> equipments = aWorkshop.getEquipments();
+    private PlanningProcess productPlanningBackwards(
+            Product product, Workshop workshop,
+            LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
+    
+        List<Task> reversedTasks = reverseTasksOf(product);
+        LinkedList<Planning> plannings = scheduleBackwards(
+                reversedTasks, workshop.getEquipments(), deadline, equipmentFreeTime);
 
-        List<Task> reversedTasks = reverseTasksOf(aProduct);
-
-        LinkedList<Planning> plannings = new LinkedList<>();
-        LocalDateTime currentProductEnd = deadline;
-        LocalDateTime overallStart = deadline;
-
-        for (Task t : reversedTasks) {
-            Equipment equipment = getRequiredEquipmentFor(t, equipments);
-            long durationMinutes = calculateTaskDurationFor(t, equipment);
-
-            LocalDateTime end = findAvailableEndBackwards(equipment, currentProductEnd, durationMinutes,
-                    equipmentFreeTime);
-            LocalDateTime start = end.minusMinutes(durationMinutes);
-
-            plannings.addFirst(createPlanning(t, equipment, start, end));
-
-            currentProductEnd = start;
-            overallStart = start;
-
-            equipmentFreeTime.put(equipment.getId(), start);
-        }
-
+        LocalDateTime overallStart = plannings.getFirst().getPeriod().getStart();
         return createPlanningProcess(plannings, overallStart, deadline);
     }
 
+    private LinkedList<Planning> scheduleBackwards(
+            List<Task> reversedTasks, Collection<Equipment> equipments,
+            LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
+
+        LinkedList<Planning> result = new LinkedList<>();
+        LocalDateTime currentEnd = deadline;
+
+        for (Task task : reversedTasks) {
+            Equipment equipment = getRequiredEquipmentFor(task, equipments);
+            long duration = calculateTaskDurationFor(task, equipment);
+
+            LocalDateTime end = findAvailableEndBackwards(equipment, currentEnd, duration, equipmentFreeTime);
+            LocalDateTime start = end.minusMinutes(duration);
+
+            result.addFirst(createPlanning(task, equipment, start, end));
+            equipmentFreeTime.put(equipment.getId(), start);
+            currentEnd = start;
+        }
+
+        return result;
+    }
 
     private LocalDateTime findAvailableEndBackwards(Equipment aEquipment, LocalDateTime maxEnd, long durationMinutes,
             Map<Long, LocalDateTime> equipmentFreeTime) {
@@ -182,6 +162,27 @@ public class PlanningProcessService {
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(
                         "No se encontró un taller con el equipamiento necesario para fabricar el producto dentro del plazo requerido"));
+    }
+
+    private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
+            Workshop aWorkshop, Product aProduct, ManufacturingOrder order,
+            LocalDateTime finalDeliveryDate, LocalDateTime requestedStart) {
+
+        List<PlanningProcess> result = new ArrayList<>();
+        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
+
+        for (int i = 0; i < order.getQuantity(); i++) {
+            PlanningProcess process = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
+                    equipmentFreeTime);
+            process.setOrder(order);
+
+            if (process.getStart().isBefore(requestedStart))
+                return Optional.empty();
+
+            result.add(process);
+        }
+
+        return Optional.of(result);
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
