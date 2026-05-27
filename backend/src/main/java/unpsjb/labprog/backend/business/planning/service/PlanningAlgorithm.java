@@ -44,10 +44,6 @@ public class PlanningAlgorithm {
     @Autowired
     ManufacturingOrderService orderService;
 
-    /*
-     * Planificación hacia adelante: se asignan las tareas en el orden dado,
-     * buscando el próximo slot disponible para cada tarea
-     */
     public PlanningProcess planningForward(PlanningRequestDTO request) {
         LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
         Product product = productService.findByName(request.getProductName());
@@ -204,6 +200,12 @@ public class PlanningAlgorithm {
                 .orElse(requestedTime);
     }
 
+    private List<Task> reverseTasksOf(Product product) {
+        List<Task> result = new ArrayList<>(product.getTasks());
+        Collections.reverse(result);
+        return result;
+    }
+
     public List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
         List<EquipmentType> result = new ArrayList<>();
         for (Task t : aProduct.getTasks()) {
@@ -222,9 +224,8 @@ public class PlanningAlgorithm {
         throw new BusinessException("Equipo no encontrado para la tarea: " + aTask.getName());
     }
 
-    private List<Task> reverseTasksOf(Product product) {
-        List<Task> result = new ArrayList<>(product.getTasks());
-        Collections.reverse(result);
+    private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
+        long result = (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
         return result;
     }
 
@@ -241,11 +242,6 @@ public class PlanningAlgorithm {
         result.setTask(aTask);
         result.setPeriod(new Period(startTime, endTime, aTask.getDuration()));
         result.setEquipment(aEquipment);
-        return result;
-    }
-
-    private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-        long result = (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
         return result;
     }
 

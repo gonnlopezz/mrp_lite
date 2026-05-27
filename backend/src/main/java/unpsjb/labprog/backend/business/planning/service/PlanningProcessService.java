@@ -1,6 +1,5 @@
 package unpsjb.labprog.backend.business.planning.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,29 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
 import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
-import unpsjb.labprog.backend.business.product.ProductService;
-import unpsjb.labprog.backend.business.workshop.WorkshopService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
-import unpsjb.labprog.backend.model.EquipmentType;
-import unpsjb.labprog.backend.model.ManufacturingOrder;
-import unpsjb.labprog.backend.model.OrderState;
 import unpsjb.labprog.backend.model.PlanningProcess;
-import unpsjb.labprog.backend.model.Product;
-import unpsjb.labprog.backend.model.Workshop;
 
 @Service
 public class PlanningProcessService {
     @Autowired
     PlanningProcessRepository repository;
-
-    @Autowired
-    ProductService productService;
-
-    @Autowired
-    ManufacturingOrderService orderService;
 
     @Autowired
     PlanningAlgorithm algorithm;
