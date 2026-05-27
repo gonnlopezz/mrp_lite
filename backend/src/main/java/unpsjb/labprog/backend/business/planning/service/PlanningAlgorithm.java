@@ -1,4 +1,4 @@
-package unpsjb.labprog.backend.business.planning;
+package unpsjb.labprog.backend.business.planning.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,20 +11,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
+import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
 import unpsjb.labprog.backend.business.product.ProductService;
 import unpsjb.labprog.backend.business.workshop.WorkshopService;
-import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
-import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Equipment;
 import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
-import unpsjb.labprog.backend.model.OrderState;
 import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.Planning;
 import unpsjb.labprog.backend.model.PlanningProcess;
@@ -33,7 +28,7 @@ import unpsjb.labprog.backend.model.Workshop;
 import unpsjb.labprog.backend.model.Task;
 
 @Service
-public class PlanningProcessService {
+public class PlanningAlgorithm {
     @Autowired
     PlanningProcessRepository repository;
 
@@ -46,34 +41,11 @@ public class PlanningProcessService {
     @Autowired
     ManufacturingOrderService orderService;
 
-    @Transactional
-    public PlanningProcess save(PlanningRequestDTO request) {
-        LocalDateTime normalizedStart = request.getStartDate().toLocalDate().atStartOfDay();
-        PlanningProcess process = productPlanning(request.getProductName(), request.getWorkshopCode(), normalizedStart);
-        return repository.save(process);
-    }
-
-    @Transactional
-    public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
-        ManufacturingOrder order = orderService.findById(request.getOrder().getId());
-        Product product = productService.findById(order.getProduct().getId());
-
-        LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
-        LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
-
-        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(requiredTypes,
-                requiredTypes.size());
-
-        List<PlanningProcess> finalProcesses = searchValidPlanning(availableWorkshops, product, order,
-                finalDeliveryDate, requestedStart);
-        order.setState(OrderState.PLANIFICADO);
-        orderService.save(order);
-
-        return (List<PlanningProcess>) repository.saveAll(finalProcesses);
-    }
-
-    private PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
+    /*
+     * Planificación hacia adelante: se asignan las tareas en el orden dado,
+     * buscando el próximo slot disponible para cada tarea
+     */
+    public PlanningProcess productPlanning(String productName, String workshopCode, LocalDateTime start) {
         Product product = productService.findByName(productName);
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
         Workshop workshop = resolveWorkshop(workshopCode, requiredTypes);
@@ -94,7 +66,7 @@ public class PlanningProcessService {
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    private List<PlanningProcess> searchValidPlanning(
+    public List<PlanningProcess> searchValidPlanning(
             List<Workshop> workshops, Product product, ManufacturingOrder order,
             LocalDateTime deliveryDate, LocalDateTime requestedStart) {
 
@@ -135,7 +107,8 @@ public class PlanningProcessService {
             LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
 
         List<Task> reversedTasks = reverseTasksOf(product);
-        LinkedList<Planning> plannings = scheduleBackwards(reversedTasks, workshop.getEquipments(), deadline, equipmentFreeTime);
+        LinkedList<Planning> plannings = scheduleBackwards(reversedTasks, workshop.getEquipments(), deadline,
+                equipmentFreeTime);
 
         LocalDateTime overallStart = plannings.getFirst().getPeriod().getStart();
         return createPlanningProcess(plannings, overallStart, deadline);
@@ -207,7 +180,7 @@ public class PlanningProcessService {
                 .orElse(requestedTime);
     }
 
-    private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
+    public List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
         List<EquipmentType> result = new ArrayList<>();
         for (Task t : aProduct.getTasks()) {
             EquipmentType type = t.getType();
@@ -252,33 +225,4 @@ public class PlanningProcessService {
         return result;
     }
 
-    public List<PlanningProcess> findAll() {
-        List<PlanningProcess> result = new ArrayList<>();
-        repository.findAll().forEach(e -> result.add(e));
-        return result;
-    }
-
-    public Page<PlanningProcess> findByPage(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size));
-    }
-
-    public List<PlanningProcess> findByWorkshop(Integer workshopId) {
-        return repository.findAllByWorkshopId(workshopId);
-    }
-
-    public PlanningProcess findById(long id) {
-        return repository.findById(id).orElse(null);
-    }
-
-    public List<PlanningProcess> findFiltered(Long workshopId, Long orderId) {
-        if (workshopId == null && orderId == null)
-            return this.findAll();
-
-        return repository.findProcessesByFilters(workshopId, orderId);
-    }
-
-    @Transactional
-    public void delete(long id) {
-        repository.deleteById(id);
-    }
 }

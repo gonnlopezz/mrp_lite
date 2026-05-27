@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
-import unpsjb.labprog.backend.business.planning.PlanningProcessService;
+import unpsjb.labprog.backend.business.planning.service.PlanningProcessService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
