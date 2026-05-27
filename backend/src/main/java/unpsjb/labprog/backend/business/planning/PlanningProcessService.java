@@ -96,10 +96,41 @@ public class PlanningProcessService {
         return createPlanningProcess(plannings, start, currentTime);
     }
 
+    private List<PlanningProcess> searchValidPlanning(
+            List<Workshop> workshops, Product product, ManufacturingOrder order,
+            LocalDateTime deliveryDate, LocalDateTime requestedStart) {
+        return workshops.stream()
+                .flatMap(w -> simulateWorkshopPlanning(w, product, order, deliveryDate, requestedStart).stream())
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(
+                        "No se encontró un taller con el equipamiento necesario para fabricar el producto dentro del plazo requerido"));
+    }
+
+    private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
+            Workshop aWorkshop, Product aProduct, ManufacturingOrder order,
+            LocalDateTime finalDeliveryDate, LocalDateTime requestedStart) {
+
+        List<PlanningProcess> result = new ArrayList<>();
+        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
+
+        for (int i = 0; i < order.getQuantity(); i++) {
+            PlanningProcess process = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
+                    equipmentFreeTime);
+            process.setOrder(order);
+
+            if (process.getStart().isBefore(requestedStart))
+                return Optional.empty();
+
+            result.add(process);
+        }
+
+        return Optional.of(result);
+    }
+
     private PlanningProcess productPlanningBackwards(
             Product product, Workshop workshop,
             LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
-    
+
         List<Task> reversedTasks = reverseTasksOf(product);
         LinkedList<Planning> plannings = scheduleBackwards(
                 reversedTasks, workshop.getEquipments(), deadline, equipmentFreeTime);
@@ -152,37 +183,6 @@ public class PlanningProcessService {
         }
 
         return result;
-    }
-
-    private List<PlanningProcess> searchValidPlanning(
-            List<Workshop> workshops, Product product, ManufacturingOrder order,
-            LocalDateTime deliveryDate, LocalDateTime requestedStart) {
-        return workshops.stream()
-                .flatMap(w -> simulateWorkshopPlanning(w, product, order, deliveryDate, requestedStart).stream())
-                .findFirst()
-                .orElseThrow(() -> new BusinessException(
-                        "No se encontró un taller con el equipamiento necesario para fabricar el producto dentro del plazo requerido"));
-    }
-
-    private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
-            Workshop aWorkshop, Product aProduct, ManufacturingOrder order,
-            LocalDateTime finalDeliveryDate, LocalDateTime requestedStart) {
-
-        List<PlanningProcess> result = new ArrayList<>();
-        Map<Long, LocalDateTime> equipmentFreeTime = new HashMap<>();
-
-        for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess process = productPlanningBackwards(aProduct, aWorkshop, finalDeliveryDate,
-                    equipmentFreeTime);
-            process.setOrder(order);
-
-            if (process.getStart().isBefore(requestedStart))
-                return Optional.empty();
-
-            result.add(process);
-        }
-
-        return Optional.of(result);
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
