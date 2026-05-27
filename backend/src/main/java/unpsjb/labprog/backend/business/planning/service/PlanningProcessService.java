@@ -30,36 +30,21 @@ public class PlanningProcessService {
     ProductService productService;
 
     @Autowired
-    WorkshopService workshopService;
-
-    @Autowired
     ManufacturingOrderService orderService;
 
     @Autowired
     PlanningAlgorithm algorithm;
 
     @Transactional
-    public PlanningProcess save(PlanningRequestDTO request) {
-        LocalDateTime normalizedStart = request.getStartDate().toLocalDate().atStartOfDay();
-        PlanningProcess process = algorithm.planningForward(request.getProductName(), request.getWorkshopCode(),
-                normalizedStart);
-        return repository.save(process);
+    public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
+        List<PlanningProcess> processes = algorithm.planningBackward(request);
+        return (List<PlanningProcess>) repository.saveAll(processes);
     }
 
     @Transactional
-    public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
-        ManufacturingOrder order = orderService.findById(request.getOrder().getId());
-        Product product = productService.findById(order.getProduct().getId());
-
-        LocalDateTime finalDeliveryDate = order.getDeliveryDate().atStartOfDay();
-        LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
-
-        List<PlanningProcess> finalProcesses = algorithm.planningBackward(order, product, finalDeliveryDate, requestedStart);
-
-        order.setState(OrderState.PLANIFICADO);
-        orderService.save(order);
-
-        return (List<PlanningProcess>) repository.saveAll(finalProcesses);
+    public PlanningProcess save(PlanningRequestDTO request) {
+        PlanningProcess process = algorithm.planningForward(request);
+        return repository.save(process);
     }
 
     public List<PlanningProcess> findAll() {

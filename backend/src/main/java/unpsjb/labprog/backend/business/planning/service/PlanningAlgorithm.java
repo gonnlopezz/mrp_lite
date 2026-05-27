@@ -16,10 +16,13 @@ import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
 import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
 import unpsjb.labprog.backend.business.product.ProductService;
 import unpsjb.labprog.backend.business.workshop.WorkshopService;
+import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
+import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Equipment;
 import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.OrderState;
 import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.Planning;
 import unpsjb.labprog.backend.model.PlanningProcess;
@@ -45,39 +48,46 @@ public class PlanningAlgorithm {
      * Planificación hacia adelante: se asignan las tareas en el orden dado,
      * buscando el próximo slot disponible para cada tarea
      */
-    public PlanningProcess planningForward(String productName, String workshopCode, LocalDateTime start) {
-        Product product = productService.findByName(productName);
+    public PlanningProcess planningForward(PlanningRequestDTO request) {
+        LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
+        Product product = productService.findByName(request.getProductName());
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-        Workshop workshop = resolveWorkshop(workshopCode, requiredTypes);
+        Workshop workshop = resolveWorkshop(request.getWorkshopCode(), requiredTypes);
 
         List<Planning> plannings = new ArrayList<>();
         LocalDateTime currentTime = start;
         Collection<Equipment> equipments = workshop.getEquipments();
 
-        for (Task t : product.getTasks()) {
-            Equipment equipment = getRequiredEquipmentFor(t, equipments);
+        for (Task task : product.getTasks()) {
+            Equipment equipment = getRequiredEquipmentFor(task, equipments);
             LocalDateTime availableTime = getNextAvailableSlot(equipment, currentTime);
-            LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(t, equipment));
+            LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(task, equipment));
 
-            plannings.add(createPlanning(t, equipment, availableTime, end));
+            plannings.add(createPlanning(task, equipment, availableTime, end));
             currentTime = end;
         }
 
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    public List<PlanningProcess> planningBackward(
-            ManufacturingOrder order,
-            Product product,
-            LocalDateTime deliveryDate,
-            LocalDateTime requestedStart) {
+    public List<PlanningProcess> planningBackward(PlanningFromOrderRequestDTO request) {
+        ManufacturingOrder order = orderService.findById(request.getOrder().getId());
+        Product product = productService.findById(order.getProduct().getId());
+
+        LocalDateTime deliveryDate = order.getDeliveryDate().atStartOfDay();
+        LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
 
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-        List<Workshop> availableWorkshops = workshopService.findAllByEquipmentTypes(
+        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
                 requiredTypes, requiredTypes.size());
 
-        List<PlanningProcess> result = searchValidPlanning(availableWorkshops, product, order, deliveryDate, requestedStart);
-        return result;
+        List<PlanningProcess> processes = searchValidPlanning(
+                workshops, product, order, deliveryDate, requestedStart);
+
+        order.setState(OrderState.PLANIFICADO);
+        orderService.save(order);
+
+        return processes;
     }
 
     public List<PlanningProcess> searchValidPlanning(
