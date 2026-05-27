@@ -149,6 +149,7 @@ public class PlanningProcessService {
         return createPlanningProcess(plannings, overallStart, deadline);
     }
 
+
     private LocalDateTime findAvailableEndBackwards(Equipment aEquipment, LocalDateTime maxEnd, long durationMinutes,
             Map<Long, LocalDateTime> equipmentFreeTime) {
 
