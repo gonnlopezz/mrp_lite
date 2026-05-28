@@ -10,6 +10,11 @@ Given('que existe el pedido para el cliente {string} con fecha de entrega {strin
     this.pedido = dataPackage.data;
 });
 
+Given('que existen los pedidos pendientes de planificacion antes cargados', async function () {
+    return true;
+});
+
+
 When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto' , async function (fechaPedido, fechaEntrega, cantidad) {
 
     this.pedido = {

@@ -72,6 +72,26 @@ When('se solicita planificar el pedido el día {string}', async function (date) 
 });
 
 
+When('se solicita planificar todos los pedidos pendientes el día {string}', async function (date) {
+    const [dia, mes, año] = date.split('-');
+    const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
+
+    const response = await fetch('http://backend:8080/plannings/pending', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            startDate: fechaISO
+        })
+    });
+
+    const data = await response.json();
+    this.resultado = { status: response.status, respuesta: data.message };
+    this.responseBody = data.data;
+});
+
+
+
+
 Then('se generaron las siguientes planificaciones', function (dataTable) {
     const planificacionesEsperadas = dataTable.hashes();
     
