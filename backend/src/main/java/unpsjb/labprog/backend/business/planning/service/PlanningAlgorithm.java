@@ -37,11 +37,11 @@ public class PlanningAlgorithm {
             LocalDateTime availableTime = getNextAvailableSlot(equipment, currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(task, equipment));
 
-            plannings.add(createPlanning(task, equipment, availableTime, end));
+            plannings.add(new Planning(task, equipment, new Period(availableTime, end, task.getDuration())));
             currentTime = end;
         }
 
-        return createPlanningProcess(plannings, start, currentTime);
+        return new PlanningProcess(plannings, start, currentTime);
     }
 
     public PlanningProcess scheduleBackwardFor(
@@ -54,7 +54,7 @@ public class PlanningAlgorithm {
 
         LocalDateTime start = plannings.getFirst().getPeriod().getStart();
 
-        return createPlanningProcess(
+        return new PlanningProcess(
                 plannings, start, deadline);
     }
 
@@ -72,7 +72,7 @@ public class PlanningAlgorithm {
             LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, freeTimeCache);
             LocalDateTime start = end.minusMinutes(duration);
 
-            result.addFirst(createPlanning(task, equipment, start, end));
+            result.addFirst(new Planning(task, equipment, new Period(start, end, task.getDuration())));
             freeTimeCache.put(equipment.getId(), start);
             currentEnd = start;
         }
@@ -128,13 +128,6 @@ public class PlanningAlgorithm {
         return result;
     }
 
-    private Planning createPlanning(Task aTask, Equipment aEquipment, LocalDateTime start, LocalDateTime end) {
-        Planning result = new Planning();
-        result.setTask(aTask);
-        result.setPeriod(new Period(start, end, aTask.getDuration()));
-        result.setEquipment(aEquipment);
-        return result;
-    }
 
     private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
         PlanningProcess result = new PlanningProcess();

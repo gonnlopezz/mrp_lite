@@ -17,6 +17,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Planning {
+
+    public Planning(Task aTask, Equipment aEquipment, Period aPeriod) {
+        this.task = aTask;
+        this.equipment = aEquipment;
+        this.period = aPeriod;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
