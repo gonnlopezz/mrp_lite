@@ -26,16 +26,14 @@ public class PlanningAlgorithm {
     @Autowired
     PlanningProcessRepository repository;
 
-    // ─── PÚBLICO - llamado por PlanningScheduler ──────────────
-
     public PlanningProcess scheduleForward(
-            Product product, Workshop workshop, LocalDateTime start) {
+            Product aProduct, Workshop aWorkshop, LocalDateTime start) {
 
         List<Planning> plannings = new ArrayList<>();
         LocalDateTime currentTime = start;
 
-        for (Task task : product.getTasks()) {
-            Equipment equipment = getRequiredEquipmentFor(task, workshop.getEquipments());
+        for (Task task : aProduct.getTasks()) {
+            Equipment equipment = getRequiredEquipmentFor(task, aWorkshop.getEquipments());
             LocalDateTime availableTime = getNextAvailableSlot(equipment, currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(task, equipment));
 
@@ -46,21 +44,21 @@ public class PlanningAlgorithm {
         return createPlanningProcess(plannings, start, currentTime);
     }
 
-    public PlanningProcess scheduleBackwardsFor(
-            Product product, Workshop workshop,
+    public PlanningProcess scheduleBackwardFor(
+            Product aProduct, Workshop aWorkshop,
             LocalDateTime deadline, Map<Long, LocalDateTime> freeTimeCache) {
 
-        List<Task> reversedTasks = reverseTasksOf(product);
-        LinkedList<Planning> plannings = scheduleBackwards(
-                reversedTasks, workshop.getEquipments(), deadline, freeTimeCache);
+        List<Task> reversedTasks = reverseTasksOf(aProduct);
+        LinkedList<Planning> plannings = scheduleBackward(
+                reversedTasks, aWorkshop.getEquipments(), deadline, freeTimeCache);
+
+        LocalDateTime start = plannings.getFirst().getPeriod().getStart();
 
         return createPlanningProcess(
-                plannings, plannings.getFirst().getPeriod().getStart(), deadline);
+                plannings, start, deadline);
     }
 
-    // ─── PRIVADO - detalles del algoritmo ────────────────────
-
-    private LinkedList<Planning> scheduleBackwards(
+    private LinkedList<Planning> scheduleBackward(
             List<Task> reversedTasks, Collection<Equipment> equipments,
             LocalDateTime deadline, Map<Long, LocalDateTime> freeTimeCache) {
 
@@ -71,7 +69,7 @@ public class PlanningAlgorithm {
             Equipment equipment = getRequiredEquipmentFor(task, equipments);
             long duration = calculateTaskDurationFor(task, equipment);
 
-            LocalDateTime end = findAvailableEndBackwards(equipment, currentEnd, duration, freeTimeCache);
+            LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, freeTimeCache);
             LocalDateTime start = end.minusMinutes(duration);
 
             result.addFirst(createPlanning(task, equipment, start, end));
@@ -82,16 +80,16 @@ public class PlanningAlgorithm {
         return result;
     }
 
-    private LocalDateTime findAvailableEndBackwards(
-            Equipment equipment, LocalDateTime maxEnd,
+    private LocalDateTime findAvailableEndBackward(
+            Equipment aEquipment, LocalDateTime maxEnd,
             long durationMinutes, Map<Long, LocalDateTime> freeTimeCache) {
 
         LocalDateTime result = maxEnd;
-        if (freeTimeCache.containsKey(equipment.getId())
-                && freeTimeCache.get(equipment.getId()).isBefore(result))
-            result = freeTimeCache.get(equipment.getId());
+        if (freeTimeCache.containsKey(aEquipment.getId())
+                && freeTimeCache.get(aEquipment.getId()).isBefore(result))
+            result = freeTimeCache.get(aEquipment.getId());
 
-        List<Planning> existingPlannings = equipment.getPlannings();
+        List<Planning> existingPlannings = aEquipment.getPlannings();
         if (existingPlannings == null || existingPlannings.isEmpty())
             return result;
 
@@ -113,34 +111,32 @@ public class PlanningAlgorithm {
                 .orElse(requestedTime);
     }
 
-    private Equipment getRequiredEquipmentFor(Task task, Collection<Equipment> equipments) {
+    private Equipment getRequiredEquipmentFor(Task aTask, Collection<Equipment> equipments) {
         for (Equipment eq : equipments)
-            if (eq.getType().equals(task.getType()))
+            if (eq.getType().equals(aTask.getType()))
                 return eq;
-        throw new BusinessException("Equipo no encontrado para la tarea: " + task.getName());
+        throw new BusinessException("Equipo no encontrado para la tarea: " + aTask.getName());
     }
 
-    private List<Task> reverseTasksOf(Product product) {
-        List<Task> result = new ArrayList<>(product.getTasks());
+    private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
+        return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
+    }
+
+    private List<Task> reverseTasksOf(Product aProduct) {
+        List<Task> result = new ArrayList<>(aProduct.getTasks());
         Collections.reverse(result);
         return result;
     }
 
-    private long calculateTaskDurationFor(Task task, Equipment equipment) {
-        return (long) Math.ceil((double) task.getDuration() / equipment.getCapacity());
-    }
-
-    private Planning createPlanning(Task task, Equipment equipment,
-            LocalDateTime start, LocalDateTime end) {
+    private Planning createPlanning(Task aTask, Equipment aEquipment, LocalDateTime start, LocalDateTime end) {
         Planning result = new Planning();
-        result.setTask(task);
-        result.setPeriod(new Period(start, end, task.getDuration()));
-        result.setEquipment(equipment);
+        result.setTask(aTask);
+        result.setPeriod(new Period(start, end, aTask.getDuration()));
+        result.setEquipment(aEquipment);
         return result;
     }
 
-    private PlanningProcess createPlanningProcess(
-            List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
+    private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
         PlanningProcess result = new PlanningProcess();
         result.setStart(start);
         result.setEndDate(end);

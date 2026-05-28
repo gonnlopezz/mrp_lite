@@ -31,7 +31,6 @@ public class PlanningScheduler {
     @Autowired ManufacturingOrderService orderService;
     @Autowired PlanningAlgorithm algorithm;
 
-    // ─── API PÚBLICA ──────────────────────────────────────────
     public PlanningProcess planForward(PlanningRequestDTO request) {
         LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
         Product product = productService.findByName(request.getProductName());
@@ -49,8 +48,7 @@ public class PlanningScheduler {
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
 
         List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
-        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
-                requiredTypes, requiredTypes.size());
+        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes);
 
         List<PlanningProcess> processes = searchValidPlanning(
                 workshops, product, order, deliveryDate, requestedStart);
@@ -61,14 +59,12 @@ public class PlanningScheduler {
         return processes;
     }
 
-    // ─── ORQUESTACIÓN INTERNA ─────────────────────────────────
     private List<PlanningProcess> searchValidPlanning(
-            List<Workshop> workshops, Product product, ManufacturingOrder order,
+            List<Workshop> workshops, Product aProduct, ManufacturingOrder aOrder,
             LocalDateTime deliveryDate, LocalDateTime requestedStart) {
 
         for (Workshop workshop : workshops) {
-            Optional<List<PlanningProcess>> result =
-                simulateWorkshopPlanning(workshop, product, order, deliveryDate, requestedStart);
+            Optional<List<PlanningProcess>> result = simulateWorkshopPlanning(workshop, aProduct, aOrder, deliveryDate, requestedStart);
             if (result.isPresent())
                 return result.get();
         }
@@ -78,16 +74,16 @@ public class PlanningScheduler {
     }
 
     private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
-            Workshop workshop, Product product, ManufacturingOrder order,
+            Workshop aWorkshop, Product aProduct, ManufacturingOrder aOrder,
             LocalDateTime deadline, LocalDateTime requestedStart) {
 
         List<PlanningProcess> result = new ArrayList<>();
         Map<Long, LocalDateTime> freeTimeCache = new HashMap<>();
 
-        for (int i = 0; i < order.getQuantity(); i++) {
-            PlanningProcess process = algorithm.scheduleBackwardsFor(
-                product, workshop, deadline, freeTimeCache);
-            process.setOrder(order);
+        for (int i = 0; i < aOrder.getQuantity(); i++) {
+            PlanningProcess process = algorithm.scheduleBackwardFor(
+                aProduct, aWorkshop, deadline, freeTimeCache);
+            process.setOrder(aOrder);
 
             if (process.getStart().isBefore(requestedStart))
                 return Optional.empty();
@@ -104,12 +100,12 @@ public class PlanningScheduler {
             workshopService.validateEquipmentSupport(workshopCode, requiredTypes);
             return result;
         }
-        return workshopService.findByEquipmentTypes(requiredTypes, requiredTypes.size());
+        return workshopService.findByEquipmentTypes(requiredTypes);
     }
 
-    private List<EquipmentType> getRequiredEquipmentTypesFor(Product product) {
+    private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
         List<EquipmentType> result = new ArrayList<>();
-        for (Task task : product.getTasks()) {
+        for (Task task : aProduct.getTasks()) {
             EquipmentType type = task.getType();
             if (type != null && !result.contains(type))
                 result.add(type);
