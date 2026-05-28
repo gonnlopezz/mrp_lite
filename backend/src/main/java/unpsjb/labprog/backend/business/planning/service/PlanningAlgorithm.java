@@ -46,11 +46,11 @@ public class PlanningAlgorithm {
 
     public PlanningProcess scheduleBackwardFor(
             Product aProduct, Workshop aWorkshop,
-            LocalDateTime deadline, Map<Long, LocalDateTime> freeTimeCache) {
+            LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
 
         List<Task> reversedTasks = reverseTasksOf(aProduct);
         LinkedList<Planning> plannings = scheduleBackward(
-                reversedTasks, aWorkshop.getEquipments(), deadline, freeTimeCache);
+                reversedTasks, aWorkshop.getEquipments(), deadline, equipmentFreeTime);
 
         LocalDateTime start = plannings.getFirst().getPeriod().getStart();
 
@@ -60,7 +60,7 @@ public class PlanningAlgorithm {
 
     private LinkedList<Planning> scheduleBackward(
             List<Task> reversedTasks, Collection<Equipment> equipments,
-            LocalDateTime deadline, Map<Long, LocalDateTime> freeTimeCache) {
+            LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
 
         LinkedList<Planning> result = new LinkedList<>();
         LocalDateTime currentEnd = deadline;
@@ -69,11 +69,11 @@ public class PlanningAlgorithm {
             Equipment equipment = getRequiredEquipmentFor(task, equipments);
             long duration = calculateTaskDurationFor(task, equipment);
 
-            LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, freeTimeCache);
+            LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, equipmentFreeTime);
             LocalDateTime start = end.minusMinutes(duration);
 
             result.addFirst(new Planning(task, equipment, new Period(start, end, task.getDuration())));
-            freeTimeCache.put(equipment.getId(), start);
+            equipmentFreeTime.put(equipment.getId(), start);
             currentEnd = start;
         }
 
@@ -82,16 +82,15 @@ public class PlanningAlgorithm {
 
     private LocalDateTime findAvailableEndBackward(
             Equipment aEquipment, LocalDateTime maxEnd,
-            long durationMinutes, Map<Long, LocalDateTime> freeTimeCache) {
+            long durationMinutes, Map<Long, LocalDateTime> equipmentFreeTime) {
 
         LocalDateTime result = maxEnd;
-        if (freeTimeCache.containsKey(aEquipment.getId())
-                && freeTimeCache.get(aEquipment.getId()).isBefore(result))
-            result = freeTimeCache.get(aEquipment.getId());
+        if (equipmentFreeTime.containsKey(aEquipment.getId())
+                && equipmentFreeTime.get(aEquipment.getId()).isBefore(result))
+            result = equipmentFreeTime.get(aEquipment.getId());
 
         List<Planning> existingPlannings = aEquipment.getPlannings();
-        if (existingPlannings == null || existingPlannings.isEmpty())
-            return result;
+        if (existingPlannings.isEmpty()) return result;
 
         for (Planning p : existingPlannings) {
             LocalDateTime targetStart = result.minusMinutes(durationMinutes);
@@ -128,12 +127,4 @@ public class PlanningAlgorithm {
         return result;
     }
 
-
-    private PlanningProcess createPlanningProcess(List<Planning> plannings, LocalDateTime start, LocalDateTime end) {
-        PlanningProcess result = new PlanningProcess();
-        result.setStart(start);
-        result.setEndDate(end);
-        result.setPlannings(plannings);
-        return result;
-    }
 }
