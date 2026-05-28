@@ -18,18 +18,16 @@ public class PlanningProcessService {
     PlanningProcessRepository repository;
 
     @Autowired
-    PlanningAlgorithm algorithm;
+    PlanningScheduler scheduler;
 
-    @Transactional
-    public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
-        List<PlanningProcess> processes = algorithm.planningBackward(request);
-        return (List<PlanningProcess>) repository.saveAll(processes);
+     @Transactional
+    public PlanningProcess save(PlanningRequestDTO request) {
+        return repository.save(scheduler.planForward(request));
     }
 
     @Transactional
-    public PlanningProcess save(PlanningRequestDTO request) {
-        PlanningProcess process = algorithm.planningForward(request);
-        return repository.save(process);
+    public List<PlanningProcess> saveFromOrder(PlanningFromOrderRequestDTO request) {
+        return (List<PlanningProcess>) repository.saveAll(scheduler.planBackward(request));
     }
 
     public List<PlanningProcess> findAll() {
