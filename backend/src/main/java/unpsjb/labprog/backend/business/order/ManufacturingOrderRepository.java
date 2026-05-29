@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.business.order;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.OrderState;
 
 @Repository
 public interface ManufacturingOrderRepository extends CrudRepository<ManufacturingOrder, Long>, PagingAndSortingRepository<ManufacturingOrder, Long> {
@@ -21,4 +23,6 @@ public interface ManufacturingOrderRepository extends CrudRepository<Manufacturi
     @Query("SELECT o FROM ManufacturingOrder o " +
             "WHERE o.customer.cuit = :cuit AND o.deliveryDate = :deliveryDate")
     public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate);
+
+    List<ManufacturingOrder> findByStateOrderByDeliveryDateAsc(OrderState state);
 }

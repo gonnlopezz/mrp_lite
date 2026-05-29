@@ -4,9 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +13,7 @@ import unpsjb.labprog.backend.model.PlanningProcess;
 
 @Repository
 public interface PlanningProcessRepository
-                extends CrudRepository<PlanningProcess, Long>, PagingAndSortingRepository<PlanningProcess, Long> {
+                extends JpaRepository<PlanningProcess, Long> {
 
         @Query("SELECT MAX(p.period.endDate) FROM Planning p WHERE p.equipment.id = :equipmentId")
         public Optional<LocalDateTime> findMaxEndTimeForEquipment(@Param("equipmentId") Long equipmentId);

@@ -1,6 +1,10 @@
 package unpsjb.labprog.backend.presenter;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.planning.service.PlanningProcessService;
+import unpsjb.labprog.backend.dto.PlanAllPendingRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
+import unpsjb.labprog.backend.model.PlanningProcess;
 
 @RestController
 @RequestMapping("plannings")
@@ -78,9 +84,27 @@ public class PlanningPresenter {
         }
     }
 
+    @PostMapping("/pending")
+    public ResponseEntity<Object> planPendingOrders(@RequestBody PlanAllPendingRequestDTO request) {
+        try {
+            if (request.getStartDate() == null) {
+                return Response.error("La fecha de inicio (startDate) es obligatoria.");
+            }
+            
+            List<PlanningProcess> processes = service.savePendingOrders(request.getStartDate());
+            
+            return Response.ok(processes, "Pedidos pendientes planificados con éxito");
+        } catch (Exception e) {
+            return Response.error("Error al procesar la planificación masiva: " + e.getMessage());
+        }
+    }
+    
+
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") long id) {
         service.delete(id);
         return Response.ok("Planificación id " + id + " eliminada con éxito.");
     }
+
+    
 }

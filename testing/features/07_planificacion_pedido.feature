@@ -67,28 +67,28 @@ Escenario: Planificación de todos los pedidos pendientes. Y uso de huecos en eq
     Y se generaron las siguientes planificaciones
       | inicio           | fin              | equipo        | tarea                  |
       | 2025-03-05 18:55 | 2025-03-05 19:25 | G01_amoladora | cortar perfiles        |
-      | 2025-03-05 19:25 | 2025-03-05 19:55 | G01_amoladora | cortar perfiles        |  # 👈 CORREGIDO: Arranca 19:25, termina 19:55
-      | 2025-03-05 19:55 | 2025-03-05 20:25 | G01_amoladora | cortar perfiles        |  # 👈 CORREGIDO: Arranca 19:55, termina 20:25
-      | 2025-03-05 20:25 | 2025-03-05 20:55 | G01_amoladora | cortar perfiles        |  # 👈 CORREGIDO: Arranca 20:25, termina 20:55
-      | 2025-03-05 19:25 | 2025-03-05 19:55 | G01_amoladora | cortar malla           |
-      | 2025-03-05 20:25 | 2025-03-05 20:35 | G01_amoladora | cortar malla           |
-      | 2025-03-05 21:25 | 2025-03-05 21:35 | G01_amoladora | cortar malla           |
-      | 2025-03-05 22:25 | 2025-03-05 22:35 | G01_amoladora | cortar malla           |
-      | 2025-03-05 19:35 | 2025-03-05 19:50 | G02_soldadora | soldar canasto         |
-      | 2025-03-05 20:35 | 2025-03-05 20:50 | G02_soldadora | soldar canasto         |
-      | 2025-03-05 21:35 | 2025-03-05 21:50 | G02_soldadora | soldar canasto         |
-      | 2025-03-05 22:35 | 2025-03-05 22:50 | G02_soldadora | soldar canasto         |
-      | 2025-03-05 19:50 | 2025-03-05 20:00 | G02_soldadora | unir pie               |
-      | 2025-03-05 20:50 | 2025-03-05 21:00 | G02_soldadora | unir pie               |
-      | 2025-03-05 21:50 | 2025-03-05 22:00 | G02_soldadora | unir pie               |
-      | 2025-03-05 22:50 | 2025-03-05 23:00 | G02_soldadora | unir pie               |
-      | 2025-03-05 20:00 | 2025-03-05 21:00 | G04_pistola   | pintar antioxidante    |
-      | 2025-03-05 21:00 | 2025-03-05 22:00 | G04_pistola   | pintar antioxidante    |
-      | 2025-03-05 22:00 | 2025-03-05 23:00 | G04_pistola   | pintar antioxidante    |
-      | 2025-03-05 23:00 | 2025-03-06 00:00 | G04_pistola   | pintar antioxidante    |
       | 2025-03-05 19:20 | 2025-03-05 19:35 | G02_soldadora | unir ramas             |
-      | 2025-03-05 21:05 | 2025-03-05 21:20 | G02_soldadora | unir ramas             |
-      | 2025-03-05 22:20 | 2025-03-05 22:35 | G02_soldadora | unir ramas             |
+      | 2025-03-05 19:25 | 2025-03-05 19:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 19:35 | 2025-03-05 19:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 19:50 | 2025-03-05 20:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 19:55 | 2025-03-05 20:25 | G01_amoladora | cortar perfiles        |
       | 2025-03-05 20:00 | 2025-03-05 21:20 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 20:00 | 2025-03-05 21:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 20:25 | 2025-03-05 20:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 20:35 | 2025-03-05 20:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 20:50 | 2025-03-05 21:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 20:55 | 2025-03-05 21:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 21:00 | 2025-03-05 22:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 21:05 | 2025-03-05 21:20 | G02_soldadora | unir ramas             |
       | 2025-03-05 21:20 | 2025-03-05 22:40 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 21:25 | 2025-03-05 21:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 21:35 | 2025-03-05 21:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 21:50 | 2025-03-05 22:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 21:55 | 2025-03-05 22:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 22:00 | 2025-03-05 23:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 22:20 | 2025-03-05 22:35 | G02_soldadora | unir ramas             |
+      | 2025-03-05 22:25 | 2025-03-05 22:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 22:35 | 2025-03-05 22:50 | G02_soldadora | soldar canasto         |
       | 2025-03-05 22:40 | 2025-03-06 00:00 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 22:50 | 2025-03-05 23:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 23:00 | 2025-03-06 00:00 | G04_pistola   | pintar antioxidante    |

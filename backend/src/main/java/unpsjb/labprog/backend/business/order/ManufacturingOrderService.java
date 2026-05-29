@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.OrderState;
 import unpsjb.labprog.backend.model.PlanningProcess;
 
 @Service
@@ -46,6 +47,10 @@ public class ManufacturingOrderService {
 
     public List<PlanningProcess> findPlanningProcesses(long orderId) {
         return planningProcessRepository.findByOrderId(orderId) ;
+    }
+
+    public List<ManufacturingOrder> findByStateOrderByDeliveryDateAsc(OrderState state) {
+        return repository.findByStateOrderByDeliveryDateAsc(state);
     }
 
     @Transactional

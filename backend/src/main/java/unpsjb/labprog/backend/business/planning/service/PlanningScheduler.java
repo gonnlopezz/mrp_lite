@@ -18,6 +18,7 @@ import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
 import unpsjb.labprog.backend.model.OrderState;
+import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.PlanningProcess;
 import unpsjb.labprog.backend.model.Product;
 import unpsjb.labprog.backend.model.Workshop;
@@ -26,10 +27,14 @@ import unpsjb.labprog.backend.model.Task;
 @Service
 public class PlanningScheduler {
 
-    @Autowired ProductService productService;
-    @Autowired WorkshopService workshopService;
-    @Autowired ManufacturingOrderService orderService;
-    @Autowired PlanningAlgorithm algorithm;
+    @Autowired
+    ProductService productService;
+    @Autowired
+    WorkshopService workshopService;
+    @Autowired
+    ManufacturingOrderService orderService;
+    @Autowired
+    PlanningAlgorithm algorithm;
 
     public PlanningProcess planForward(PlanningRequestDTO request) {
         LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
@@ -64,13 +69,14 @@ public class PlanningScheduler {
             LocalDateTime deliveryDate, LocalDateTime requestedStart) {
 
         for (Workshop workshop : workshops) {
-            Optional<List<PlanningProcess>> result = simulateWorkshopPlanning(workshop, aProduct, aOrder, deliveryDate, requestedStart);
+            Optional<List<PlanningProcess>> result = simulateWorkshopPlanning(workshop, aProduct, aOrder, deliveryDate,
+                    requestedStart);
             if (result.isPresent())
                 return result.get();
         }
 
         throw new BusinessException(
-            "No se encontró taller disponible para el pedido en el plazo requerido");
+                "No se encontró taller disponible para el pedido en el plazo requerido");
     }
 
     private Optional<List<PlanningProcess>> simulateWorkshopPlanning(
@@ -82,7 +88,7 @@ public class PlanningScheduler {
 
         for (int i = 0; i < aOrder.getQuantity(); i++) {
             PlanningProcess process = algorithm.scheduleBackwardFor(
-                aProduct, aWorkshop, deadline, freeTimeCache);
+                    aProduct, aWorkshop, deadline, freeTimeCache);
             process.setOrder(aOrder);
 
             if (process.getStart().isBefore(requestedStart))
@@ -92,6 +98,58 @@ public class PlanningScheduler {
         }
 
         return Optional.of(result);
+    }
+
+    public List<PlanningProcess> planBulkOrders(List<ManufacturingOrder> orders, LocalDateTime executionStart) {
+        List<PlanningProcess> totalProcesses = new ArrayList<>();
+
+        // Estructura de control crucial: Rastrea en memoria los bloques ocupados por ID
+        // de Equipo
+        // a lo largo de TODOS los pedidos procesados en este lote
+        Map<Long, List<Period>> runtimeBusyCache = new HashMap<>();
+
+        for (ManufacturingOrder order : orders) {
+            Product product = productService.findById(order.getProduct().getId());
+            List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
+            List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes);
+
+            boolean scheduledSuccessfully = false;
+
+            for (Workshop workshop : workshops) {
+                try {
+                    List<PlanningProcess> orderProcesses = new ArrayList<>();
+                    // Clono temporal del caché para no ensuciar el estado global si este taller
+                    // falla
+                    Map<Long, List<Period>> simulationCache = deepCopyCache(runtimeBusyCache);
+
+                    for (int i = 0; i < order.getQuantity(); i++) {
+                        LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
+
+                        PlanningProcess process = algorithm.scheduleBackwardForBulk(
+                                product, workshop, deadline, executionStart, simulationCache);
+                        process.setOrder(order);
+                        orderProcesses.add(process);
+                    }
+
+                    // Si completó todas las unidades sin lanzar BusinessException, consolidamos los
+                    // cambios
+                    runtimeBusyCache = simulationCache;
+                    totalProcesses.addAll(orderProcesses);
+                    order.setState(OrderState.PLANIFICADO);
+                    scheduledSuccessfully = true;
+                    break; // Taller asignado con éxito, salimos del bucle de talleres
+                } catch (BusinessException e) {
+                    // El taller actual no tiene espacio suficiente, continúa con la siguiente
+                    // opción
+                }
+            }
+
+            if (!scheduledSuccessfully) {
+                order.setState(OrderState.NO_PLANIFICABLE);
+            }
+            orderService.save(order);
+        }
+        return totalProcesses;
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
@@ -111,5 +169,13 @@ public class PlanningScheduler {
                 result.add(type);
         }
         return result;
+    }
+
+    private Map<Long, List<Period>> deepCopyCache(Map<Long, List<Period>> original) {
+        Map<Long, List<Period>> copy = new HashMap<>();
+        for (Map.Entry<Long, List<Period>> entry : original.entrySet()) {
+            copy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return copy;
     }
 }

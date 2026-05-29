@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -84,24 +85,106 @@ public class PlanningAlgorithm {
             Equipment aEquipment, LocalDateTime maxEnd,
             long durationMinutes, Map<Long, LocalDateTime> equipmentFreeTime) {
 
-        LocalDateTime result = maxEnd;
-        if (equipmentFreeTime.containsKey(aEquipment.getId())
-                && equipmentFreeTime.get(aEquipment.getId()).isBefore(result))
-            result = equipmentFreeTime.get(aEquipment.getId());
+        LocalDateTime candidateEnd = maxEnd;
 
-        List<Planning> existingPlannings = aEquipment.getPlannings();
-        if (existingPlannings.isEmpty()) return result;
+        List<Period> busyPeriods = new ArrayList<>();
 
-        for (Planning p : existingPlannings) {
-            LocalDateTime targetStart = result.minusMinutes(durationMinutes);
-            LocalDateTime bStart = p.getPeriod().getStart();
-            LocalDateTime bEnd = p.getPeriod().getEndDate();
-
-            if (targetStart.isBefore(bEnd) && result.isAfter(bStart))
-                result = bStart;
+        for (Planning p : aEquipment.getPlannings()) {
+            busyPeriods.add(p.getPeriod());
         }
 
-        return result;
+        if (equipmentFreeTime.containsKey(aEquipment.getId())) {
+            LocalDateTime freeTimeLimit = equipmentFreeTime.get(aEquipment.getId());
+            busyPeriods.add(new Period(freeTimeLimit, maxEnd.plusDays(1), 0));
+        }
+
+        busyPeriods.sort((p1, p2) -> p2.getEndDate().compareTo(p1.getEndDate()));
+
+        for (Period p : busyPeriods) {
+            LocalDateTime candidateStart = candidateEnd.minusMinutes(durationMinutes);
+
+            if (candidateStart.isBefore(p.getEndDate()) && candidateEnd.isAfter(p.getStart())) {
+                candidateEnd = p.getStart();
+            }
+        }
+
+        return candidateEnd;
+    }
+
+    public PlanningProcess scheduleBackwardForBulk(
+            Product aProduct, Workshop aWorkshop, LocalDateTime deadline, 
+            LocalDateTime executionStart, Map<Long, List<Period>> runtimeBusyCache) {
+
+        List<Task> reversedTasks = new ArrayList<>(aProduct.getTasks());
+        Collections.reverse(reversedTasks);
+
+        LinkedList<Planning> plannings = new LinkedList<>();
+        LocalDateTime currentEnd = deadline;
+
+        // Rastreo local intra-unidad para evitar solapamientos dentro del mismo producto
+        Map<Long, LocalDateTime> intraUnitFreeTime = new HashMap<>();
+
+        for (Task task : reversedTasks) {
+            Equipment equipment = getRequiredEquipmentFor(task, aWorkshop.getEquipments());
+            long duration = (long) Math.ceil((double) task.getDuration() / equipment.getCapacity());
+
+            LocalDateTime end = findBulkAvailableEndBackward(
+                    equipment, currentEnd, duration, intraUnitFreeTime, runtimeBusyCache
+            );
+            LocalDateTime start = end.minusMinutes(duration);
+
+            if (start.isBefore(executionStart)) {
+                throw new BusinessException("La planificación excede el límite de inicio permitido.");
+            }
+
+            Period allocatedPeriod = new Period(start, end, task.getDuration());
+            plannings.addFirst(new Planning(task, equipment, allocatedPeriod));
+            
+            // Actualizamos la línea de tiempo del lote y de la unidad actual
+            runtimeBusyCache.computeIfAbsent(equipment.getId(), k -> new ArrayList<>()).add(allocatedPeriod);
+            intraUnitFreeTime.put(equipment.getId(), start);
+            
+            currentEnd = start;
+        }
+
+        return new PlanningProcess(plannings, plannings.getFirst().getPeriod().getStart(), deadline);
+    }
+
+    private LocalDateTime findBulkAvailableEndBackward(
+            Equipment aEquipment, LocalDateTime maxEnd, long durationMinutes, 
+            Map<Long, LocalDateTime> intraUnitFreeTime, Map<Long, List<Period>> runtimeBusyCache) {
+
+        LocalDateTime candidateEnd = maxEnd;
+        List<Period> busyPeriods = new ArrayList<>();
+
+        // 1. Añadimos periodos históricos consolidados de la base de datos
+        for (Planning p : aEquipment.getPlannings()) {
+            busyPeriods.add(p.getPeriod());
+        }
+
+        // 2. Añadimos periodos generados dinámicamente por otras unidades/pedidos del lote actual
+        if (runtimeBusyCache.containsKey(aEquipment.getId())) {
+            busyPeriods.addAll(runtimeBusyCache.get(aEquipment.getId()));
+        }
+
+        // 3. Restricción de secuencia interna de la unidad de fabricación
+        if (intraUnitFreeTime.containsKey(aEquipment.getId())) {
+            LocalDateTime freeTimeLimit = intraUnitFreeTime.get(aEquipment.getId());
+            busyPeriods.add(new Period(freeTimeLimit, maxEnd.plusDays(2), 0));
+        }
+
+        // 4. Ordenación descendente indispensable para la evaluación en reversa
+        busyPeriods.sort((p1, p2) -> p2.getEndDate().compareTo(p1.getEndDate()));
+
+        // 5. Ajuste de ventanas libres resolviendo colisiones de forma transitiva
+        for (Period p : busyPeriods) {
+            LocalDateTime candidateStart = candidateEnd.minusMinutes(durationMinutes);
+            if (candidateStart.isBefore(p.getEndDate()) && candidateEnd.isAfter(p.getStart())) {
+                candidateEnd = p.getStart();
+            }
+        }
+
+        return candidateEnd;
     }
 
     private LocalDateTime getNextAvailableSlot(Equipment equipment, LocalDateTime requestedTime) {
