@@ -34,7 +34,7 @@ public class PlanningAlgorithm {
 
         for (Task task : aProduct.getTasks()) {
             Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
-            LocalDateTime availableTime = getNextAvailableSlot(equipment, currentTime);
+            LocalDateTime availableTime = equipment.firstAvailableSlotAfter(currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(task, equipment));
 
             plannings.add(new Planning(task, equipment, new Period(availableTime, end, task.getDuration())));
@@ -178,12 +178,6 @@ public class PlanningAlgorithm {
         }
 
         return candidateEnd;
-    }
-
-    private LocalDateTime getNextAvailableSlot(Equipment equipment, LocalDateTime requestedTime) {
-        return repository.findMaxEndTimeForEquipment(equipment.getId())
-                .map(max -> max.isAfter(requestedTime) ? max : requestedTime)
-                .orElse(requestedTime);
     }
 
 

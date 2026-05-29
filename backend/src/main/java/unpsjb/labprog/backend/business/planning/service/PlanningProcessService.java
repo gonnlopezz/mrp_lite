@@ -71,6 +71,7 @@ public class PlanningProcessService {
                         "Planificación no encontrada con id: " + id));
     }
 
+
     public List<PlanningProcess> findFiltered(Long workshopId, Long orderId) {
         if (workshopId == null && orderId == null)
             return this.findAll();

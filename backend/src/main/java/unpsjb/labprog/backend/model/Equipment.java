@@ -1,5 +1,6 @@
 package unpsjb.labprog.backend.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,5 +38,17 @@ public class Equipment {
     @OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
     @OrderBy("period.endDate DESC")
     private List<Planning> plannings = new ArrayList<>();
+
+    public LocalDateTime firstAvailableSlotAfter(LocalDateTime requestedTime) {
+        if (this.plannings == null || this.plannings.isEmpty()) {
+            return requestedTime;
+        }
+
+        // Como la lista está ordenada con @OrderBy("period.endDate DESC"),
+        // el elemento 0 es SIEMPRE el que termina más tarde.
+        LocalDateTime maxEndTime = this.plannings.get(0).getPeriod().getEndDate();
+
+        return maxEndTime.isAfter(requestedTime) ? maxEndTime : requestedTime;
+    }
 
 }
