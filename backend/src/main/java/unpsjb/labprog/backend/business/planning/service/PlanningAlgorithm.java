@@ -2,7 +2,6 @@ package unpsjb.labprog.backend.business.planning.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,7 +33,7 @@ public class PlanningAlgorithm {
         LocalDateTime currentTime = start;
 
         for (Task task : aProduct.getTasks()) {
-            Equipment equipment = getRequiredEquipmentFor(task, aWorkshop.getEquipments());
+            Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
             LocalDateTime availableTime = getNextAvailableSlot(equipment, currentTime);
             LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(task, equipment));
 
@@ -51,7 +50,7 @@ public class PlanningAlgorithm {
 
         List<Task> reversedTasks = reverseTasksOf(aProduct);
         LinkedList<Planning> plannings = scheduleBackward(
-                reversedTasks, aWorkshop.getEquipments(), deadline, equipmentFreeTime);
+                aWorkshop, reversedTasks, deadline, equipmentFreeTime);
 
         LocalDateTime start = plannings.getFirst().getPeriod().getStart();
 
@@ -60,14 +59,15 @@ public class PlanningAlgorithm {
     }
 
     private LinkedList<Planning> scheduleBackward(
-            List<Task> reversedTasks, Collection<Equipment> equipments,
+            Workshop aWorkshop,
+            List<Task> reversedTasks, 
             LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
 
         LinkedList<Planning> result = new LinkedList<>();
         LocalDateTime currentEnd = deadline;
 
         for (Task task : reversedTasks) {
-            Equipment equipment = getRequiredEquipmentFor(task, equipments);
+            Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
             long duration = calculateTaskDurationFor(task, equipment);
 
             LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, equipmentFreeTime);
@@ -121,11 +121,10 @@ public class PlanningAlgorithm {
         LinkedList<Planning> plannings = new LinkedList<>();
         LocalDateTime currentEnd = deadline;
 
-        // Rastreo local intra-unidad para evitar solapamientos dentro del mismo producto
         Map<Long, LocalDateTime> intraUnitFreeTime = new HashMap<>();
 
         for (Task task : reversedTasks) {
-            Equipment equipment = getRequiredEquipmentFor(task, aWorkshop.getEquipments());
+            Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
             long duration = (long) Math.ceil((double) task.getDuration() / equipment.getCapacity());
 
             LocalDateTime end = findBulkAvailableEndBackward(
@@ -140,7 +139,6 @@ public class PlanningAlgorithm {
             Period allocatedPeriod = new Period(start, end, task.getDuration());
             plannings.addFirst(new Planning(task, equipment, allocatedPeriod));
             
-            // Actualizamos la línea de tiempo del lote y de la unidad actual
             runtimeBusyCache.computeIfAbsent(equipment.getId(), k -> new ArrayList<>()).add(allocatedPeriod);
             intraUnitFreeTime.put(equipment.getId(), start);
             
@@ -157,26 +155,21 @@ public class PlanningAlgorithm {
         LocalDateTime candidateEnd = maxEnd;
         List<Period> busyPeriods = new ArrayList<>();
 
-        // 1. Añadimos periodos históricos consolidados de la base de datos
         for (Planning p : aEquipment.getPlannings()) {
             busyPeriods.add(p.getPeriod());
         }
 
-        // 2. Añadimos periodos generados dinámicamente por otras unidades/pedidos del lote actual
         if (runtimeBusyCache.containsKey(aEquipment.getId())) {
             busyPeriods.addAll(runtimeBusyCache.get(aEquipment.getId()));
         }
 
-        // 3. Restricción de secuencia interna de la unidad de fabricación
         if (intraUnitFreeTime.containsKey(aEquipment.getId())) {
             LocalDateTime freeTimeLimit = intraUnitFreeTime.get(aEquipment.getId());
             busyPeriods.add(new Period(freeTimeLimit, maxEnd.plusDays(2), 0));
         }
 
-        // 4. Ordenación descendente indispensable para la evaluación en reversa
         busyPeriods.sort((p1, p2) -> p2.getEndDate().compareTo(p1.getEndDate()));
 
-        // 5. Ajuste de ventanas libres resolviendo colisiones de forma transitiva
         for (Period p : busyPeriods) {
             LocalDateTime candidateStart = candidateEnd.minusMinutes(durationMinutes);
             if (candidateStart.isBefore(p.getEndDate()) && candidateEnd.isAfter(p.getStart())) {
@@ -193,12 +186,6 @@ public class PlanningAlgorithm {
                 .orElse(requestedTime);
     }
 
-    private Equipment getRequiredEquipmentFor(Task aTask, Collection<Equipment> equipments) {
-        for (Equipment eq : equipments)
-            if (eq.getType().equals(aTask.getType()))
-                return eq;
-        throw new BusinessException("Equipo no encontrado para la tarea: " + aTask.getName());
-    }
 
     private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
         return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());

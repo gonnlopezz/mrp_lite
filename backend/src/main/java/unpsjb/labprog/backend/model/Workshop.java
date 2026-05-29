@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import unpsjb.labprog.backend.exception.BusinessException;
 
 @Entity
 @Getter
@@ -30,4 +31,14 @@ public class Workshop {
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
     private Collection<Equipment> equipments;
+
+    // Métodos
+
+    public Equipment findEquipmentForType(EquipmentType type) {
+        for(Equipment eq : equipments) {
+            if (eq.getType().equals(type))
+                return eq;
+        }
+        throw new BusinessException("El taller no cuenta con el tipo de equipo requerido: " + type.getName());
+    }
 }

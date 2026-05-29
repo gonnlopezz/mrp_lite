@@ -1,6 +1,8 @@
 package unpsjb.labprog.backend.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,5 +29,18 @@ public class Product {
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } , orphanRemoval = true)
     private Collection<Task> tasks;
+
+
+    // Métodos
+
+    public List<EquipmentType> requiredEquipmentTypes() {
+        List<EquipmentType> result = new ArrayList<>();
+        for (Task task : this.getTasks()) {
+            EquipmentType type = task.getType();
+            if (type != null && !result.contains(type))
+                result.add(type);
+        }
+        return result;
+    }
 
 }

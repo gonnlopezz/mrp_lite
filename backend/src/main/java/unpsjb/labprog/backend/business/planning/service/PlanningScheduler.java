@@ -22,7 +22,6 @@ import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.PlanningProcess;
 import unpsjb.labprog.backend.model.Product;
 import unpsjb.labprog.backend.model.Workshop;
-import unpsjb.labprog.backend.model.Task;
 
 @Service
 public class PlanningScheduler {
@@ -39,7 +38,7 @@ public class PlanningScheduler {
     public PlanningProcess planForward(PlanningRequestDTO request) {
         LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
         Product product = productService.findByName(request.getProductName());
-        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
+        List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
         Workshop workshop = resolveWorkshop(request.getWorkshopCode(), requiredTypes);
 
         return algorithm.scheduleForward(product, workshop, start);
@@ -52,7 +51,7 @@ public class PlanningScheduler {
         LocalDateTime deliveryDate = order.getDeliveryDate().atStartOfDay();
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
 
-        List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
+        List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
         List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes);
 
         List<PlanningProcess> processes = searchValidPlanning(
@@ -103,14 +102,11 @@ public class PlanningScheduler {
     public List<PlanningProcess> planBulkOrders(List<ManufacturingOrder> orders, LocalDateTime executionStart) {
         List<PlanningProcess> totalProcesses = new ArrayList<>();
 
-        // Estructura de control crucial: Rastrea en memoria los bloques ocupados por ID
-        // de Equipo
-        // a lo largo de TODOS los pedidos procesados en este lote
         Map<Long, List<Period>> runtimeBusyCache = new HashMap<>();
 
         for (ManufacturingOrder order : orders) {
             Product product = productService.findById(order.getProduct().getId());
-            List<EquipmentType> requiredTypes = getRequiredEquipmentTypesFor(product);
+            List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
             List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes);
 
             boolean scheduledSuccessfully = false;
@@ -118,8 +114,6 @@ public class PlanningScheduler {
             for (Workshop workshop : workshops) {
                 try {
                     List<PlanningProcess> orderProcesses = new ArrayList<>();
-                    // Clono temporal del caché para no ensuciar el estado global si este taller
-                    // falla
                     Map<Long, List<Period>> simulationCache = deepCopyCache(runtimeBusyCache);
 
                     for (int i = 0; i < order.getQuantity(); i++) {
@@ -131,16 +125,12 @@ public class PlanningScheduler {
                         orderProcesses.add(process);
                     }
 
-                    // Si completó todas las unidades sin lanzar BusinessException, consolidamos los
-                    // cambios
                     runtimeBusyCache = simulationCache;
                     totalProcesses.addAll(orderProcesses);
                     order.setState(OrderState.PLANIFICADO);
                     scheduledSuccessfully = true;
-                    break; // Taller asignado con éxito, salimos del bucle de talleres
+                    break;
                 } catch (BusinessException e) {
-                    // El taller actual no tiene espacio suficiente, continúa con la siguiente
-                    // opción
                 }
             }
 
@@ -159,16 +149,6 @@ public class PlanningScheduler {
             return result;
         }
         return workshopService.findByEquipmentTypes(requiredTypes);
-    }
-
-    private List<EquipmentType> getRequiredEquipmentTypesFor(Product aProduct) {
-        List<EquipmentType> result = new ArrayList<>();
-        for (Task task : aProduct.getTasks()) {
-            EquipmentType type = task.getType();
-            if (type != null && !result.contains(type))
-                result.add(type);
-        }
-        return result;
     }
 
     private Map<Long, List<Period>> deepCopyCache(Map<Long, List<Period>> original) {

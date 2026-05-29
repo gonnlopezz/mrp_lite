@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
 import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
@@ -27,7 +29,7 @@ public class PlanningProcessService {
     @Autowired
     ManufacturingOrderService orderService;
 
-     @Transactional
+    @Transactional
     public PlanningProcess save(PlanningRequestDTO request) {
         return repository.save(scheduler.planForward(request));
     }
@@ -40,12 +42,13 @@ public class PlanningProcessService {
     @Transactional
     public List<PlanningProcess> savePendingOrders(LocalDateTime executionTime) {
         List<ManufacturingOrder> pendingOrders = orderService.findByStateOrderByDeliveryDateAsc(OrderState.PENDIENTE);
-        
-        if (pendingOrders.isEmpty()) return new ArrayList<>();
+
+        if (pendingOrders.isEmpty())
+            return new ArrayList<>();
 
         List<PlanningProcess> processes = scheduler.planBulkOrders(pendingOrders, executionTime);
         repository.saveAll(processes);
-        return processes;       
+        return processes;
     }
 
     public List<PlanningProcess> findAll() {
@@ -63,7 +66,9 @@ public class PlanningProcessService {
     }
 
     public PlanningProcess findById(long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Planificación no encontrada con id: " + id));
     }
 
     public List<PlanningProcess> findFiltered(Long workshopId, Long orderId) {
