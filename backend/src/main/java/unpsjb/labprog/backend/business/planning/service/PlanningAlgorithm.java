@@ -40,57 +40,30 @@ public class PlanningAlgorithm {
         return new PlanningProcess(plannings, start, currentTime);
     }
 
-    public PlanningProcess scheduleBackwardFor(
-            Product aProduct, Workshop aWorkshop,
-            LocalDateTime deadline, Map<Long, LocalDateTime> equipmentFreeTime) {
 
-        LinkedList<Planning> plannings = scheduleBackward(
-                aWorkshop, reverseTasksOf(aProduct), deadline,
-                equipmentFreeTime, new HashMap<>());
+    public PlanningProcess scheduleBackward(
+            Product product, Workshop workshop, LocalDateTime deadline,
+            Map<Long, LocalDateTime> intraUnitCache, Map<Long, List<Period>> crossUnitCache) {
 
-        return new PlanningProcess(plannings, plannings.getFirst().getPeriod().getStart(), deadline);
-    }
-
-    public PlanningProcess scheduleBackwardForBulk(
-            Product aProduct, Workshop aWorkshop, LocalDateTime deadline,
-            LocalDateTime executionStart, Map<Long, List<Period>> runtimeBusyCache) {
-
-        Map<Long, LocalDateTime> intraUnitFreeTime = new HashMap<>();
-        LinkedList<Planning> plannings = scheduleBackward(
-                aWorkshop, reverseTasksOf(aProduct), deadline,
-                intraUnitFreeTime, runtimeBusyCache); 
-
-        LocalDateTime start = plannings.getFirst().getPeriod().getStart();
-        if (start.isBefore(executionStart))
-            throw new BusinessException("La planificación excede el límite de inicio permitido.");
-
-        return new PlanningProcess(plannings, start, deadline);
-    }
-
-    private LinkedList<Planning> scheduleBackward(
-            Workshop aWorkshop, List<Task> reversedTasks, LocalDateTime deadline,
-            Map<Long, LocalDateTime> freeTimeMap,
-            Map<Long, List<Period>> runtimeCache) {
-
-        LinkedList<Planning> result = new LinkedList<>();
+        LinkedList<Planning> plannings = new LinkedList<>();
         LocalDateTime currentEnd = deadline;
 
-        for (Task task : reversedTasks) {
-            Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
+        for (Task task : reverseTasksOf(product)) {
+            Equipment equipment = workshop.findEquipmentForType(task.getType());
             long duration = calculateTaskDurationFor(task, equipment);
 
-            LocalDateTime end = findAvailableEndBackward(
-                    equipment, currentEnd, duration, freeTimeMap, runtimeCache);
+            LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, intraUnitCache, crossUnitCache);
             LocalDateTime start = end.minusMinutes(duration);
             Period period = new Period(start, end, task.getDuration());
 
-            result.addFirst(new Planning(task, equipment, period));
-            runtimeCache.computeIfAbsent(equipment.getId(), k -> new ArrayList<>()).add(period);
-            freeTimeMap.put(equipment.getId(), start);
+            plannings.addFirst(new Planning(task, equipment, period));
+            
+            crossUnitCache.computeIfAbsent(equipment.getId(), k -> new ArrayList<>()).add(period);
+            intraUnitCache.put(equipment.getId(), start);
             currentEnd = start;
         }
 
-        return result;
+        return new PlanningProcess(plannings, plannings.getFirst().getPeriod().getStart(), deadline);
     }
 
     private LocalDateTime findAvailableEndBackward(

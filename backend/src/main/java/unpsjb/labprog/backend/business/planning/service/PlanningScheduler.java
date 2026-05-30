@@ -63,6 +63,70 @@ public class PlanningScheduler {
         return processes;
     }
 
+    public List<PlanningProcess> planBulkOrders(
+            List<ManufacturingOrder> orders, LocalDateTime executionStart) {
+
+        List<PlanningProcess> total = new ArrayList<>();
+        Map<Long, List<Period>> runtimeCache = new HashMap<>();
+
+        for (ManufacturingOrder order : orders) {
+            tryScheduleOrder(order, executionStart, runtimeCache, total);
+        }
+
+        return total;
+    }
+
+    private void tryScheduleOrder(
+            ManufacturingOrder order, LocalDateTime executionStart,
+            Map<Long, List<Period>> runtimeCache, List<PlanningProcess> accumulator) {
+
+        Product product = productService.findById(order.getProduct().getId());
+        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
+                product.requiredEquipmentTypes());
+
+        for (Workshop workshop : workshops) {
+            try {
+                Map<Long, List<Period>> simulationCache = deepCopyCache(runtimeCache);
+                List<PlanningProcess> processes = scheduleAllUnitsFor(order, product, workshop, executionStart,
+                        simulationCache);
+
+                runtimeCache.clear();
+                runtimeCache.putAll(simulationCache);
+                accumulator.addAll(processes);
+                order.setState(OrderState.PLANIFICADO);
+                orderService.save(order);
+                return;
+            } catch (BusinessException e) {
+
+            }
+        }
+
+        order.setState(OrderState.NO_PLANIFICABLE);
+        orderService.save(order);
+    }
+
+    private List<PlanningProcess> scheduleAllUnitsFor(
+            ManufacturingOrder order, Product product, Workshop workshop,
+            LocalDateTime executionStart, Map<Long, List<Period>> cache) {
+
+        List<PlanningProcess> processes = new ArrayList<>();
+        LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
+
+        for (int i = 0; i < order.getQuantity(); i++) {
+            Map<Long, LocalDateTime> intraUnitFreeTime = new HashMap<>();
+
+            PlanningProcess process = algorithm.scheduleBackward(product, workshop, deadline, intraUnitFreeTime, cache);
+
+            if (process.getStart().isBefore(executionStart)) {
+                throw new BusinessException("La planificación excede el límite de inicio permitido.");
+            }
+
+            process.setOrder(order);
+            processes.add(process);
+        }
+        return processes;
+    }
+
     private List<PlanningProcess> searchValidPlanning(
             List<Workshop> workshops, Product aProduct, ManufacturingOrder aOrder,
             LocalDateTime deliveryDate, LocalDateTime requestedStart) {
@@ -86,60 +150,17 @@ public class PlanningScheduler {
         Map<Long, LocalDateTime> freeTimeCache = new HashMap<>();
 
         for (int i = 0; i < aOrder.getQuantity(); i++) {
-            PlanningProcess process = algorithm.scheduleBackwardFor(
-                    aProduct, aWorkshop, deadline, freeTimeCache);
+            PlanningProcess process = algorithm.scheduleBackward(aProduct, aWorkshop, deadline, freeTimeCache,
+                    new HashMap<>());
             process.setOrder(aOrder);
 
-            if (process.getStart().isBefore(requestedStart))
+            if (process.getStart().isBefore(requestedStart)) {
                 return Optional.empty();
+            }
 
             result.add(process);
         }
-
         return Optional.of(result);
-    }
-
-    public List<PlanningProcess> planBulkOrders(List<ManufacturingOrder> orders, LocalDateTime executionStart) {
-        List<PlanningProcess> totalProcesses = new ArrayList<>();
-
-        Map<Long, List<Period>> runtimeBusyCache = new HashMap<>();
-
-        for (ManufacturingOrder order : orders) {
-            Product product = productService.findById(order.getProduct().getId());
-            List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
-            List<Workshop> workshops = workshopService.findAllByEquipmentTypes(requiredTypes);
-
-            boolean scheduledSuccessfully = false;
-
-            for (Workshop workshop : workshops) {
-                try {
-                    List<PlanningProcess> orderProcesses = new ArrayList<>();
-                    Map<Long, List<Period>> simulationCache = deepCopyCache(runtimeBusyCache);
-
-                    for (int i = 0; i < order.getQuantity(); i++) {
-                        LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
-
-                        PlanningProcess process = algorithm.scheduleBackwardForBulk(
-                                product, workshop, deadline, executionStart, simulationCache);
-                        process.setOrder(order);
-                        orderProcesses.add(process);
-                    }
-
-                    runtimeBusyCache = simulationCache;
-                    totalProcesses.addAll(orderProcesses);
-                    order.setState(OrderState.PLANIFICADO);
-                    scheduledSuccessfully = true;
-                    break;
-                } catch (BusinessException e) {
-                }
-            }
-
-            if (!scheduledSuccessfully) {
-                order.setState(OrderState.NO_PLANIFICABLE);
-            }
-            orderService.save(order);
-        }
-        return totalProcesses;
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
