@@ -4,13 +4,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
-import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Equipment;
 import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.Planning;
@@ -42,14 +40,14 @@ public class PlanningAlgorithm {
 
 
     public PlanningProcess scheduleBackward(
-            Product product, Workshop workshop, LocalDateTime deadline,
+            Product aProduct, Workshop aWorkshop, LocalDateTime deadline,
             Map<Long, LocalDateTime> intraUnitCache, Map<Long, List<Period>> crossUnitCache) {
 
         LinkedList<Planning> plannings = new LinkedList<>();
         LocalDateTime currentEnd = deadline;
 
-        for (Task task : reverseTasksOf(product)) {
-            Equipment equipment = workshop.findEquipmentForType(task.getType());
+        for (Task task : reverseTasksOf(aProduct)) {
+            Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
             long duration = calculateTaskDurationFor(task, equipment);
 
             LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, intraUnitCache, crossUnitCache);
@@ -67,19 +65,19 @@ public class PlanningAlgorithm {
     }
 
     private LocalDateTime findAvailableEndBackward(
-            Equipment equipment, LocalDateTime maxEnd, long duration,
+            Equipment aEquipment, LocalDateTime maxEnd, long duration,
             Map<Long, LocalDateTime> freeTimeMap,
             Map<Long, List<Period>> runtimeCache) {
 
         List<Period> busyPeriods = new ArrayList<>();
 
-        for (Planning p : equipment.getPlannings())
+        for (Planning p : aEquipment.getPlannings())
             busyPeriods.add(p.getPeriod());
 
-        busyPeriods.addAll(runtimeCache.getOrDefault(equipment.getId(), List.of()));
+        busyPeriods.addAll(runtimeCache.getOrDefault(aEquipment.getId(), List.of()));
 
-        if (freeTimeMap.containsKey(equipment.getId()))
-            busyPeriods.add(new Period(freeTimeMap.get(equipment.getId()), maxEnd.plusDays(2), 0));
+        if (freeTimeMap.containsKey(aEquipment.getId()))
+            busyPeriods.add(new Period(freeTimeMap.get(aEquipment.getId()), maxEnd.plusDays(2), 0));
 
         return resolveBackwardSlot(maxEnd, duration, busyPeriods);
     }
@@ -101,7 +99,8 @@ public class PlanningAlgorithm {
     }
 
     private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-        return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
+        long result = (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
+        return result;
     }
 
     private List<Task> reverseTasksOf(Product aProduct) {
