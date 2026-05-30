@@ -40,15 +40,17 @@ public class Equipment {
     private List<Planning> plannings = new ArrayList<>();
 
     public LocalDateTime firstAvailableSlotAfter(LocalDateTime requestedTime) {
-        if (this.plannings == null || this.plannings.isEmpty()) {
+        if (this.plannings == null || this.plannings.isEmpty()) 
             return requestedTime;
+        
+        LocalDateTime result = requestedTime;
+        
+        for(Planning p : this.plannings) {
+            if (p.getPeriod().getEndDate().isAfter(result)) {
+                result = p.getPeriod().getEndDate();
+            }
         }
-
-        // Como la lista está ordenada con @OrderBy("period.endDate DESC"),
-        // el elemento 0 es SIEMPRE el que termina más tarde.
-        LocalDateTime maxEndTime = this.plannings.get(0).getPeriod().getEndDate();
-
-        return maxEndTime.isAfter(requestedTime) ? maxEndTime : requestedTime;
+        return result;
     }
 
 }
