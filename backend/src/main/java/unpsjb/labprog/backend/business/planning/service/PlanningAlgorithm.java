@@ -150,7 +150,7 @@ public class PlanningAlgorithm {
             LocalDateTime maxEnd, long durationMinutes, List<Period> busyPeriods) {
 
         LocalDateTime result = maxEnd;
-        List<Period> sortedPeriods = reverseBusyPeriods(busyPeriods); 
+        List<Period> sortedPeriods = new ArrayList<>(busyPeriods);
         sortedPeriods.sort(Comparator.comparing(Period::getEndDate).reversed());
 
         for (Period busy : sortedPeriods) {
@@ -172,10 +172,5 @@ public class PlanningAlgorithm {
         return result;
     }
 
-    private List<Period> reverseBusyPeriods(List<Period> busyPeriods) {
-        List<Period> result = new ArrayList<>(busyPeriods);
-        Collections.reverse(result);
-        return result;
-    }
 
 }
