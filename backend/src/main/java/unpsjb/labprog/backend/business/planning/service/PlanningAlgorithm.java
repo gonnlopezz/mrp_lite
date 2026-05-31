@@ -86,10 +86,10 @@ public class PlanningAlgorithm {
             LocalDateTime maxEnd, long durationMinutes, List<Period> busyPeriods) {
 
         LocalDateTime result = maxEnd;
-        List<Period> sorted = new ArrayList<>(busyPeriods);
-        sorted.sort(Comparator.comparing(Period::getEndDate).reversed());
+        List<Period> sortedBusyPeriods = new ArrayList<>(busyPeriods);
+        sortedBusyPeriods.sort(Comparator.comparing(Period::getEndDate).reversed());
 
-        for (Period busy : sorted) {
+        for (Period busy : sortedBusyPeriods) {
             LocalDateTime candidateStart = result.minusMinutes(durationMinutes);
             if (candidateStart.isBefore(busy.getEndDate()) && result.isAfter(busy.getStart()))
                 result = busy.getStart();
