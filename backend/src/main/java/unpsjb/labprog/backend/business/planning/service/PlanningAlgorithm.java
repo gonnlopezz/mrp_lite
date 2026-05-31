@@ -38,7 +38,6 @@ public class PlanningAlgorithm {
         return new PlanningProcess(plannings, plannings.get(0).getPeriod().getStart(), currentTime);
     }
 
-
     public PlanningProcess scheduleBackward(
             Product aProduct, Workshop aWorkshop, LocalDateTime deadline,
             Map<Long, LocalDateTime> intraUnitCache, Map<Long, List<Period>> crossUnitCache) {
@@ -50,12 +49,13 @@ public class PlanningAlgorithm {
             Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
             long duration = calculateTaskDurationFor(task, equipment);
 
-            LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, intraUnitCache, crossUnitCache);
+            LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, intraUnitCache,
+                    crossUnitCache);
             LocalDateTime start = end.minusMinutes(duration);
             Period period = new Period(start, end, task.getDuration());
 
             plannings.addFirst(new Planning(task, equipment, period));
-            
+
             crossUnitCache.computeIfAbsent(equipment.getId(), k -> new ArrayList<>()).add(period);
             intraUnitCache.put(equipment.getId(), start);
             currentEnd = start;
@@ -65,25 +65,25 @@ public class PlanningAlgorithm {
     }
 
     private LocalDateTime findAvailableEndBackward(
-        Equipment equipment, LocalDateTime maxEnd, long duration,
-        Map<Long, LocalDateTime> intraUnitCache,
-        Map<Long, List<Period>> crossUnitCache) {
+            Equipment equipment, LocalDateTime maxEnd, long duration,
+            Map<Long, LocalDateTime> intraUnitCache,
+            Map<Long, List<Period>> crossUnitCache) {
 
-    List<Period> busyPeriods = new ArrayList<>();
+        List<Period> busyPeriods = new ArrayList<>();
 
-    for (Planning p : equipment.getPlannings()) 
-        busyPeriods.add(p.getPeriod());
+        for (Planning p : equipment.getPlannings())
+            busyPeriods.add(p.getPeriod());
 
-    busyPeriods.addAll(crossUnitCache.getOrDefault(equipment.getId(), List.of()));
+        busyPeriods.addAll(crossUnitCache.getOrDefault(equipment.getId(), List.of()));
 
-    if (intraUnitCache.containsKey(equipment.getId())) {
-        LocalDateTime nextTaskStart = intraUnitCache.get(equipment.getId());
-        if (nextTaskStart.isBefore(maxEnd)) 
-            maxEnd = nextTaskStart;
-        
+        if (intraUnitCache.containsKey(equipment.getId())) {
+            LocalDateTime nextTaskStart = intraUnitCache.get(equipment.getId());
+            if (nextTaskStart.isBefore(maxEnd))
+                maxEnd = nextTaskStart;
+
+        }
+        return resolveBackwardSlot(maxEnd, duration, busyPeriods);
     }
-    return resolveBackwardSlot(maxEnd, duration, busyPeriods);
-}
 
     private LocalDateTime resolveBackwardSlot(
             LocalDateTime maxEnd, long durationMinutes, List<Period> busyPeriods) {
