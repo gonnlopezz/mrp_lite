@@ -35,7 +35,7 @@ public class PlanningAlgorithm {
             currentTime = end;
         }
 
-        return new PlanningProcess(plannings, start, currentTime);
+        return new PlanningProcess(plannings, plannings.get(0).getPeriod().getStart(), currentTime);
     }
 
 
@@ -65,22 +65,25 @@ public class PlanningAlgorithm {
     }
 
     private LocalDateTime findAvailableEndBackward(
-            Equipment aEquipment, LocalDateTime maxEnd, long duration,
-            Map<Long, LocalDateTime> freeTimeMap,
-            Map<Long, List<Period>> runtimeCache) {
+        Equipment equipment, LocalDateTime maxEnd, long duration,
+        Map<Long, LocalDateTime> intraUnitCache,
+        Map<Long, List<Period>> crossUnitCache) {
 
-        List<Period> busyPeriods = new ArrayList<>();
+    List<Period> busyPeriods = new ArrayList<>();
 
-        for (Planning p : aEquipment.getPlannings())
-            busyPeriods.add(p.getPeriod());
+    for (Planning p : equipment.getPlannings()) 
+        busyPeriods.add(p.getPeriod());
 
-        busyPeriods.addAll(runtimeCache.getOrDefault(aEquipment.getId(), List.of()));
+    busyPeriods.addAll(crossUnitCache.getOrDefault(equipment.getId(), List.of()));
 
-        if (freeTimeMap.containsKey(aEquipment.getId()))
-            busyPeriods.add(new Period(freeTimeMap.get(aEquipment.getId()), maxEnd.plusDays(2), 0));
-
-        return resolveBackwardSlot(maxEnd, duration, busyPeriods);
+    if (intraUnitCache.containsKey(equipment.getId())) {
+        LocalDateTime nextTaskStart = intraUnitCache.get(equipment.getId());
+        if (nextTaskStart.isBefore(maxEnd)) 
+            maxEnd = nextTaskStart;
+        
     }
+    return resolveBackwardSlot(maxEnd, duration, busyPeriods);
+}
 
     private LocalDateTime resolveBackwardSlot(
             LocalDateTime maxEnd, long durationMinutes, List<Period> busyPeriods) {
@@ -99,8 +102,7 @@ public class PlanningAlgorithm {
     }
 
     private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-        long result = (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
-        return result;
+        return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
     }
 
     private List<Task> reverseTasksOf(Product aProduct) {

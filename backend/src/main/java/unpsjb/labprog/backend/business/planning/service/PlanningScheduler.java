@@ -96,7 +96,8 @@ public class PlanningScheduler {
                 globalCache.clear();
                 globalCache.putAll(simulationCache);
                 return processes;
-            } catch (BusinessException ignored) {
+            } catch (BusinessException e) {
+                // El taller no pudo planificar el pedido, se intenta con el siguiente
             }
         }
 
