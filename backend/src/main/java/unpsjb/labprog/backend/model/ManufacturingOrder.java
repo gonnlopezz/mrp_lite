@@ -41,4 +41,15 @@ public class ManufacturingOrder {
 
     @ManyToOne
     private Product product;
+
+
+    // Métodos
+
+    public void markAsPlanned() {
+        this.state = OrderState.PLANIFICADO;
+    }
+
+    public void markAsUnschedulable() {
+        this.state = OrderState.NO_PLANIFICABLE;
+    }
 }

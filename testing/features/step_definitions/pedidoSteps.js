@@ -58,3 +58,7 @@ When('se solicita generar un pedido para ese cliente fecha de pedido {string} pa
         };
     }
 });
+
+Then('el pedido debería tener el estado {string}', function (resultadoEsperado) {
+    assert.strictEqual(this.resultado.respuesta, resultadoEsperado);
+});

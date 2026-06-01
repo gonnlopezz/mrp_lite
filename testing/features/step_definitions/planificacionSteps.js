@@ -124,9 +124,9 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
         const fin = real.period.endDate.replace('T', ' ').substring(0, 16);
         const equipo = real.equipment.code;
         const tarea = real.task.name;
-        if (inicio.startsWith('2025-03-05')) {
-            console.log(`| ${inicio} | ${fin} | ${equipo} | ${tarea}        |`);
-        }
+        // if (inicio.startsWith('2025-03-05')) {
+        //     console.log(`| ${inicio} | ${fin} | ${equipo} | ${tarea}        |`);
+        // }
 
         assert.strictEqual(inicio, esperada.inicio, `Error en inicio (Fila ${index + 1})`);
         assert.strictEqual(fin, esperada.fin, `Error en fin (Fila ${index + 1})`);

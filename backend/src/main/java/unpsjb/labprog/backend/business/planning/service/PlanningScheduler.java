@@ -16,7 +16,6 @@ import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
-import unpsjb.labprog.backend.model.OrderState;
 import unpsjb.labprog.backend.model.Period;
 import unpsjb.labprog.backend.model.PlanningProcess;
 import unpsjb.labprog.backend.model.Product;
@@ -54,7 +53,7 @@ public class PlanningScheduler {
         List<PlanningProcess> processes = scheduleBackwardOnFirstAvailableWorkshop(
                 workshops, product, order, deadline, requestedStart, new HashMap<>());
 
-        order.setState(OrderState.PLANIFICADO);
+        order.markAsPlanned();
         orderService.save(order);
         return processes;
     }
@@ -62,7 +61,7 @@ public class PlanningScheduler {
     public List<PlanningProcess> planBulkOrders(
             List<ManufacturingOrder> orders, LocalDateTime executionStart) {
 
-        List<PlanningProcess> total = new ArrayList<>();
+        List<PlanningProcess> result = new ArrayList<>();
         Map<Long, List<Period>> runtimeCache = new HashMap<>();
 
         for (ManufacturingOrder order : orders) {
@@ -73,18 +72,18 @@ public class PlanningScheduler {
                 List<PlanningProcess> processes = scheduleBackwardOnFirstAvailableWorkshop(
                         possibleWorkshops, product, order,
                         order.getDeliveryDate().atStartOfDay(), executionStart, runtimeCache);
-                total.addAll(processes);
-                order.setState(OrderState.PLANIFICADO);
+                result.addAll(processes);
+                order.markAsPlanned();
             } catch (BusinessException e) {
-                order.setState(OrderState.NO_PLANIFICABLE);
+                order.markAsUnschedulable();
             }
             orderService.save(order);
         }
-        return total;
+        return result;
     }
 
     private List<PlanningProcess> scheduleBackwardOnFirstAvailableWorkshop(
-            List<Workshop> workshops, Product product, ManufacturingOrder order,
+            List<Workshop> workshops, Product aProduct, ManufacturingOrder aOrder,
             LocalDateTime deadline, LocalDateTime startLimit,
             Map<Long, List<Period>> globalCache) {
 
@@ -92,7 +91,7 @@ public class PlanningScheduler {
             Map<Long, List<Period>> simulationCache = deepCopyCache(globalCache);
             try {
                 List<PlanningProcess> processes = scheduleUnitsBackward(
-                        order, product, workshop, deadline, startLimit, simulationCache);
+                        aOrder, aProduct, workshop, deadline, startLimit, simulationCache);
                 globalCache.clear();
                 globalCache.putAll(simulationCache);
                 return processes;
@@ -106,25 +105,25 @@ public class PlanningScheduler {
     }
 
     private List<PlanningProcess> scheduleUnitsBackward(
-            ManufacturingOrder order, Product product, Workshop workshop,
+            ManufacturingOrder aOrder, Product aProduct, Workshop aWorkshop,
             LocalDateTime deadline, LocalDateTime startLimit,
             Map<Long, List<Period>> crossUnitCache) {
 
-        List<PlanningProcess> processes = new ArrayList<>();
+        List<PlanningProcess> result = new ArrayList<>();
 
-        for (int i = 0; i < order.getQuantity(); i++) {
+        for (int i = 0; i < aOrder.getQuantity(); i++) {
             Map<Long, LocalDateTime> intraUnitCache = new HashMap<>();
             PlanningProcess process = algorithm.scheduleBackward(
-                    product, workshop, deadline, intraUnitCache, crossUnitCache);
-            process.setOrder(order);
+                    aProduct, aWorkshop, deadline, intraUnitCache, crossUnitCache);
+            process.setOrder(aOrder);
 
             if (process.getStart().isBefore(startLimit)) {
                 throw new BusinessException(
-                        "La planificación del pedido excede el límite de inicio permitido.");
+                        "El pedido no se puede planificar dentro  del plazo requerido.");
             }
-            processes.add(process);
+            result.add(process);
         }
-        return processes;
+        return result;
     }
 
     private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
