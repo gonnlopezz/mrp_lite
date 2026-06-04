@@ -74,12 +74,18 @@ public class PlanningPresenter {
     @PostMapping("/order")
     public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
         try {
-            return Response.ok(service.saveFromOrder(request), "Pedido planificado con éxito");
+            List<PlanningProcess> result = service.saveFromOrder(request);
+            if(result.isEmpty()) {
+                return Response.ok(result, "El pedido no pudo planificarse en el plazo requerido");
+            }
+            return Response.ok(result, "Pedido planificado con éxito");
         } catch (EntityNotFoundException e) {
             return Response.notFound(e.getMessage());
         } catch (BusinessException e) {
             return Response.conflict(e.getMessage());
         } catch (Exception e) {
+            System.err.println("🚨 ERROR CRÍTICO EN TEST DE PLANIFICACIÓN: " + e.getMessage());
+            e.printStackTrace();
             return Response.error(e.getMessage());
         }
     }

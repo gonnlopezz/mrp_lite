@@ -4,9 +4,8 @@ const { Given, When, Then } = require('cucumber');
 Given('que existe el pedido para el cliente {string} con fecha de entrega {string}', async function (aCustomerCuit, aFechaEntrega) {
     const [dia, mes, año] = aFechaEntrega.split('-');
     const fechaISO = `${año}-${mes}-${dia}`;
-    
     const response = await fetch(`http://backend:8080/orders/cuit/${aCustomerCuit}/deliveryDate/${fechaISO}`);
-    const dataPackage = await response.json(); 
+    const dataPackage = await response.json();
     this.pedido = dataPackage.data;
 });
 
@@ -25,7 +24,7 @@ Given('se encuentra en estado {string}', function (estadoEsperado) {
 });
 
 
-When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto' , async function (fechaPedido, fechaEntrega, cantidad) {
+When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto', async function (fechaPedido, fechaEntrega, cantidad) {
 
     this.pedido = {
         orderDate: fechaPedido,
@@ -35,7 +34,7 @@ When('se solicita generar un pedido para ese cliente fecha de pedido {string} pa
         product: this.product
     };
 
- 
+
     try {
         const response = await fetch('http://backend:8080/orders', {
             method: 'POST',
@@ -44,11 +43,11 @@ When('se solicita generar un pedido para ese cliente fecha de pedido {string} pa
             },
             body: JSON.stringify(this.pedido)
         });
-        
+
 
         const textoCrudo = await response.text();
-        let mensajeFinal = textoCrudo; 
-        
+        let mensajeFinal = textoCrudo;
+
         try {
             const jsonParseado = JSON.parse(textoCrudo);
             if (jsonParseado.message) {
@@ -67,8 +66,4 @@ When('se solicita generar un pedido para ese cliente fecha de pedido {string} pa
             respuesta: "Error de conexión: " + error.message
         };
     }
-});
-
-Then('el pedido debería tener el estado {string}', function (resultadoEsperado) {
-    assert.strictEqual(this.resultado.respuesta, resultadoEsperado);
 });

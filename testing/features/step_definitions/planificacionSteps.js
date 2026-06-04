@@ -56,7 +56,6 @@ When('se solicita planificar el producto el día {string}', async function (date
 When('se solicita planificar el pedido el día {string}', async function (date) {
     const [dia, mes, año] = date.split('-');
     const fechaISO = `${año}-${mes}-${dia}T00:00:00`;
-
     const response = await fetch('http://backend:8080/plannings/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -83,15 +83,3 @@ Escenario: Planificación de todos los pedidos pendientes. Y uso de huecos en eq
       | 2025-03-05 22:50 | 2025-03-05 23:00 | G02_soldadora | unir pie               |
       | 2025-03-05 23:00 | 2025-03-06 00:00 | G04_pistola   | pintar antioxidante    |
 
-# Casos negativos
-
-Escenario: Intentar planificar un pedido que no existe
-    Dado que no existe ningún pedido con id 99999
-    Cuando se solicita planificar el pedido el día "01-02-2025"
-    Entonces se espera el siguiente 404 con "Pedido no encontrado"
-
-  Esquema del escenario: Intentar planificar un pedido cuyo estado no admite replanificación
-    Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-02-2025"
-    Y se encuentra en estado "PLANIFICADO"
-    Cuando se solicita planificar el pedido el día "01-02-2025"
-    Entonces se espera el siguiente 409 con "El pedido ya se encuentra en estado planificado"

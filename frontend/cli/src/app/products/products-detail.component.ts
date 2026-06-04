@@ -108,7 +108,7 @@ export class ProductsDetailComponent {
   }
 
   goBack(): void {
-    this.router.navigateByUrl('/products', { skipLocationChange: true });
+    this.router.navigate(['/products']);
   }
 
   ngOnInit(): void {

@@ -39,7 +39,7 @@ export class ManufacturingOrderDetailComponent implements OnInit {
     ) { }
 
     goBack(): void {
-        this.router.navigateByUrl('/orders', { skipLocationChange: true });
+        this.router.navigate(['/orders']);
     }
 
     ngOnInit(): void {

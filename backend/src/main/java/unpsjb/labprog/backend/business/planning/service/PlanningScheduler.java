@@ -45,18 +45,23 @@ public class PlanningScheduler {
     public List<PlanningProcess> planBackward(PlanningFromOrderRequestDTO request) {
         ManufacturingOrder order = orderService.findById(request.getOrder().getId());
         order.validatePlannable();
+
         Product product = productService.findById(order.getProduct().getId());
         LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
-        List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
-                product.requiredEquipmentTypes());
+        List<PlanningProcess> result = new ArrayList<>();
+        try {
+            List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
+                    product.requiredEquipmentTypes());
+            result = scheduleBackwardOnFirstAvailableWorkshop(
+                    workshops, product, order, deadline, requestedStart, new HashMap<>());
+            order.markAsPlanned();
+        } catch (BusinessException e) {
+            order.markAsUnschedulable();
+        }
 
-        List<PlanningProcess> processes = scheduleBackwardOnFirstAvailableWorkshop(
-                workshops, product, order, deadline, requestedStart, new HashMap<>());
-
-        order.markAsPlanned();
         orderService.save(order);
-        return processes;
+        return result;
     }
 
     public List<PlanningProcess> planBulkOrders(
@@ -67,9 +72,9 @@ public class PlanningScheduler {
 
         for (ManufacturingOrder order : orders) {
             Product product = productService.findById(order.getProduct().getId());
-            List<Workshop> possibleWorkshops = workshopService.findAllByEquipmentTypes(
-                    product.requiredEquipmentTypes());
             try {
+                List<Workshop> possibleWorkshops = workshopService.findAllByEquipmentTypes(
+                        product.requiredEquipmentTypes());
                 List<PlanningProcess> processes = scheduleBackwardOnFirstAvailableWorkshop(
                         possibleWorkshops, product, order,
                         order.getDeliveryDate().atStartOfDay(), executionStart, runtimeCache);
@@ -120,7 +125,7 @@ public class PlanningScheduler {
 
             if (process.getStart().isBefore(startLimit)) {
                 throw new BusinessException(
-                        "El pedido no se puede planificar dentro  del plazo requerido.");
+                        "El pedido no se puede planificar dentro del plazo requerido.");
             }
             result.add(process);
         }
