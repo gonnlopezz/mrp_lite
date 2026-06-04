@@ -37,4 +37,5 @@ public interface PlanningProcessRepository
         List<PlanningProcess> findProcessesByFilters(
                         @Param("workshopId") Long workshopId,
                         @Param("orderId") Long orderId);
+
 }

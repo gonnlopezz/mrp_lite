@@ -14,15 +14,27 @@ import unpsjb.labprog.backend.model.ManufacturingOrder;
 import unpsjb.labprog.backend.model.OrderState;
 
 @Repository
-public interface ManufacturingOrderRepository extends CrudRepository<ManufacturingOrder, Long>, PagingAndSortingRepository<ManufacturingOrder, Long> {
-    @Query("SELECT o FROM ManufacturingOrder o " +
-            "Where o.customer.companyName ILIKE CONCAT('%', :term, '%') " +
-            "OR o.product.name ILIKE CONCAT('%', :term, '%')")
-    public Page<ManufacturingOrder> search(String term, Pageable pageable);
+public interface ManufacturingOrderRepository
+                extends CrudRepository<ManufacturingOrder, Long>, PagingAndSortingRepository<ManufacturingOrder, Long> {
+        @Query("SELECT o FROM ManufacturingOrder o " +
+                        "Where o.customer.companyName ILIKE CONCAT('%', :term, '%') " +
+                        "OR o.product.name ILIKE CONCAT('%', :term, '%')")
+        public Page<ManufacturingOrder> search(String term, Pageable pageable);
 
-    @Query("SELECT o FROM ManufacturingOrder o " +
-            "WHERE o.customer.cuit = :cuit AND o.deliveryDate = :deliveryDate")
-    public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate);
+        @Query("SELECT o FROM ManufacturingOrder o " +
+                        "WHERE o.customer.cuit = :cuit AND o.deliveryDate = :deliveryDate")
+        public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate);
 
-    List<ManufacturingOrder> findByStateOrderByDeliveryDateAsc(OrderState state);
+        List<ManufacturingOrder> findByStateOrderByDeliveryDateAsc(OrderState state);
+
+        Page<ManufacturingOrder> findByStateOrderByDeliveryDateAsc(OrderState state, Pageable pageable);
+
+        @Query("SELECT o FROM ManufacturingOrder o ORDER BY " +
+                        "CASE WHEN o.state = unpsjb.labprog.backend.model.OrderState.PENDIENTE       THEN 1 " +
+                        "     WHEN o.state = unpsjb.labprog.backend.model.OrderState.NO_PLANIFICABLE THEN 2 " +
+                        "     WHEN o.state = unpsjb.labprog.backend.model.OrderState.PLANIFICADO     THEN 3 " +
+                        "     ELSE 4 END ASC, " +
+                        "o.deliveryDate ASC")
+        Page<ManufacturingOrder> findAllOrderedByStatePriority(Pageable pageable);
+
 }

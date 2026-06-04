@@ -24,3 +24,8 @@ Escenario: La cantidad de unidades supera la capacidad de todos los talleres en 
     Dado que existe el pedido para el cliente "30000000033" con fecha de entrega "10-02-2025"
     Cuando se solicita planificar el pedido el día "09-02-2025"
     Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido"
+
+    Escenario: Planificar todos los pedidos pendientes marca el pedido no planificable sin interrumpir la planificación de los demás pedidos pendientes
+    Dado que existen los pedidos pendientes de planificacion antes cargados
+    Cuando se solicita planificar todos los pedidos pendientes el día "02-03-2025"
+    Entonces se espera el siguiente 200 con "Pedidos pendientes planificados con éxito"

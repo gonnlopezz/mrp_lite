@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.OrderState;
 
 @RestController
 @RequestMapping("orders")
@@ -30,8 +31,11 @@ public class ManufacturingOrderPresenter {
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     public ResponseEntity<Object> findByPage(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return Response.ok(service.findByPage(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) OrderState state) {
+        return Response.ok(
+                state != null ? service.findByPageAndState(page, size, state)
+                        : service.findByPage(page, size));
     }
 
     @RequestMapping(value = "/search/{term}", method = RequestMethod.GET)
@@ -55,9 +59,9 @@ public class ManufacturingOrderPresenter {
     }
 
     @RequestMapping(value = "/id/{id}/plannings", method = RequestMethod.GET)
-    public ResponseEntity<Object> findPlanningProcesses(@PathVariable("id") int id) {       
+    public ResponseEntity<Object> findPlanningProcesses(@PathVariable("id") int id) {
         return Response.ok(service.findPlanningProcesses(id));
-    }   
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody ManufacturingOrder aOrder) {

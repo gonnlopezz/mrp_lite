@@ -23,23 +23,77 @@
             </a>
         </div>
 
-        <div class="px-4 py-3 border-bottom">
-            <div class="row">
-                <div class="col-md-5 col-lg-4">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-white border-end-0 text-muted">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 border-end-0 ps-0 bg-white"
-                            placeholder="Buscar pedido por cliente o producto..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
-                        <button class="btn btn-outline-secondary border-start-0" type="button" (click)="onSearch()">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
+        <div class="px-4 pt-2 border-bottom bg-white d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <div class="mb-2" style="width: 100%; max-width: 320px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0 border-end-0 ps-0 bg-white"
+                        placeholder="Buscar pedido o cliente..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
+                    <button class="btn btn-outline-secondary border-start-0" (click)="onSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
             </div>
-        </div>
 
+
+            <ul class="nav nav-tabs border-0 gap-1" style="margin-bottom: -1px;">
+
+                <li class="nav-item">
+                    <button class="nav-link px-3 py-2 fw-medium transition-base" [class.active]="activeTab === 'TODOS'"
+                        (click)="setTab('TODOS')">
+                        Todos
+                        <span class="badge ms-1 rounded-pill px-2 py-1 text-xs"
+                            [class.bg-primary]="activeTab === 'TODOS'" [class.bg-light]="activeTab !== 'TODOS'"
+                            [class.text-dark]="activeTab !== 'TODOS'">
+                            {{ tabCounts.TODOS }}
+                        </span>
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link px-3 py-2 fw-medium transition-base"
+                        [class.active]="activeTab === 'PENDIENTE'" (click)="setTab('PENDIENTE')">
+                        Pendientes
+                        <span class="badge ms-1 rounded-pill px-2 py-1 text-xs"
+                            [class.bg-primary]="activeTab === 'PENDIENTE'" [class.bg-light]="activeTab !== 'PENDIENTE'"
+                            [class.text-dark]="activeTab !== 'PENDIENTE'">
+                            {{ tabCounts.PENDIENTE }}
+                        </span>
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link px-3 py-2 fw-medium transition-base"
+                        [class.active]="activeTab === 'PLANIFICADO'" (click)="setTab('PLANIFICADO')">
+                        Planificados
+                        <span class="badge ms-1 rounded-pill px-2 py-1 text-xs"
+                            [class.bg-primary]="activeTab === 'PLANIFICADO'"
+                            [class.bg-light]="activeTab !== 'PLANIFICADO'"
+                            [class.text-dark]="activeTab !== 'PLANIFICADO'">
+                            {{ tabCounts.PLANIFICADO }}
+                        </span>
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link px-3 py-2 fw-medium transition-base"
+                        [class.active]="activeTab === 'NO_PLANIFICABLE'" (click)="setTab('NO_PLANIFICABLE')">
+                        No planificables
+                        <span class="badge ms-1 rounded-pill px-2 py-1 text-xs"
+                            [class.bg-primary]="activeTab === 'NO_PLANIFICABLE'"
+                            [class.bg-light]="activeTab !== 'NO_PLANIFICABLE'"
+                            [class.text-dark]="activeTab !== 'NO_PLANIFICABLE'">
+                            {{ tabCounts.NO_PLANIFICABLE }}
+                        </span>
+                    </button>
+                </li>
+
+            </ul>
+
+        </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle custom-table mb-0">
                 <thead>
@@ -75,28 +129,29 @@
                             <td><span class="text-muted small">{{ order.deliveryDate | date: 'dd/MM/yyyy' }}</span></td>
                             <td>
                                 <span class="badge" [ngClass]="{
-                                    'bg-warning text-dark': order.state === 'PENDIENTE',
-                                    'bg-info': order.state === 'PLANIFICADO',
-                                    'bg-danger': order.state === 'NO_PLANIFICABLE',
-                                    'bg-success': order.state === 'FINALIZADO'
-                                }">
+    'bg-warning text-dark': $any(order.state) === 'PENDIENTE',
+    'bg-info': $any(order.state) === 'PLANIFICADO',
+    'bg-danger': $any(order.state) === 'NO_PLANIFICABLE',
+    'bg-success': $any(order.state) === 'FINALIZADO'
+}">
                                     {{ order.state }}
                                 </span>
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-1">
 
-                                    <button *ngIf="order.state === 'PENDIENTE'" (click)="tryPlanningOrder(order.id)"
-                                        class="btn-icon hover-primary" title="Generar planificación">
+                                    <button *ngIf="$any(order.state) === 'PENDIENTE'"
+                                        (click)="tryPlanningOrder(order.id)" class="btn-icon hover-primary"
+                                        title="Generar planificación">
                                         <i class="fas fa-play-circle"></i>
                                     </button>
 
-                                    <button *ngIf="order.state === 'PLANIFICADO'"
+                                    <button *ngIf="$any(order.state) === 'PLANIFICADO'"
                                         routerLink="/orders/{{order.id}}/plannings" class="btn-icon hover-success"
                                         title="Ver planificación">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
-                                    
+
                                     <button routerLink="/orders/{{order.id}}" class="btn-icon hover-primary"
                                         title="Editar pedido">
                                         <i class="fas fa-pencil-alt"></i>

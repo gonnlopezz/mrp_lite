@@ -31,7 +31,6 @@ export class ManufacturingOrderDetailComponent implements OnInit {
         private orderService: OrderService,
         private customerService: CustomerService,
         private productService: productService,
-        private location: Location,
         private route: ActivatedRoute,
         private router: Router,
         private toastr: ToastrService,

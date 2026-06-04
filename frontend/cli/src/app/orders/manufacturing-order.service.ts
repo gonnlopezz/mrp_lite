@@ -17,7 +17,8 @@ export class OrderService {
       return this.http.get<DataPackage>(this.ordersUrl);
     }
   
-    byPage(page: number, size: number): Observable<DataPackage> {
+    byPage(page: number, size: number, state?: string): Observable<DataPackage> {
+      if(state) return this.http.get<DataPackage>(`${this.ordersUrl}/page?page=${page - 1}&size=${size}&state=${state}`);
       return this.http.get<DataPackage>(`${this.ordersUrl}/page?page=${page - 1}&size=${size}`);
     }
 

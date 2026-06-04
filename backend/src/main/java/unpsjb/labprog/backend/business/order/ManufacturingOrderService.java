@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -31,7 +32,11 @@ public class ManufacturingOrderService {
     }
 
     public Page<ManufacturingOrder> findByPage(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size));
+        return repository.findAllOrderedByStatePriority(PageRequest.of(page, size));
+    }
+
+    public Page<ManufacturingOrder> findByPageAndState(int page, int size, OrderState state) {
+        return repository.findByStateOrderByDeliveryDateAsc(state, PageRequest.of(page, size, Sort.by("deliveryDate").ascending()));
     }
 
     public Page<ManufacturingOrder> search(String term, int page, int size) {

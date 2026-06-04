@@ -57,5 +57,7 @@ public class ManufacturingOrder {
     public void validatePlannable() {
         if (this.state == OrderState.PLANIFICADO) 
             throw new BusinessException("El pedido ya se encuentra en estado planificado");
+        if (this.state == OrderState.NO_PLANIFICABLE) 
+            throw new BusinessException("El pedido ya se encuentra en estado no planificable");
     }
 }
