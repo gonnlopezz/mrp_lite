@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
@@ -38,7 +39,7 @@ public class ManufacturingOrderService {
     }
 
     public ManufacturingOrder findById(long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
     }
 
     public ManufacturingOrder findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate) {

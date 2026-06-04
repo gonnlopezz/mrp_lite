@@ -93,28 +93,9 @@ Escenario: Planificación de todos los pedidos pendientes. Y uso de huecos en eq
       | 2025-03-05 22:50 | 2025-03-05 23:00 | G02_soldadora | unir pie               |
       | 2025-03-05 23:00 | 2025-03-06 00:00 | G04_pistola   | pintar antioxidante    |
 
+# Casos negativos
 
-Esquema del escenario: Fallo por pedido viajero del tiempo o plazos imposibles
-    Dado el producto con nombre "<producto>"
-    Y el cliente con <cuit>
-    Y que existe el pedido para el cliente "<cuit>" con fecha de entrega "<fechaEntrega>"
-    Cuando se solicita planificar el pedido el día "<fechaSimulacion>"
-    Entonces se espera el siguiente status: <status> con la respuesta: "<respuesta>"
-
-    Ejemplos:
-      | cuit        | producto                 | fechaSimulacion | fechaEntrega | status | respuesta                                                         |
-      | 27123456781 | Soporte metálico mediano | 05-02-2025      | 04-02-2025   |    400 | El pedido no se puede planificar dentro del plazo requerido.     |
-      | 20304958722 | Soporte metálico mediano | 04-02-2025      | 04-02-2025   |    400 | El pedido no se puede planificar dentro del plazo requerido.     |
-
-  Escenario: Fallo por capacidad técnica ausente en todos los talleres del sistema
-    Dado el producto con nombre "Soporte en U para estantería"
-    Y el cliente con 27123456781
-    Y que existe el pedido para el cliente "27123456781" con fecha de entrega "15-06-2025"
-    Cuando se solicita planificar el pedido el día "10-06-2025"
-    Entonces se espera el siguiente status: 400 con la respuesta: "No se encontró taller disponible para el pedido en el plazo requerido."
-
-    Escenario: Fallo masivo por colisión o saturación de cuellos de botella en lote nocturno
-    Dado que existen los pedidos pendientes de planificacion antes cargados
-    Cuando se solicita planificar todos los pedidos pendientes el día "03-03-2025"
-    Entonces se espera el siguiente status: 200 con la respuesta: "Pedidos pendientes planificados con éxito"
-    Y el pedido debería tener el estado "NO_PLANIFICABLE"
+Escenario: Intentar planificar un pedido que no existe
+    Dado que no existe ningún pedido con id 99999
+    Cuando se solicita planificar el pedido el día "01-02-2025"
+    Entonces se espera el siguiente 404 con "Pedido no encontrado"

@@ -10,6 +10,12 @@ Given('que existe el pedido para el cliente {string} con fecha de entrega {strin
     this.pedido = dataPackage.data;
 });
 
+Given('que no existe ningún pedido con id {int}', async function (aOrderId) {
+    this.pedido = {
+        id: aOrderId,
+    }
+});
+
 Given('que existen los pedidos pendientes de planificacion antes cargados', async function () {
     return true;
 });
