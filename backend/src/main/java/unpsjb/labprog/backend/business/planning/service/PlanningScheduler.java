@@ -44,6 +44,7 @@ public class PlanningScheduler {
 
     public List<PlanningProcess> planBackward(PlanningFromOrderRequestDTO request) {
         ManufacturingOrder order = orderService.findById(request.getOrder().getId());
+        order.validatePlannable();
         Product product = productService.findById(order.getProduct().getId());
         LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();

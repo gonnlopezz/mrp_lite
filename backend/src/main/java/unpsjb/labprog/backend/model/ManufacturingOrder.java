@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import unpsjb.labprog.backend.exception.BusinessException;
 
 @Entity
 @Getter
@@ -51,5 +52,10 @@ public class ManufacturingOrder {
 
     public void markAsUnschedulable() {
         this.state = OrderState.NO_PLANIFICABLE;
+    }
+
+    public void validatePlannable() {
+        if (this.state == OrderState.PLANIFICADO) 
+            throw new BusinessException("El pedido ya se encuentra en estado planificado");
     }
 }

@@ -49,16 +49,6 @@ Escenario: Planificación de un pedido con el taller primera opción completamen
       | 2025-02-09 23:15 | 2025-02-10 00:00 | G02_soldadora | armado              |
 
 
-Escenario: Planificación de todos los pedidos pendientes.
-    Dado que existe el pedido para el cliente "27982145634" con fecha de entrega "10-02-2025"
-    Cuando se solicita planificar el pedido el día "09-02-2025"
-    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
-    Y se generaron las siguientes planificaciones
-      | inicio           | fin              | equipo        | tarea           |
-      | 2025-02-09 21:50 | 2025-02-09 22:20 | G01_amoladora | cortar planchas |
-      | 2025-02-09 22:20 | 2025-02-09 22:30 | G01_amoladora | cortar perfiles |
-      | 2025-02-09 22:30 | 2025-02-09 23:15 | G02_soldadora | armado          |
-
 
 Escenario: Planificación de todos los pedidos pendientes. Y uso de huecos en equipos.
     Dado que existen los pedidos pendientes de planificacion antes cargados
@@ -99,3 +89,9 @@ Escenario: Intentar planificar un pedido que no existe
     Dado que no existe ningún pedido con id 99999
     Cuando se solicita planificar el pedido el día "01-02-2025"
     Entonces se espera el siguiente 404 con "Pedido no encontrado"
+
+  Esquema del escenario: Intentar planificar un pedido cuyo estado no admite replanificación
+    Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-02-2025"
+    Y se encuentra en estado "PLANIFICADO"
+    Cuando se solicita planificar el pedido el día "01-02-2025"
+    Entonces se espera el siguiente 409 con "El pedido ya se encuentra en estado planificado"

@@ -37,3 +37,4 @@ Característica: administrar pedidos de fabricación
       | 20654239875 | 2025-03-01   | 2025-03-06   |        4 | Canasto de basura chico 1,5mts  |    200 | Pedido de fabricación generado correctamente |
       | 20654239875 | 2025-03-01   | 2025-03-06   |        3 | Pieza chica en U                |    200 | Pedido de fabricación generado correctamente |
       
+ 

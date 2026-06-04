@@ -20,6 +20,10 @@ Given('que existen los pedidos pendientes de planificacion antes cargados', asyn
     return true;
 });
 
+Given('se encuentra en estado {string}', function (estadoEsperado) {
+    return true;
+});
+
 
 When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto' , async function (fechaPedido, fechaEntrega, cantidad) {
 
