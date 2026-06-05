@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { WorkshopService } from '../workshops/workshop.service';
 import { OrderService } from '../orders/manufacturing-order.service';
 import { PlanningService } from './planning.service';
@@ -17,6 +17,8 @@ import { PlanningProcess } from '../planning/planning';
 import { ColorMode, ChartRow, WorkshopChartBlock, DayOrderSummary, DayProductSummary } from './planning-dashboard';
 import { productService } from '../products/product.service';
 import { RouterModule } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 const PROCESS_PALETTE = [
   '#3366cc', '#dc3912', '#ff9900', '#109618',
@@ -28,7 +30,7 @@ declare var google: any;
 @Component({
   selector: 'app-planning-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, NgbTypeaheadModule],
   templateUrl: './planning-dashboard.html',
   providers: [PlanningChartService]
 })
@@ -42,6 +44,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
   selectedWorkshopId: string = '';
   selectedOrderId: string = '';
+  selectedOrderObject: manufacturingOrder | null = null;
   selectedDate: string = '';
   colorMode: ColorMode = 'by-process';
 
@@ -62,6 +65,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     private productService: productService,
     private planningService: PlanningService,
     private chartService: PlanningChartService,
+    private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -100,10 +104,43 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // ─── Lógica de Typeahead para Pedidos (Formato Solicitado) ────────────────
+
+  searchOrders = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(term =>
+        term.length < 1
+          ? of([])
+          : of(this.orders.filter(o =>
+              o.id.toString().includes(term.toLowerCase()) ||
+              (o.customer?.companyName || '').toLowerCase().includes(term.toLowerCase())
+            )).pipe(
+              map(results => results.slice(0, 10))
+            )
+      ),
+      catchError(() => of([]))
+    );
+
+  orderInputFormatter = (order: manufacturingOrder): string => {
+    return order ? `Orden #${order.id} — ${order.customer?.companyName || 'Cliente'}` : '';
+  };
+
+  orderResultFormatter = (order: manufacturingOrder): string => {
+    return `Orden #${order.id} — ${order.customer?.companyName || 'Cliente'}`;
+  };
+  
   // ─── Fetch principal ─────────────────────────────────────────────────────
 
   onFiltersChange(): void {
     this.fetchAndRender();
+  }
+
+  onOrderSelected(event: any): void {
+    this.selectedOrderObject = event.item;
+    this.selectedOrderId = this.selectedOrderObject ? this.selectedOrderObject.id.toString() : '';
+    this.onFiltersChange();
   }
 
   fetchAndRender(): void {
@@ -155,6 +192,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   resetFilters(): void {
     this.selectedWorkshopId = '';
     this.selectedOrderId = '';
+    this.selectedOrderObject = null; // <-- Limpieza física del input text
     this.selectedDate = '';
     this.onFiltersChange();
   }
@@ -170,7 +208,9 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     this.workshopBlocks.forEach((block, index) => {
       const divRef = divs[index];
       if (!divRef) return;
-      this.chartService.drawBlock(block, divRef.nativeElement, this.dayTimeRange);
+
+      // Le pasamos el rango dinámico casteado
+      this.chartService.drawBlock(block, divRef.nativeElement, (block as any).timeRange);
     });
     this.renderingCharts = false;
     this.cdr.detectChanges();
@@ -243,13 +283,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
         const row: ChartRow = {
           equipmentCode: planning.equipment?.code ?? 'S/E',
           rowLabel: processLabel,
-          tooltip: this.buildTooltip(
-            processLabel,
-            planning.task?.name ?? 'Tarea',
-            planning.equipment?.code ?? 'S/E',
-            start, end, color,
-            process.order?.id ? `Orden #${process.order.id}` : undefined
-          ),
+          tooltip: this.buildTooltip(processLabel, planning.task?.name ?? 'Tarea', planning.equipment?.code ?? 'S/E', start, end, color),
           start, end, color
         };
 
@@ -258,11 +292,19 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
             workshopName: workshop.name, workshopCode: workshop.code,
             rows: [], ordersOfTheDay: [], productsOfTheDay: []
           });
+          // Lo tratamos como any temporalmente para asignarle el rango dinámico
+          (blocksMap.get(workshop.code) as any).timeRange = { min: start, max: end };
+        } else {
+          const block = blocksMap.get(workshop.code) as any;
+          if (start < block.timeRange.min) block.timeRange.min = start;
+          if (end > block.timeRange.max) block.timeRange.max = end;
         }
+
         blocksMap.get(workshop.code)!.rows.push(row);
       });
     });
 
+    // El resto del método se mantiene igual mapeando los summaries...
     blocksMap.forEach((block, workshopCode) => {
       const { orders, products } = this.computeSummaryForWorkshop(workshopCode);
       block.ordersOfTheDay = orders;
@@ -270,7 +312,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     });
 
     this.workshopBlocks = Array.from(blocksMap.values());
-    this.computeDayTimeRange();
+
+    // ⚠️ ELIMINAMOS la llamada a 'this.computeDayTimeRange()' ya no es necesaria globalmente
   }
 
   private computeSummaryForWorkshop(workshopCode: string): {
@@ -410,4 +453,27 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
       behavior: 'smooth'
     });
   }
+  // Control de Fechas
+
+  get selectedDateIndex(): number {
+    if (!this.selectedDate || this.availableDates.length === 0) return 0;
+    return this.availableDates.indexOf(this.selectedDate) + 1;
+  }
+
+  setToday(): void {
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    if (this.availableDates.includes(todayStr)) {
+      this.selectedDate = todayStr;
+    } else {
+      this.toastr.info('No se encontraron órdenes de producción planificadas para la jornada de hoy.', 'Dashboard');
+      return;
+    }
+
+    this.renderingCharts = true;
+    this.computeWorkshopBlocks();
+    this.renderAllCharts();
+  }
 }
+
+

@@ -45,13 +45,19 @@
                         <!-- Filtro pedido -->
                         <div class="col-sm-4">
                             <label class="form-label small fw-bold text-secondary mb-1">Pedido</label>
-                            <select class="form-select form-select-sm rounded-3" [(ngModel)]="selectedOrderId"
-                                (change)="onFiltersChange()">
-                                <option value="">-- Todos los Pedidos --</option>
-                                <option *ngFor="let o of orders" [value]="o.id">
-                                    Orden #{{ o.id }} — {{ o.customer?.companyName || 'Cliente' }}
-                                </option>
-                            </select>
+                            <div class="position-relative">
+                                <input type="text" class="form-control form-control-sm rounded-3 bg-white"
+                                    placeholder="Buscar por ID o Cliente..." [(ngModel)]="selectedOrderObject"
+                                    [ngbTypeahead]="searchOrders" [inputFormatter]="orderInputFormatter"
+                                    [resultFormatter]="orderResultFormatter" (selectItem)="onOrderSelected($event)"
+                                    [editable]="false" />
+
+                                <button *ngIf="selectedOrderObject" type="button"
+                                    class="btn btn-sm position-absolute end-0 top-50 translate-middle-y border-0 bg-transparent text-muted me-1 py-0 shadow-none"
+                                    (click)="selectedOrderObject = null; selectedOrderId = ''; onFiltersChange()">
+                                    <i class="fas fa-times-circle text-xs opacity-50"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Toggle + botón reset -->
@@ -90,7 +96,6 @@
         <!-- ── Body ───────────────────────────────────────────────────────────── -->
         <div class="card-body p-4 bg-light-subtle">
 
-            <!-- Loading -->
             <div class="text-center py-5" *ngIf="loading">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Cargando...</span>
@@ -100,7 +105,6 @@
 
             <ng-container *ngIf="!loading">
 
-                <!-- ── Sin datos ──────────────────────────────────────────────────── -->
                 <div *ngIf="!hasData" class="text-center py-5 border rounded-4 bg-white shadow-sm">
                     <i class="fas fa-calendar-times text-secondary fa-3x mb-3"></i>
                     <h5 class="text-dark fw-semibold">Sin asignaciones registradas</h5>
@@ -109,35 +113,49 @@
                     </p>
                 </div>
 
-                <!-- ── Con datos ──────────────────────────────────────────────────── -->
                 <div *ngIf="hasData">
 
-                    <!-- Carrusel de fechas -->
+                    <div
+                        class="bg-white rounded-4 border border-light-subtle shadow-sm p-3 mb-4 d-flex flex-column align-items-center justify-content-center">
 
-                    <div class="bg-white rounded-4 shadow-sm border p-3 mb-4">
-                        <div class="d-flex align-items-center justify-content-between">
-
-                            <button class="btn btn-sm btn-outline-primary rounded-circle px-2"
-                                (click)="changeDate('prev')" [disabled]="isFirstDate">
-                                <i class="fas fa-chevron-left"></i>
+                        <div class="d-flex align-items-center gap-2">
+                            <button
+                                class="btn btn-sm btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-none transition-base"
+                                style="width: 32px; height: 32px; border-color: #e2e8f0; background-color: #f1f5f9;"
+                                [disabled]="isFirstDate" (click)="changeDate('prev')">
+                                <i class="fas fa-chevron-left text-secondary" style="font-size: 1.2rem;"></i>
                             </button>
 
-                            <div class="text-center">
-                                <span class="fw-bold text-dark d-block" style="font-size: 1rem;">
-                                    {{ selectedDate | date:'dd/MM/yyyy' }}
-                                </span>
-                                <small class="text-muted font-monospace">
-                                    {{ availableDates.indexOf(selectedDate) + 1 }} de {{ availableDates.length }}
-                                    {{ availableDates.length === 1 ? 'fecha' : 'fechas' }} con planificaciones
-                                </small>
+                            <div class="position-relative">
+                                <div class="bg-light border border-light-subtle btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+                                    style="pointer-events: none; min-width: 140px;">
+                                    <span class="font-monospace fw-bold text-dark tracking-wider w-100 text-center"
+                                        style="font-size: 0.9rem;">
+                                        {{ selectedDate | date: 'dd/MM/yyyy' : 'UTC' }}
+                                    </span>
+                                    <i class="far fa-calendar-alt text-muted small"></i>
+                                </div>
                             </div>
 
-                            <button class="btn btn-sm btn-outline-primary rounded-circle px-2"
-                                (click)="changeDate('next')" [disabled]="isLastDate">
-                                <i class="fas fa-chevron-right"></i>
+                            <button
+                                class="btn btn-outline-primary btn-sm rounded-2 px-3 fw-semibold ms-1 shadow-none transition-base"
+                                (click)="setToday()" style="font-size: 0.85rem;">
+                                Hoy
                             </button>
 
+                            <button
+                                class="btn btn-sm btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-none transition-base"
+                                style="width: 32px; height: 32px; border-color: #e2e8f0; background-color: #f1f5f9;"
+                                [disabled]="isLastDate" (click)="changeDate('next')">
+                                <i class="fas fa-chevron-right text-secondary" style="font-size: 1.2rem;"></i>
+                            </button>
                         </div>
+
+                        <span class="text-muted small mt-2 font-monospace"
+                            style="font-size: 0.72rem; letter-spacing: 0.02em;">
+                            {{ availableDates.indexOf(selectedDate) + 1 }} de {{ availableDates.length }} fechas con
+                            planificaciones
+                        </span>
                     </div>
 
                     <div class="text-center mb-2" style="height: 20px;">
