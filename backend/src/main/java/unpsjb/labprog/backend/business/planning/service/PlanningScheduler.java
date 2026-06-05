@@ -14,6 +14,7 @@ import unpsjb.labprog.backend.business.workshop.WorkshopService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
+import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.EquipmentType;
 import unpsjb.labprog.backend.model.ManufacturingOrder;
 import unpsjb.labprog.backend.model.Period;
@@ -38,7 +39,6 @@ public class PlanningScheduler {
         Product product = productService.findByName(request.getProductName());
         List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
         Workshop workshop = resolveWorkshop(request.getWorkshopCode(), requiredTypes);
-
         return algorithm.scheduleForward(product, workshop, start);
     }
 
@@ -50,19 +50,24 @@ public class PlanningScheduler {
         LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
         LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
         List<PlanningProcess> result = new ArrayList<>();
+
         try {
             List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
                     product.requiredEquipmentTypes());
             result = scheduleBackwardOnFirstAvailableWorkshop(
                     workshops, product, order, deadline, requestedStart, new HashMap<>());
             order.markAsPlanned();
+        } catch (SchedulingException e) {
+            order.markAsUnschedulable(e.getMessage(), positiveOrNull(e.getSchedulableQuantity()));
         } catch (BusinessException e) {
-            order.markAsUnschedulable();
+            order.markAsUnschedulable(e.getMessage(), null);
         }
 
         orderService.save(order);
         return result;
     }
+
+    // ── planBulkOrders: misma mejora ─────────────────────────────────────────
 
     public List<PlanningProcess> planBulkOrders(
             List<ManufacturingOrder> orders, LocalDateTime executionStart) {
@@ -80,18 +85,23 @@ public class PlanningScheduler {
                         order.getDeliveryDate().atStartOfDay(), executionStart, runtimeCache);
                 result.addAll(processes);
                 order.markAsPlanned();
+            } catch (SchedulingException e) {
+                order.markAsUnschedulable(e.getMessage(), positiveOrNull(e.getSchedulableQuantity()));
             } catch (BusinessException e) {
-                order.markAsUnschedulable();
+                order.markAsUnschedulable(e.getMessage(), null);
             }
             orderService.save(order);
         }
         return result;
     }
 
+
     private List<PlanningProcess> scheduleBackwardOnFirstAvailableWorkshop(
             List<Workshop> workshops, Product aProduct, ManufacturingOrder aOrder,
             LocalDateTime deadline, LocalDateTime startLimit,
             Map<Long, List<Period>> globalCache) {
+
+        int bestSchedulableCount = 0;
 
         for (Workshop workshop : workshops) {
             Map<Long, List<Period>> simulationCache = deepCopyCache(globalCache);
@@ -101,14 +111,18 @@ public class PlanningScheduler {
                 globalCache.clear();
                 globalCache.putAll(simulationCache);
                 return processes;
+            } catch (SchedulingException e) {
+                bestSchedulableCount = Math.max(bestSchedulableCount, e.getSchedulableQuantity());
             } catch (BusinessException e) {
-                // El taller no pudo planificar el pedido, se intenta con el siguiente
+                // Taller sin el equipamiento necesario; ignorar y probar el siguiente
             }
         }
 
-        throw new BusinessException(
-                "No se encontró taller disponible para el pedido en el plazo requerido.");
+        throw new SchedulingException(
+                "No se encontró taller disponible para el pedido en el plazo requerido.",
+                bestSchedulableCount);
     }
+
 
     private List<PlanningProcess> scheduleUnitsBackward(
             ManufacturingOrder aOrder, Product aProduct, Workshop aWorkshop,
@@ -124,8 +138,9 @@ public class PlanningScheduler {
             process.setOrder(aOrder);
 
             if (process.getStart().isBefore(startLimit)) {
-                throw new BusinessException(
-                        "El pedido no se puede planificar dentro del plazo requerido.");
+                throw new SchedulingException(
+                        "El pedido no se puede planificar dentro del plazo requerido.",
+                        result.size());
             }
             result.add(process);
         }
@@ -147,5 +162,9 @@ public class PlanningScheduler {
             copy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
         }
         return copy;
+    }
+
+    private Integer positiveOrNull(int value) {
+        return value > 0 ? value : null;
     }
 }

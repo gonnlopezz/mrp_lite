@@ -39,6 +39,10 @@ public class PlanningProcessService {
         return repository.saveAll(scheduler.planBackward(request));
     }
 
+    public ManufacturingOrder findOrderById(long id) {
+        return orderService.findById(id);
+    }
+
     @Transactional
     public List<PlanningProcess> savePendingOrders(LocalDateTime executionTime) {
         List<ManufacturingOrder> pendingOrders = orderService.findByStateOrderByDeliveryDateAsc(OrderState.PENDIENTE);

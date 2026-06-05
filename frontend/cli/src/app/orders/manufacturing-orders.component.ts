@@ -32,6 +32,8 @@ export class ManufacturingOrdersComponent implements OnInit {
     TODOS: 0, PENDIENTE: 0, PLANIFICADO: 0, NO_PLANIFICABLE: 0
   };
 
+  selectedOrderForModal: any = null;
+
   constructor(
     private orderService: OrderService,
     private planningService: PlanningService,
@@ -115,22 +117,42 @@ export class ManufacturingOrdersComponent implements OnInit {
       .catch(() => { });
   }
 
-  tryPlanningOrder(orderId: number): void {
+  private planningOrder(orderId: number, modalContent: any): void {
+    const startDate = new Date().toISOString().split('T')[0] + 'T00:00:00';
+
+    this.planningService.save({ order: { id: orderId }, startDate }).subscribe({
+      next: (dataPackage) => {
+        this.refresh();
+        const data = <any>dataPackage.data;
+
+        if (Array.isArray(data)) {
+          this.toastr.success('¡Pedido planificado con éxito!', 'Éxito');
+        }
+        else if (data && data.state === 'NO_PLANIFICABLE') {
+          this.toastr.warning('El pedido no pudo planificarse por completo.', 'Planificación Parcial');
+          this.openFailureModal(data, modalContent);
+        }
+      },
+      error: err => console.error(err),
+    });
+  }
+
+  // 3. Modificá este método público para pasarle la referencia del template del modal
+  tryPlanningOrder(orderId: number, modalContent: any): void {
     const ref = this.modalService.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Planificar Pedido';
     ref.componentInstance.message = 'Se generarán las planificaciones para cada producto. ¿Desea continuar?';
     ref.componentInstance.btnOkText = 'Sí, Planificar';
     ref.componentInstance.isDelete = false;
 
-    ref.result.then(ok => { if (ok) this.planningOrder(orderId); })
-      .catch(() => { });
+    ref.result.then(ok => {
+      if (ok) this.planningOrder(orderId, modalContent);
+    }).catch(() => { });
   }
 
-  private planningOrder(orderId: number): void {
-    const startDate = new Date().toISOString().split('T')[0] + 'T00:00:00';
-    this.planningService.save({ order: { id: orderId }, startDate }).subscribe({
-      next: () => { this.refresh(); this.toastr.success('¡Pedido planificado con éxito!', 'Éxito'); },
-      error: err => console.error(err),
-    });
+  // 4. Nuevo método limpio para abrir el modal de auditoría/renegociación
+  openFailureModal(order: any, modalContent: any): void {
+    this.selectedOrderForModal = order;
+    this.modalService.open(modalContent, { centered: true, backdrop: 'static', size: 'lg' });
   }
 }

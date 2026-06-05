@@ -1,10 +1,8 @@
 package unpsjb.labprog.backend.presenter;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +19,7 @@ import unpsjb.labprog.backend.dto.PlanAllPendingRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
+import unpsjb.labprog.backend.model.ManufacturingOrder;
 import unpsjb.labprog.backend.model.PlanningProcess;
 
 @RestController
@@ -72,23 +71,26 @@ public class PlanningPresenter {
     }
 
     @PostMapping("/order")
-    public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
-        try {
-            List<PlanningProcess> result = service.saveFromOrder(request);
-            if(result.isEmpty()) {
-                return Response.ok(result, "El pedido no pudo planificarse en el plazo requerido");
-            }
-            return Response.ok(result, "Pedido planificado con éxito");
-        } catch (EntityNotFoundException e) {
-            return Response.notFound(e.getMessage());
-        } catch (BusinessException e) {
-            return Response.conflict(e.getMessage());
-        } catch (Exception e) {
-            System.err.println("🚨 ERROR CRÍTICO EN TEST DE PLANIFICACIÓN: " + e.getMessage());
-            e.printStackTrace();
-            return Response.error(e.getMessage());
+public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
+    try {
+        List<PlanningProcess> result = service.saveFromOrder(request);
+        
+        if (result.isEmpty()) {
+            ManufacturingOrder failedOrder = service.findOrderById(request.getOrder().getId());
+            return Response.ok(failedOrder, "El pedido no pudo planificarse en el plazo requerido");
         }
+        
+        return Response.ok(result, "Pedido planificado con éxito");
+    } catch (EntityNotFoundException e) {
+        return Response.notFound(e.getMessage());
+    } catch (BusinessException e) {
+        return Response.conflict(e.getMessage());
+    } catch (Exception e) {
+        System.err.println("🚨 ERROR CRÍTICO EN TEST DE PLANIFICACIÓN: " + e.getMessage());
+        e.printStackTrace();
+        return Response.error(e.getMessage());
     }
+}
 
     @PostMapping("/pending")
     public ResponseEntity<Object> planPendingOrders(@RequestBody PlanAllPendingRequestDTO request) {

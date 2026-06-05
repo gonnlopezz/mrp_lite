@@ -43,6 +43,11 @@ public class ManufacturingOrder {
     @ManyToOne
     private Product product;
 
+    @Column
+    private String schedulingFailureReason;
+
+    @Column
+    private Integer schedulableQuantity;
 
     // Métodos
 
@@ -51,13 +56,20 @@ public class ManufacturingOrder {
     }
 
     public void markAsUnschedulable() {
-        this.state = OrderState.NO_PLANIFICABLE;
+        markAsUnschedulable(null, null);
     }
 
+    public void markAsUnschedulable(String reason, Integer schedulableQuantity) {
+        this.state = OrderState.NO_PLANIFICABLE;
+        this.schedulingFailureReason = reason;
+        this.schedulableQuantity = schedulableQuantity;
+    }
+    
+
     public void validatePlannable() {
-        if (this.state == OrderState.PLANIFICADO) 
+        if (this.state == OrderState.PLANIFICADO)
             throw new BusinessException("El pedido ya se encuentra en estado planificado");
-        if (this.state == OrderState.NO_PLANIFICABLE) 
-            throw new BusinessException("El pedido ya se encuentra en estado no planificable");
+        if (this.state == OrderState.FINALIZADO)
+            throw new BusinessException("El pedido ya se encuentra en estado finalizado");
     }
 }
