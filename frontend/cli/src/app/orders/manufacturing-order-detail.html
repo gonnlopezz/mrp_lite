@@ -60,17 +60,10 @@
               </div>
 
               <!-- Fecha Pedido -->
-              <div class="col-md-6">
-                <label class="label-caps mb-1 d-block">Fecha de Pedido</label>
-                <input type="date" class="form-control form-control-sm bg-white" required name="orderDate"
-                  [(ngModel)]="order.orderDate" #orderDateInput="ngModel"
-                  [class.is-invalid]="orderDateInput.invalid && orderDateInput.touched">
-
-                <div class="error-container">
-                  <div class="error-feedback" *ngIf="orderDateInput.invalid && orderDateInput.touched">
-                    <i class="fa fa-exclamation-triangle"></i> La fecha de pedido es obligatoria.
-                  </div>
-                </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label small fw-bold text-secondary mb-1">Fecha de Pedido</label>
+                <input type="date" class="form-control rounded-3 bg-light" [(ngModel)]="order.orderDate"
+                  name="orderDate" readonly />
               </div>
 
               <!-- Fecha Entrega -->
@@ -93,8 +86,8 @@
                 <input type="text" class="form-control form-control-sm bg-white" required id="productInput"
                   name="product" placeholder="Buscar producto..." [ngModel]="selectedProduct"
                   [inputFormatter]="productInputFormatter" [resultFormatter]="productResultFormatter"
-                  [ngbTypeahead]="searchProducts" (selectItem)="onProductSelected($event.item)"
-                  #productInput="ngModel" [class.is-invalid]="!order.product && productInput.touched">
+                  [ngbTypeahead]="searchProducts" (selectItem)="onProductSelected($event.item)" #productInput="ngModel"
+                  [class.is-invalid]="!order.product && productInput.touched">
 
                 <div class="error-container">
                   <div class="error-feedback" *ngIf="!order.product && productInput.touched">
@@ -124,30 +117,30 @@
                   [value]="order.state || 'PENDIENTE'">
               </div>
 
-            <hr class="my-4" style="border-top: 1px solid #f1f5f9; opacity: 1;">
+              <hr class="my-4" style="border-top: 1px solid #f1f5f9; opacity: 1;">
 
-            <div class="d-flex justify-content-end gap-2">
-              <button type="button" class="btn btn-light px-4 text-slate fw-semibold border shadow-none"
-                (click)="goBack()" style="font-size: 0.85rem;">
-                Cancelar
-              </button>
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light px-4 text-slate fw-semibold border shadow-none"
+                  (click)="goBack()" style="font-size: 0.85rem;">
+                  Cancelar
+                </button>
 
-              <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save()"
-                [disabled]="orderForm.invalid || !order.customer || !order.product" style="font-size: 0.85rem;">
-                <i class="fas {{ order.id ? 'fa-save' : 'fa-check-circle' }} me-2"></i>
-                {{ order.id ? 'Guardar Cambios' : 'Confirmar Pedido' }}
-              </button>
+                <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save()"
+                  [disabled]="orderForm.invalid || !order.customer || !order.product" style="font-size: 0.85rem;">
+                  <i class="fas {{ order.id ? 'fa-save' : 'fa-check-circle' }} me-2"></i>
+                  {{ order.id ? 'Guardar Cambios' : 'Confirmar Pedido' }}
+                </button>
+              </div>
             </div>
+          </form>
+
         </div>
-    </form>
+
+        <p class="text-center text-muted mt-3" style="font-size: 0.75rem;">
+          <i class="fas fa-info-circle me-1"></i>
+          Los datos guardados impactarán inmediatamente en el sistema.
+        </p>
 
       </div>
-
-      <p class="text-center text-muted mt-3" style="font-size: 0.75rem;">
-        <i class="fas fa-info-circle me-1"></i>
-        Los datos guardados impactarán inmediatamente en el sistema.
-      </p>
-
     </div>
   </div>
-</div>

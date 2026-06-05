@@ -3,8 +3,8 @@ import { Product } from "../products/product";
 
 export interface manufacturingOrder {
     id: number;
-    orderDate: Date;
-    deliveryDate: Date;
+    orderDate: string | Date;    
+    deliveryDate: string | Date; 
     quantity: number;
     state: orderState;
     customer: Customer;

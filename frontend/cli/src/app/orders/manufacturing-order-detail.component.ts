@@ -51,9 +51,11 @@ export class ManufacturingOrderDetailComponent implements OnInit {
         const id = this.route.snapshot.paramMap.get('id');
 
         if (id === 'new' || !id) {
+            const todayStr = new Date().toISOString().split('T')[0];
+
             this.order = <manufacturingOrder>{
-                orderDate: new Date(),
-                deliveryDate: new Date(),
+                orderDate: todayStr,      
+                deliveryDate: todayStr,    
                 quantity: 1,
                 state: orderState.PENDIENTE,
                 customer: null as unknown as Customer,
