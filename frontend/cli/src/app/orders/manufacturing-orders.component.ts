@@ -27,6 +27,7 @@ export class ManufacturingOrdersComponent implements OnInit {
   currentPage = 1;
   searchTerm = '';
   activeTab: OrderTab = 'TODOS';
+  processingPlanning: boolean = false;
 
   tabCounts: Record<OrderTab, number> = {
     TODOS: 0, PENDIENTE: 0, PLANIFICADO: 0, NO_PLANIFICABLE: 0
@@ -90,6 +91,28 @@ export class ManufacturingOrdersComponent implements OnInit {
   }
 
   // ─── Acciones ────────────────────────────────────────────────────────────
+
+  executePlanBatch(): void {
+    this.processingPlanning = true;
+
+    this.planningService.runMassivePlanning().subscribe({
+      next: (res) => {
+        this.toastr.success('¡Proceso masivo finalizado con éxito!', 'Motor de Planificación');
+        this.processingPlanning = false;
+
+        this.refresh();
+
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('Ocurrió un error al procesar la asignación de lotes.', 'Error');
+        this.processingPlanning = false;
+
+        this.cdr.markForCheck();
+      }
+    });
+  }
 
   onPageChangeRequested(page: number): void {
     this.currentPage = page;

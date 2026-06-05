@@ -71,26 +71,26 @@ public class PlanningPresenter {
     }
 
     @PostMapping("/order")
-public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
-    try {
-        List<PlanningProcess> result = service.saveFromOrder(request);
-        
-        if (result.isEmpty()) {
-            ManufacturingOrder failedOrder = service.findOrderById(request.getOrder().getId());
-            return Response.ok(failedOrder, "El pedido no pudo planificarse en el plazo requerido");
+    public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
+        try {
+            List<PlanningProcess> result = service.saveFromOrder(request);
+
+            if (result.isEmpty()) {
+                ManufacturingOrder failedOrder = service.findOrderById(request.getOrder().getId());
+                return Response.ok(failedOrder, "El pedido no pudo planificarse en el plazo requerido");
+            }
+
+            return Response.ok(result, "Pedido planificado con éxito");
+        } catch (EntityNotFoundException e) {
+            return Response.notFound(e.getMessage());
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("🚨 ERROR CRÍTICO EN TEST DE PLANIFICACIÓN: " + e.getMessage());
+            e.printStackTrace();
+            return Response.error(e.getMessage());
         }
-        
-        return Response.ok(result, "Pedido planificado con éxito");
-    } catch (EntityNotFoundException e) {
-        return Response.notFound(e.getMessage());
-    } catch (BusinessException e) {
-        return Response.conflict(e.getMessage());
-    } catch (Exception e) {
-        System.err.println("🚨 ERROR CRÍTICO EN TEST DE PLANIFICACIÓN: " + e.getMessage());
-        e.printStackTrace();
-        return Response.error(e.getMessage());
     }
-}
 
     @PostMapping("/pending")
     public ResponseEntity<Object> planPendingOrders(@RequestBody PlanAllPendingRequestDTO request) {
@@ -98,15 +98,14 @@ public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderReques
             if (request.getStartDate() == null) {
                 return Response.error("La fecha de inicio (startDate) es obligatoria.");
             }
-            
+
             List<PlanningProcess> processes = service.savePendingOrders(request.getStartDate());
-            
+
             return Response.ok(processes, "Pedidos pendientes planificados con éxito");
         } catch (Exception e) {
             return Response.error("Error al procesar la planificación masiva: " + e.getMessage());
         }
     }
-    
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") long id) {
@@ -114,5 +113,4 @@ public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderReques
         return Response.ok("Planificación id " + id + " eliminada con éxito.");
     }
 
-    
 }

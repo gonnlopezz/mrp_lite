@@ -24,6 +24,18 @@ export class PlanningService {
     return this.http.post<DataPackage>(`${this.planningUrl}/order`, request);
   }
 
+  runMassivePlanning(): Observable<DataPackage> {
+    const now = new Date();
+
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    const localISOTime = new Date(now.getTime() - tzOffset).toISOString().slice(0, 19);
+
+    const payload = {
+      startDate: localISOTime
+    };
+    return this.http.post<DataPackage>(`${this.planningUrl}/pending`, payload);
+  }
+
   getByPage(page: number, size: number): Observable<DataPackage> {
     return this.http.get<DataPackage>(`${this.planningUrl}/page?page=${page - 1}&size=${size}`);
   }
