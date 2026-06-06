@@ -18,3 +18,4 @@ VALUES (503, '2026-06-16', '2026-06-18', 200, 'PENDIENTE', 500, 1);
 -- -- Caso 4: No planificable por Error Estructural (Ningún taller cuenta con las máquinas para el Soporte en U)
 INSERT INTO manufacturing_order (id, order_date, delivery_date, quantity, order_state, customer_id, product_id)
 VALUES (504, '2026-06-16', '2026-06-16', 1, 'PENDIENTE', 500, 5);
+
