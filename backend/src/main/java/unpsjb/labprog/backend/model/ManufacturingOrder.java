@@ -21,7 +21,7 @@ import unpsjb.labprog.backend.exception.BusinessException;
 @NoArgsConstructor
 public class ManufacturingOrder {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)

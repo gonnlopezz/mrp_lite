@@ -20,7 +20,7 @@ import unpsjb.labprog.backend.exception.BusinessException;
 @NoArgsConstructor
 public class Workshop {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)

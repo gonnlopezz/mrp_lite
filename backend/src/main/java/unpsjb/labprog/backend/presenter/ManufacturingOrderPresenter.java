@@ -38,6 +38,11 @@ public class ManufacturingOrderPresenter {
                         : service.findByPage(page, size));
     }
 
+    @RequestMapping(value = "/planned", method = RequestMethod.GET)
+    public ResponseEntity<Object> findAllPlanned() {
+        return Response.ok(service.findByStateOrderByDeliveryDateAsc(OrderState.PLANIFICADO));
+    }
+
     @RequestMapping(value = "/search/{term}", method = RequestMethod.GET)
     public ResponseEntity<Object> search(
             @PathVariable String term,

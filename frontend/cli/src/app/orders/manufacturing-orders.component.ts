@@ -14,7 +14,6 @@ import { PaginationComponent } from '../pagination/pagination.component';
 
 type OrderTab = 'TODOS' | 'PENDIENTE' | 'PLANIFICADO' | 'NO_PLANIFICABLE';
 
-
 @Component({
   selector: 'app-orders',
   imports: [RouterModule, CommonModule, FormsModule, PaginationComponent],
@@ -28,6 +27,9 @@ export class ManufacturingOrdersComponent implements OnInit {
   searchTerm = '';
   activeTab: OrderTab = 'TODOS';
   processingPlanning: boolean = false;
+
+  // Propiedad para enlazar la fecha seleccionada en el input del modal de simulación
+  selectedSimulationDate: string = '';
 
   tabCounts: Record<OrderTab, number> = {
     TODOS: 0, PENDIENTE: 0, PLANIFICADO: 0, NO_PLANIFICABLE: 0
@@ -90,29 +92,50 @@ export class ManufacturingOrdersComponent implements OnInit {
     this.loadTabCounts();
   }
 
-  // ─── Acciones ────────────────────────────────────────────────────────────
+  // ─── Acciones Masivas (Simulador Temporal) ───────────────────────────────
 
-  executePlanBatch(): void {
+  abrirModalPlanificacion(content: any): void {
+    const ahora = new Date();
+    const tzOffset = ahora.getTimezoneOffset() * 60000;
+
+    // Setea por defecto "AAAA-MM-DD" en hora local (ej: "2026-06-05")
+    this.selectedSimulationDate = new Date(ahora.getTime() - tzOffset).toISOString().split('T')[0];
+
+    // Abre el modal centrado
+    this.modalService.open(content, { centered: true, backdrop: 'static' });
+  }
+
+  /** Ejecuta el motor mandando la fecha con las 00:00:00 hardcodeadas */
+  executePlanBatch(modalRef: any): void {
+    if (!this.selectedSimulationDate) {
+      this.toastr.warning('Debe seleccionar una fecha de inicio para la corrida.', 'Atención');
+      return;
+    }
+
     this.processingPlanning = true;
+    this.cdr.markForCheck();
 
-    this.planningService.runMassivePlanning().subscribe({
+    // 💡 Magia de Clean Architecture: El usuario ve solo la fecha, 
+    // pero a Spring Boot le llega el LocalDateTime perfecto que necesita.
+    const fechaFormateadaJava = `${this.selectedSimulationDate}T00:00:00`;
+
+    this.planningService.runMassivePlanning(fechaFormateadaJava).subscribe({
       next: (res) => {
         this.toastr.success('¡Proceso masivo finalizado con éxito!', 'Motor de Planificación');
         this.processingPlanning = false;
-
+        modalRef.close();
         this.refresh();
-
         this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.toastr.error('Ocurrió un error al procesar la asignación de lotes.', 'Error');
         this.processingPlanning = false;
-
         this.cdr.markForCheck();
       }
     });
   }
+  // ─── Acciones Individuales y Filtros ─────────────────────────────────────
 
   onPageChangeRequested(page: number): void {
     this.currentPage = page;
@@ -160,7 +183,6 @@ export class ManufacturingOrdersComponent implements OnInit {
     });
   }
 
-  // 3. Modificá este método público para pasarle la referencia del template del modal
   tryPlanningOrder(orderId: number, modalContent: any): void {
     const ref = this.modalService.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Planificar Pedido';
@@ -173,7 +195,6 @@ export class ManufacturingOrdersComponent implements OnInit {
     }).catch(() => { });
   }
 
-  // 4. Nuevo método limpio para abrir el modal de auditoría/renegociación
   openFailureModal(order: any, modalContent: any): void {
     this.selectedOrderForModal = order;
     this.modalService.open(modalContent, { centered: true, backdrop: 'static', size: 'lg' });

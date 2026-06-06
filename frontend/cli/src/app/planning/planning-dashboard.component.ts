@@ -91,7 +91,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   loadSelectData(): void {
     forkJoin({
       workshops: this.workshopService.all(),
-      orders: this.orderService.all(),
+      orders: this.orderService.allPlanned(),
       products: this.productService.all()
     }).subscribe({
       next: ({ workshops, orders, products }) => {
@@ -362,17 +362,6 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     return {
       orders: Array.from(ordersMap.values()),
       products: Array.from(productsMap.values())
-    };
-  }
-
-  private computeDayTimeRange(): void {
-    const allDates = this.workshopBlocks.flatMap(b =>
-      b.rows.flatMap(r => [r.start.getTime(), r.end.getTime()])
-    );
-    if (allDates.length === 0) { this.dayTimeRange = null; return; }
-    this.dayTimeRange = {
-      min: new Date(Math.min(...allDates)),
-      max: new Date(Math.max(...allDates))
     };
   }
 

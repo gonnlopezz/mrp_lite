@@ -20,7 +20,7 @@
 
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-outline-dark transition-base d-flex align-items-center gap-2 shadow-sm"
-                    [disabled]="processingPlanning" (click)="executePlanBatch()">
+                    [disabled]="processingPlanning" (click)="abrirModalPlanificacion(simulationModal)">
                     <span *ngIf="processingPlanning" class="spinner-border spinner-border-sm" role="status"></span>
                     <i *ngIf="!processingPlanning" class="fas fa-play text-success small"></i>
                     {{ processingPlanning ? 'Planificando...' : 'Planificar Pendientes' }}
@@ -303,6 +303,43 @@
         <button type="button" class="btn btn-light btn-sm fw-medium px-4 rounded-2 text-secondary"
             (click)="modal.close()">
             Cerrar Auditoría
+        </button>
+    </div>
+</ng-template>
+
+
+<ng-template #simulationModal let-modal>
+    <div class="modal-header border-bottom-0 pt-4 px-4 bg-white">
+        <h5 class="modal-title fw-bold text-steel tracking-tight">
+            <i class="fas fa-clock text-primary me-2"></i> Lanzar Planificación Masiva
+        </h5>
+        <button type="button" class="btn-close shadow-none" aria-label="Close" [disabled]="processingPlanning" (click)="modal.dismiss()"></button>
+    </div>
+    
+    <div class="modal-body px-4 pb-3 bg-white">
+        <p class="text-secondary small mb-3">
+            Selecciona fecha para iniciar planificación masiva.
+        </p>
+        
+        <div class="mb-2">
+            <label class="form-label small fw-bold text-secondary mb-1">Fecha Virtual de la Fábrica</label>
+            <input type="date" 
+                   class="form-control rounded-3 bg-white" 
+                   [(ngModel)]="selectedSimulationDate" 
+                   name="simulationDate"
+                   [disabled]="processingPlanning" />
+        </div>
+    </div>
+    
+    <div class="modal-footer border-top-0 px-4 pb-4 pt-1 bg-white d-flex gap-2">
+        <button type="button" class="btn btn-light rounded-3 px-3 fw-medium text-secondary" [disabled]="processingPlanning" (click)="modal.dismiss()">
+            Cancelar
+        </button>
+        <button type="button" class="btn btn-primary rounded-3 px-3 fw-medium d-flex align-items-center gap-2 shadow-sm" 
+                [disabled]="processingPlanning" 
+                (click)="executePlanBatch(modal)">
+            <span *ngIf="processingPlanning" class="spinner-border spinner-border-sm" role="status"></span>
+            {{ processingPlanning ? 'Calculando...' : 'Planificar Pendientes' }}
         </button>
     </div>
 </ng-template>
