@@ -18,7 +18,7 @@ import { ColorMode, ChartRow, WorkshopChartBlock, DayOrderSummary, DayProductSum
 import { productService } from '../products/product.service';
 import { RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDate, NgbDateStruct, NgbDatepickerModule, NgbDropdownModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 const PROCESS_PALETTE = [
   '#3366cc', '#dc3912', '#ff9900', '#109618',
@@ -30,7 +30,7 @@ declare var google: any;
 @Component({
   selector: 'app-planning-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NgbTypeaheadModule],
+  imports: [CommonModule, FormsModule, RouterModule, NgbDatepickerModule, NgbDropdownModule, NgbTypeaheadModule],
   templateUrl: './planning-dashboard.html',
   providers: [PlanningChartService]
 })
@@ -58,6 +58,15 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
   private equipmentWorkshopMap = new Map<number, { code: string; name: string }>();
   private taskProductMap = new Map<number, string>();
+
+  selectedShifts: Record<string, string> = {};
+
+  readonly SHIFT_RANGES: Record<string, { start: number; end: number }> = {
+    all: { start: 0, end: 1440 },  // 24 hs completas
+    night: { start: 0, end: 480 },  // 00:00 a 08:00 (Noche / Madrugada)
+    morning: { start: 480, end: 960 },  // 08:00 a 16:00 (Mañana)
+    afternoon: { start: 960, end: 1440 }   // 16:00 a 24:00 (Tarde / Cierre)
+  };
 
   constructor(
     private workshopService: WorkshopService,
@@ -114,11 +123,11 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
         term.length < 1
           ? of([])
           : of(this.orders.filter(o =>
-              o.id.toString().includes(term.toLowerCase()) ||
-              (o.customer?.companyName || '').toLowerCase().includes(term.toLowerCase())
-            )).pipe(
-              map(results => results.slice(0, 10))
-            )
+            o.id.toString().includes(term.toLowerCase()) ||
+            (o.customer?.companyName || '').toLowerCase().includes(term.toLowerCase())
+          )).pipe(
+            map(results => results.slice(0, 10))
+          )
       ),
       catchError(() => of([]))
     );
@@ -130,7 +139,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   orderResultFormatter = (order: manufacturingOrder): string => {
     return `Orden #${order.id} — ${order.customer?.companyName || 'Cliente'}`;
   };
-  
+
   // ─── Fetch principal ─────────────────────────────────────────────────────
 
   onFiltersChange(): void {
@@ -200,21 +209,53 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   // ─── Renderizado ─────────────────────────────────────────────────────────
 
   renderAllCharts(): void {
-    if (!this.googleChartsLoaded || !this.hasData) return;
-    this.cdr.detectChanges();
-  }
+  if (!this.googleChartsLoaded || !this.hasData) return;
+
+  // 1. Forzamos el acoplamiento de estados en el ciclo de Angular
+  this.cdr.detectChanges();
+
+  // 2. Le damos un slot mínimo al event loop para asegurar que el DOM esté listo
+  setTimeout(() => {
+    if (this.chartDivs && this.chartDivs.length > 0) {
+      this.drawCharts(this.chartDivs.toArray());
+    }
+  }, 50);
+}
 
   private drawCharts(divs: ElementRef[]): void {
-    this.workshopBlocks.forEach((block, index) => {
-      const divRef = divs[index];
-      if (!divRef) return;
+  this.workshopBlocks.forEach((block, index) => {
+    const divRef = divs[index];
+    if (!divRef) return;
 
-      // Le pasamos el rango dinámico casteado
-      this.chartService.drawBlock(block, divRef.nativeElement, (block as any).timeRange);
-    });
-    this.renderingCharts = false;
-    this.cdr.detectChanges();
-  }
+    // 1. Limpieza física segura del contenedor para forzar un lienzo fresco
+    const container = divRef.nativeElement;
+    container.innerHTML = '';
+
+    // 2. Creamos un nodo hijo interno para que Google dibuje sin romper la referencia nativa de Angular
+    const chartTarget = document.createElement('div');
+    container.appendChild(chartTarget);
+
+    const currentShift = this.getShiftForWorkshop(block.workshopCode);
+    const range = this.SHIFT_RANGES[currentShift];
+
+    const shiftMin = new Date(this.selectedDate + 'T00:00:00');
+    shiftMin.setMinutes(shiftMin.getMinutes() + range.start);
+
+    const shiftMax = new Date(this.selectedDate + 'T00:00:00');
+    shiftMax.setMinutes(shiftMax.getMinutes() + range.end);
+
+    // 3. Pasamos el nuevo nodo hijo seguro al servicio
+    this.chartService.drawBlock(
+      block,
+      chartTarget,
+      (block as any).timeRange,
+      currentShift === 'all' ? null : { min: shiftMin, max: shiftMax }
+    );
+  });
+  
+  this.renderingCharts = false;
+  this.cdr.detectChanges();
+}
 
   // ─── Mapas de lookup ─────────────────────────────────────────────────────
 
@@ -444,6 +485,39 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   }
   // Control de Fechas
 
+  get ngbSelectedDate(): { year: number; month: number; day: number } {
+  // Si por alguna razón no hay fecha, caemos en el día de hoy de forma segura para que no chille Ng-Bootstrap
+  if (!this.selectedDate) {
+    const today = new Date();
+    return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+  }
+  const [year, month, day] = this.selectedDate.split('-').map(Number);
+  return { year, month, day };
+}
+
+  get isToday(): boolean {
+    return this.selectedDate === new Date().toISOString().split('T')[0];
+  }
+
+  // Arrow function obligatoria: ng-bootstrap llama esto sin contexto de clase
+  isDateDisabled = (date: NgbDateStruct): boolean => {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return !this.availableDates.includes(
+      `${date.year}-${pad(date.month)}-${pad(date.day)}`
+    );
+  };
+
+  onCalendarDateSelect(date: NgbDate, drop: any): void {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const str = `${date.year}-${pad(date.month)}-${pad(date.day)}`;
+    if (!this.availableDates.includes(str)) return;
+    this.selectedDate = str;
+    drop.close();
+    this.renderingCharts = true;
+    this.computeWorkshopBlocks();
+    this.renderAllCharts();
+  }
+
   get selectedDateIndex(): number {
     if (!this.selectedDate || this.availableDates.length === 0) return 0;
     return this.availableDates.indexOf(this.selectedDate) + 1;
@@ -462,6 +536,19 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     this.renderingCharts = true;
     this.computeWorkshopBlocks();
     this.renderAllCharts();
+  }
+
+  // Lógica de turnos
+  getShiftForWorkshop(workshopCode: string): string {
+    return this.selectedShifts[workshopCode] || 'all';
+  }
+
+  setShift(workshopCode: string, shift: string): void {
+    if (this.getShiftForWorkshop(workshopCode) === shift) return;
+    this.selectedShifts[workshopCode] = shift;
+
+    this.renderingCharts = true;
+    this.renderAllCharts(); // Fuerza el redibujado instantáneo
   }
 }
 

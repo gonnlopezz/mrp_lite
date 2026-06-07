@@ -126,22 +126,39 @@
                                 <i class="fas fa-chevron-left text-secondary" style="font-size: 1.2rem;"></i>
                             </button>
 
-                            <div class="position-relative">
-                                <div class="bg-light border border-light-subtle btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-                                    style="pointer-events: none; min-width: 140px;">
+                            <div ngbDropdown #calDrop="ngbDropdown" placement="bottom">
+
+                                <button ngbDropdownToggle class="bg-light border border-light-subtle btn-sm px-3 py-2 rounded-3
+                 d-flex align-items-center gap-3 shadow-none" style="min-width: 140px;">
                                     <span class="font-monospace fw-bold text-dark tracking-wider w-100 text-center"
                                         style="font-size: 0.9rem;">
                                         {{ selectedDate | date: 'dd/MM/yyyy' : 'UTC' }}
                                     </span>
                                     <i class="far fa-calendar-alt text-muted small"></i>
+                                </button>
+
+                                <div ngbDropdownMenu class="p-2 border-0 shadow rounded-3 mt-1">
+                                    <ngb-datepicker [markDisabled]="isDateDisabled" [startDate]="ngbSelectedDate"
+                                        (dateSelect)="onCalendarDateSelect($event, calDrop)">
+                                    </ngb-datepicker>
                                 </div>
+
                             </div>
 
-                            <button
-                                class="btn btn-outline-primary btn-sm rounded-2 px-3 fw-semibold ms-1 shadow-none transition-base"
-                                (click)="setToday()" style="font-size: 0.85rem;">
-                                Hoy
-                            </button>
+                            <ng-container *ngIf="!isToday; else todayBadge">
+                                <button
+                                    class="btn btn-outline-primary btn-sm rounded-2 px-3 fw-semibold ms-1 shadow-none transition-base"
+                                    (click)="setToday()" style="font-size: 0.85rem;">
+                                    Hoy
+                                </button>
+                            </ng-container>
+                            <ng-template #todayBadge>
+                                <span
+                                    class="badge bg-success-subtle text-success border border-success-subtle ms-1 px-2"
+                                    style="font-size: 0.72rem; padding-top: 6px; padding-bottom: 6px;">
+                                    ● Hoy
+                                </span>
+                            </ng-template>
 
                             <button
                                 class="btn btn-sm btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-none transition-base"
@@ -167,26 +184,58 @@
 
                     <!-- Bloque por taller -->
                     <div *ngFor="let block of workshopBlocks; let i = index"
-                        class="bg-white rounded-4 shadow-sm border mb-3">
+                        class="bg-white rounded-4 shadow-sm border mb-3 overflow-hidden">
 
-                        <!-- Header del taller -->
-                        <div class="d-flex align-items-center gap-2 px-4 py-3 border-bottom">
-                            <span class="badge bg-primary font-monospace">{{ block.workshopCode }}</span>
-                            <span class="fw-semibold text-dark">{{ block.workshopName }}</span>
-                            <div class="ms-auto d-flex gap-3">
-                                <span class="text-muted small" *ngIf="block.ordersOfTheDay.length > 0">
-                                    <i class="fas fa-file-invoice me-1"></i>
-                                    {{ block.ordersOfTheDay.length }}
-                                    {{ block.ordersOfTheDay.length === 1 ? 'pedido' : 'pedidos' }} planificado{{
-                                    block.ordersOfTheDay.length === 1 ? '' : 's' }}
-                                </span>
+                        <!-- 🔥 HEADER DEL TALLER CON FILTRO DE TURNOS CRONOLÓGICO INDEPENDIENTE -->
+                        <div class="bg-white border-bottom py-3 px-4 d-flex align-items-center gap-2 flex-wrap">
+                            <span class="badge bg-primary font-monospace px-2 py-1.5" style="font-size: 0.78rem;">
+                                {{ block.workshopCode }}
+                            </span>
+                            <span class="fw-bold text-dark" style="font-size: 1rem;">{{ block.workshopName }}</span>
+                            
+                            <div class="ms-auto d-flex align-items-center gap-3 flex-wrap">
+                                <div class="d-flex gap-3 text-muted small d-none d-md-flex me-2">
+                                    <span *ngIf="block.ordersOfTheDay.length > 0">
+                                        <i class="fas fa-file-invoice me-1"></i>
+                                        {{ block.ordersOfTheDay.length }} {{ block.ordersOfTheDay.length === 1 ? 'pedido' : 'pedidos' }}
+                                    </span>
+                                    <span *ngIf="getTotalProducts(block) > 0">
+                                        <i class="fas fa-cube me-1"></i>
+                                        {{ getTotalProducts(block) }} {{ getTotalProducts(block) === 1 ? 'producto' : 'productos' }}
+                                    </span>
+                                </div>
 
-                                <span class="text-muted small" *ngIf="getTotalProducts(block) > 0">
-                                    <i class="fas fa-cube me-1"></i>
-                                    {{ getTotalProducts(block) }}
-                                    {{ getTotalProducts(block) === 1 ? 'producto' : 'productos' }} planificado{{
-                                    getTotalProducts(block) === 1 ? '' : 's' }}
-                                </span>
+                                <!-- Selector de rango de 8 horas sin salto de medianoche -->
+                                <div class="btn-group btn-group-sm border rounded-3 overflow-hidden shadow-sm" role="group" aria-label="Filtro de Turnos">
+                                    <button type="button" class="btn btn-sm px-3 border-0"
+                                        [class.btn-primary]="getShiftForWorkshop(block.workshopCode) === 'all'"
+                                        [class.btn-light]="getShiftForWorkshop(block.workshopCode) !== 'all'"
+                                        [class.text-muted]="getShiftForWorkshop(block.workshopCode) !== 'all'"
+                                        (click)="setShift(block.workshopCode, 'all')">
+                                        Todo
+                                    </button>
+                                    <button type="button" class="btn btn-sm px-2.5 border-0"
+                                        [class.btn-primary]="getShiftForWorkshop(block.workshopCode) === 'night'"
+                                        [class.btn-light]="getShiftForWorkshop(block.workshopCode) !== 'night'"
+                                        [class.text-muted]="getShiftForWorkshop(block.workshopCode) !== 'night'"
+                                        (click)="setShift(block.workshopCode, 'night')">
+                                        Mañana
+                                    </button>
+                                    <button type="button" class="btn btn-sm px-2.5 border-0"
+                                        [class.btn-primary]="getShiftForWorkshop(block.workshopCode) === 'morning'"
+                                        [class.btn-light]="getShiftForWorkshop(block.workshopCode) !== 'morning'"
+                                        [class.text-muted]="getShiftForWorkshop(block.workshopCode) !== 'morning'"
+                                        (click)="setShift(block.workshopCode, 'morning')">
+                                        Tarde
+                                    </button>
+                                    <button type="button" class="btn btn-sm px-2.5 border-0"
+                                        [class.btn-primary]="getShiftForWorkshop(block.workshopCode) === 'afternoon'"
+                                        [class.btn-light]="getShiftForWorkshop(block.workshopCode) !== 'afternoon'"
+                                        [class.text-muted]="getShiftForWorkshop(block.workshopCode) !== 'afternoon'"
+                                        (click)="setShift(block.workshopCode, 'afternoon')">
+                                        Noche
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
