@@ -203,6 +203,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     this.selectedOrderId = '';
     this.selectedOrderObject = null; // <-- Limpieza física del input text
     this.selectedDate = '';
+    this.selectedShifts = {};
     this.onFiltersChange();
   }
 
