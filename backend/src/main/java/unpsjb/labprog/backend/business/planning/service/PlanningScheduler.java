@@ -90,8 +90,8 @@ public class PlanningScheduler {
             } catch (BusinessException e) {
                 order.markAsUnschedulable(e.getMessage(), null);
             }
-            orderService.save(order);
         }
+        orderService.saveAll(orders);
         return result;
     }
 

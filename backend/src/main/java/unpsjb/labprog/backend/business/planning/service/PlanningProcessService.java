@@ -56,9 +56,7 @@ public class PlanningProcessService {
     }
 
     public List<PlanningProcess> findAll() {
-        List<PlanningProcess> result = new ArrayList<>();
-        repository.findAll().forEach(e -> result.add(e));
-        return result;
+        return repository.findAll();
     }
 
     public Page<PlanningProcess> findByPage(int page, int size) {

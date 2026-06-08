@@ -65,6 +65,11 @@ public class ManufacturingOrderService {
     }
 
     @Transactional
+    public List<ManufacturingOrder> saveAll(List<ManufacturingOrder> orders) {
+        return repository.saveAll(orders);
+    }
+
+    @Transactional
     public void delete(long id) {
         repository.deleteById(id);
     }
