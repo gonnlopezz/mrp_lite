@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { CustomerService } from './customer.service';
+import { ClienteService } from './cliente.service';
 import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { RouterModule } from '@angular/router';
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
-import { Customer } from './customer';
+import { Cliente } from './customer';
 
 @Component({
   selector: 'app-customers',
@@ -21,13 +21,13 @@ export class CustomersComponent {
   searchTerm: string = '';
 
   constructor(
-    private customerService: CustomerService,
+    private clienteService: ClienteService,
     private modalService: NgbModal,
     private cdr: ChangeDetectorRef
   ) { }
 
   getCustomers(): void {
-    this.customerService.byPage(this.currentPage, 10).subscribe(dataPackage => {
+    this.clienteService.byPage(this.currentPage, 10).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });
@@ -41,7 +41,7 @@ export class CustomersComponent {
     }
 
     this.currentPage = 1;
-    this.customerService.search(this.searchTerm, this.currentPage, 10).subscribe(dataPackage => {
+    this.clienteService.search(this.searchTerm, this.currentPage, 10).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });
@@ -71,7 +71,7 @@ export class CustomersComponent {
 
     modalRef.result.then((result) => {
       if (result) {
-        this.customerService.delete(id).subscribe(() => {
+        this.clienteService.delete(id).subscribe(() => {
           this.getCustomers();
         });
       }

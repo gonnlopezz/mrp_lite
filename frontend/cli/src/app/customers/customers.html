@@ -53,31 +53,31 @@
                 </thead>
 
                 <tbody>
-                    <tr *ngFor="let customer of resultsPage.content" class="animate__fadeIn">
+                    <tr *ngFor="let cliente of resultsPage.content" class="animate__fadeIn">
                         <td>
                             <div class="d-flex align-items-center">
                                 <div class="dot"></div>
-                                <span class="fw-semibold text-steel">{{ customer.companyName }}</span>
+                                <span class="fw-semibold text-steel">{{ cliente.razónSocial }}</span>
                             </div>
                         </td>
                         <td>
                             <span class="text-secondary font-monospace" style="font-size: 0.8rem;">
-                                {{ customer.cuit }}
+                                {{ cliente.cuit }}
                             </span>
                         </td>
                         <td>
                             <span class="text-muted text-truncate d-inline-block" style="max-width: 200px;">
-                                {{ customer.observations || '-' }}
+                                {{ cliente.observaciones || '-' }}
                             </span>
                         </td>
                         <td class="text-end">
                             <div class="d-flex justify-content-end gap-1">
-                                <a [routerLink]="['/customers', customer.id]" class="btn-icon hover-primary"
+                                <a [routerLink]="['/customers', cliente.id]" class="btn-icon hover-primary"
                                     title="Editar">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
 
-                                <button (click)="delete(customer.id)" class="btn-icon hover-danger" title="Eliminar">
+                                <button (click)="delete(cliente.id)" class="btn-icon hover-danger" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

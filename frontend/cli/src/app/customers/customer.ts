@@ -1,6 +1,6 @@
-export interface Customer {
+export interface Cliente {
     id: number;
     cuit: number;
-    companyName: string;
-    observations: string;
+    razónSocial: string;
+    observaciones: string;
 }

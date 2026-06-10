@@ -16,7 +16,7 @@ import unpsjb.labprog.backend.model.EstadoPedido;
 public interface PedidoRepository
                 extends JpaRepository<Pedido, Long> {
         @Query("SELECT o FROM Pedido o " +
-                        "Where o.cliente.razónSocial ILIKE CONCAT('%', :term, '%') " +
+                        "Where o.cliente.razonSocial ILIKE CONCAT('%', :term, '%') " +
                         "OR o.producto.nombre ILIKE CONCAT('%', :term, '%')")
         public Page<Pedido> search(String term, Pageable pageable);
 

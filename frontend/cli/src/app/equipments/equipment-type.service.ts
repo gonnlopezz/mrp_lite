@@ -2,35 +2,35 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { DataPackage } from '../data-package';
-import { EquipmentType } from './equipment-type';
+import { TipoEquipo } from './equipment-type';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EquipmentTypeService {
+export class TipoEquipoService {
 
 
-  private equipmentTypesUrl = "rest/equipment-types";
+  private tipoEquiposUrl = "rest/equipment-types";
   constructor(private http: HttpClient) { }
 
   all(): Observable<DataPackage> {
-    return this.http.get<DataPackage>(this.equipmentTypesUrl);
+    return this.http.get<DataPackage>(this.tipoEquiposUrl);
   }
 
   byPage(page: number, size: number): Observable<DataPackage> {
-    return this.http.get<DataPackage>(`${this.equipmentTypesUrl}/page?page=${page - 1}&size=${size}`);
+    return this.http.get<DataPackage>(`${this.tipoEquiposUrl}/page?page=${page - 1}&size=${size}`);
   }
 
   get(id: string): Observable<DataPackage> {
-    return this.http.get<DataPackage>(`${this.equipmentTypesUrl}/id/${id}`);
+    return this.http.get<DataPackage>(`${this.tipoEquiposUrl}/id/${id}`);
   }
 
-  save(equipmentType: EquipmentType): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.equipmentTypesUrl, equipmentType);
+  save(tipoEquipo: TipoEquipo): Observable<DataPackage> {
+    return this.http.post<DataPackage>(this.tipoEquiposUrl, tipoEquipo);
   }
 
   delete(id: number): Observable<DataPackage> {
-    return this.http.delete<DataPackage>(`${this.equipmentTypesUrl}/id/${id}`);
+    return this.http.delete<DataPackage>(`${this.tipoEquiposUrl}/id/${id}`);
   }
 
 

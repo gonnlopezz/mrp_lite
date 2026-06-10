@@ -36,7 +36,7 @@
         <div class="row g-3">
           <div class="col-md-5">
             <label class="label-caps mb-1">Nombre</label>
-            <input type="text" name="name" [(ngModel)]="product.name" class="form-control form-control-sm bg-white"
+            <input type="text" name="name" [(ngModel)]="product.nombre" class="form-control form-control-sm bg-white"
               placeholder="Ej: Producto de ejemplo" required #nameInput="ngModel" [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
             <div class="error-container">
               <div class="error-feedback" *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
@@ -69,7 +69,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngIf="!product?.tasks || product?.tasks?.length === 0">
+            <tr *ngIf="!product?.tareas || product?.tareas?.length === 0">
               <td colspan="4" class="text-center py-5">
                 <div class="text-muted">
                   <i class="fas fa-tasks fs-3 mb-2 opacity-50"></i>
@@ -78,12 +78,12 @@
               </td>
             </tr>
 
-            <tr *ngFor="let task of product.tasks; let i = index" class="animate__fadeIn">
-              <td class="fw-semibold text-steel">{{ task.name }}</td>
-              <td class="fw-semibold text-steel">{{ task.duration }}</td>
-              <td><span class="badge bg-light text-dark border px-2">{{ task.type.name }}</span></td>
+            <tr *ngFor="let task of product.tareas; let i = index" class="animate__fadeIn">
+              <td class="fw-semibold text-steel">{{ task.nombre }}</td>
+              <td class="fw-semibold text-steel">{{ task.tiempo }}</td>
+              <td><span class="badge bg-light text-dark border px-2">{{ task.type.nombre }}</span></td>
               <td class="text-end">
-                <button type="button" class="btn-icon hover-danger" (click)="product.tasks.splice(i, 1)">
+                <button type="button" class="btn-icon hover-danger" (click)="product.tareas.splice(i, 1)">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
@@ -106,7 +106,7 @@
         <div class="row g-3 align-items-center">
           <div class="col-md-5">
             <label class="label-caps mb-1">Nombre</label>
-            <input required type="text" class="form-control form-control-sm bg-white" placeholder="Ej: Cortar patatas" [(ngModel)]="newTask.name" name="taskName" #taskNameInput="ngModel" [class.is-invalid]="taskNameInput.invalid && taskNameInput.touched">
+            <input required type="text" class="form-control form-control-sm bg-white" placeholder="Ej: Cortar patatas" [(ngModel)]="newTask.nombre" name="taskName" #taskNameInput="ngModel" [class.is-invalid]="taskNameInput.invalid && taskNameInput.touched">
             <div class="error-container">
               <div class="error-feedback" *ngIf="taskNameInput.invalid && taskNameInput.touched">
                 <i class="fa fa-exclamation-triangle"></i> El nombre de la tarea es obligatorio.
@@ -115,7 +115,7 @@
           </div>
           <div class="col-md-2">
             <label class="label-caps mb-1">Duración</label>
-            <input required type="number" class="form-control form-control-sm bg-white" placeholder="Ej: 30" [(ngModel)]="newTask.duration" name="taskDuration" #taskDurationInput="ngModel" [class.is-invalid]="taskDurationInput.invalid && taskDurationInput.touched">
+            <input required type="number" class="form-control form-control-sm bg-white" placeholder="Ej: 30" [(ngModel)]="newTask.tiempo" name="taskDuration" #taskDurationInput="ngModel" [class.is-invalid]="taskDurationInput.invalid && taskDurationInput.touched">
             <div class="error-container">
               <div class="error-feedback" *ngIf="taskDurationInput.invalid && taskDurationInput.touched">
                 <i class="fa fa-exclamation-triangle"></i> La duración de la tarea es obligatoria.

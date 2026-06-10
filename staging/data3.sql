@@ -1,7 +1,7 @@
 TRUNCATE TABLE cliente RESTART IDENTITY CASCADE;
 TRUNCATE TABLE planificacion RESTART IDENTITY CASCADE;
 TRUNCATE TABLE proceso_planificacion RESTART IDENTITY CASCADE;
-TRUNCATE TABLE pedido_fabricacion RESTART IDENTITY CASCADE;
+TRUNCATE TABLE pedido RESTART IDENTITY CASCADE;
 
 DO $$
 DECLARE
@@ -45,7 +45,7 @@ BEGIN
         -- Cantidades controladas variables (entre 2 y 35 unidades) para saturar talleres progresivamente
         v_quantity := (i * 13) % 34 + 2;
 
-        INSERT INTO pedido_fabricacion (id, fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
+        INSERT INTO pedido (id, fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
         VALUES (
             2000 + i, 
             v_order_date, 

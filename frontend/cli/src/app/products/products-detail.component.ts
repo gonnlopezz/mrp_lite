@@ -1,12 +1,12 @@
 import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Product } from './product';
+import { Producto } from './product';
 import { productService } from './product.service';
-import { Task } from './task';
+import { Tarea } from './task';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { EquipmentType } from '../equipments/equipment-type';
+import { TipoEquipo } from '../equipments/equipment-type';
 import { EquipmentTypeService } from '../equipments/equipment-type.service';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
@@ -19,15 +19,15 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from '
   styles: ``
 })
 export class ProductsDetailComponent {
-  product!: Product;
+  product!: Producto;
   showTaskForm: boolean = false;
-  equipmentTypes!: EquipmentType[];
-  newTask!: Task;
-  selectedEquipmentType: EquipmentType | null = null;
+  equipmentTypes!: TipoEquipo[];
+  newTask!: Tarea;
+  selectedEquipmentType: TipoEquipo | null = null;
 
   constructor(
     private productService: productService,
-    private equipmentTypeService: EquipmentTypeService,
+    private equipmentTypeService: TipoEquipoService,
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
@@ -38,17 +38,17 @@ export class ProductsDetailComponent {
   getProduct(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if(id === 'new' || !id) {
-      this.product = <Product>{ name: "", tasks: <Task[]>[] };
+      this.producto = <Producto>{ nombre: "", tareas: <Tarea[]>[] };
     } else {
-      this.productService.get(id).subscribe(dataPackage => {
-        this.product = <Product>dataPackage.data;
+      this.productoService.get(id).subscribe(dataPackage => {
+        this.producto = <Producto>dataPackage.data;
       });
     }
   }
 
   getEquipmentTypes(): void {
-    this.equipmentTypeService.all().subscribe(dataPackage => {
-      this.equipmentTypes = <EquipmentType[]>dataPackage.data;
+    this.equipoTypeService.all().subscribe(dataPackage => {
+      this.equipoTypes = <TipoEquipo[]>dataPackage.data;
     });
   }
 
@@ -59,8 +59,8 @@ export class ProductsDetailComponent {
       switchMap(term =>
         term.length < 1
           ? of([])
-          : of(this.equipmentTypes.filter(et =>
-            et.name.toLowerCase().includes(term.toLowerCase())
+          : of(this.equipoTypes.filter(et =>
+            et.nombre.toLowerCase().includes(term.toLowerCase())
           )).pipe(
             map(results => results.slice(0, 10))
           )
@@ -68,38 +68,38 @@ export class ProductsDetailComponent {
       catchError(() => of([]))
     );
 
-  equipmentTypeInputFormatter = (type: EquipmentType): string => {
-    return type?.name ? type.name : '';
+  equipmentTypeInputFormatter = (type: TipoEquipo): string => {
+    return type?.name ? type.nombre : '';
   };
 
-  equipmentTypeResultFormatter = (type: EquipmentType): string => {
-    return type.name;
+  equipmentTypeResultFormatter = (type: TipoEquipo): string => {
+    return type.nombre;
   };
 
-  onEquipmentTypeSelected(type: EquipmentType): void {
+  onEquipmentTypeSelected(type: TipoEquipo): void {
     this.selectedEquipmentType = type;
     this.newTask.type = type;
     this.cdr.markForCheck();
   }
 
   openTaskForm(): void {
-    this.newTask = {name: "", duration: 0, type: { name: ""}} as Task;
+    this.newTask = {nombre: "", duration: 0, type: { nombre: ""}} as Task;
     this.selectedEquipmentType = null;
     this.showTaskForm = true;
   }
 
   addTask(): void {
-    this.product.tasks.push(this.newTask);
+    this.producto.tareas.push(this.newTask);
     this.showTaskForm = false;
   }
 
   save(): void {
-    this.productService.save(this.product).subscribe(dataPackage => {
-      this.product = <Product>dataPackage.data;
+    this.productoService.save(this.producto).subscribe(dataPackage => {
+      this.producto = <Producto>dataPackage.data;
       this.cdr.markForCheck();
 
       this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
-        this.router.navigate(["/products/", + this.product.id]);
+        this.router.navigate(["/products/", + this.producto.id]);
 
         this.toastr.success('Producto guardado con éxito!', 'Éxito');
 

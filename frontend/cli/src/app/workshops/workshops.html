@@ -54,18 +54,18 @@
                 <tbody>
                     <ng-container *ngFor="let workshop of resultsPage.content">
                         <tr class="animate__fadeIn">
-                            <td><span class="text-primary fw-bold font-monospace">{{ workshop.code }}</span></td>
+                            <td><span class="text-primary fw-bold font-monospace">{{ workshop.código }}</span></td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="dot"></div>
-                                    <span class="fw-semibold text-steel">{{ workshop.name }}</span>
+                                    <span class="fw-semibold text-steel">{{ workshop.nombre }}</span>
                                 </div>
                             </td>
                             <td>
                                 <span class="badge-soft-secondary">
                                     <i class="fas fa-microchip me-1"></i>
-                                    {{ workshop.equipments?.length || 0 }}
-                                    {{ workshop.equipments?.length === 1 ? 'equipo' : 'equipos' }}
+                                    {{ workshop.equipos?.length || 0 }}
+                                    {{ workshop.equipos?.length === 1 ? 'equipo' : 'equipos' }}
                                 </span>
                             </td>
                             <td class="text-end">
@@ -92,13 +92,13 @@
                                     <h6 class="label-detail mb-3">Equipamiento Asignado</h6>
 
                                     <div class="d-flex flex-wrap gap-2">
-                                        <div *ngFor="let eq of workshop.equipments" class="equipment-card">
+                                        <div *ngFor="let eq of workshop.equipos" class="equipment-card">
                                             <i class="fas fa-tools text-muted" style="font-size: 0.75rem;"></i>
-                                            <span class="text-steel fw-semibold small">{{ eq.code }}</span>
-                                            <span class="text-primary small fw-bold">| {{ eq.capacity }}</span>
+                                            <span class="text-steel fw-semibold small">{{ eq.código }}</span>
+                                            <span class="text-primary small fw-bold">| {{ eq.capacidad }}</span>
                                         </div>
 
-                                        <div *ngIf="!workshop.equipments || workshop.equipments.length === 0"
+                                        <div *ngIf="!workshop.equipos || workshop.equipos.length === 0"
                                             class="text-muted small italic py-2">
                                             <i class="fas fa-info-circle me-1"></i> Sin equipos registrados.
                                         </div>

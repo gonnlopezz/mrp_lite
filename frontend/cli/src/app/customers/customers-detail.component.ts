@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Customer } from './customer';
+import { Cliente } from './customer';
 import { CommonModule, Location, UpperCasePipe } from '@angular/common';
-import { CustomerService } from './customer.service';
+import { ClienteService } from './cliente.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
@@ -15,11 +15,11 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CustomersDetailComponent {
 
-  customer!: Customer;
+  cliente!: Cliente;
 
 
   constructor(
-    private customerService: CustomerService,
+    private clienteService: ClienteService,
     private location: Location,
     private route: ActivatedRoute,
     private router: Router,
@@ -39,10 +39,10 @@ export class CustomersDetailComponent {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id === 'new' || !id) {
-      this.customer = <Customer>{ cuit: null as unknown as number, companyName: "", observations: "" };
+      this.cliente = <Cliente>{ cuit: null as unknown as number, razónSocial: "", observaciones: "" };
     } else {
-      this.customerService.get(id).subscribe(dataPackage => {
-        this.customer = <Customer>dataPackage.data;
+      this.clienteService.get(id).subscribe(dataPackage => {
+        this.cliente = <Cliente>dataPackage.data;
         this.cdr.markForCheck();
       });
     }
@@ -50,13 +50,13 @@ export class CustomersDetailComponent {
 
 
   save(): void {
-    this.customerService.save(this.customer).subscribe(dataPackage => {
-      this.customer = <Customer>dataPackage.data;
+    this.clienteService.save(this.cliente).subscribe(dataPackage => {
+      this.cliente = <Cliente>dataPackage.data;
 
       this.cdr.markForCheck();
 
       this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
-        this.router.navigate(["/customers/", + this.customer.id]);
+        this.router.navigate(["/customers/", + this.cliente.id]);
 
         this.toastr.success('¡Cliente guardado con éxito!', 'Éxito');
 
@@ -81,7 +81,7 @@ export class CustomersDetailComponent {
 
     const soloNumeros = value.replace(/\D/g, '');
 
-    this.customer.cuit = Number(soloNumeros.slice(0, 11));
+    this.cliente.cuit = Number(soloNumeros.slice(0, 11));
 
     this.cdr.markForCheck();
   }

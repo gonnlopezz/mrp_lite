@@ -36,7 +36,7 @@
         <div class="row g-3">
           <div class="col-md-3">
             <label class="label-caps mb-1">Código</label>
-            <input type="text" name="code" [(ngModel)]="workshop.code" class="form-control form-control-sm bg-white" placeholder="Ej: ALFA" required #codeInput="ngModel" [class.is-invalid]="codeInput.invalid && (codeInput.dirty || codeInput.touched)">
+            <input type="text" name="code" [(ngModel)]="workshop.código" class="form-control form-control-sm bg-white" placeholder="Ej: ALFA" required #codeInput="ngModel" [class.is-invalid]="codeInput.invalid && (codeInput.dirty || codeInput.touched)">
             <div class="error-container">
               <div class="error-feedback" *ngIf="codeInput.invalid && (codeInput.dirty || codeInput.touched)">
                 <i class="fa fa-exclamation-triangle"></i> El código del taller es obligatorio.
@@ -45,7 +45,7 @@
           </div>
           <div class="col-md-9">
             <label class="label-caps mb-1">Nombre</label>
-            <input type="text" name="name" [(ngModel)]="workshop.name" class="form-control form-control-sm bg-white"
+            <input type="text" name="name" [(ngModel)]="workshop.nombre" class="form-control form-control-sm bg-white"
               placeholder="Ej: Taller Alfa para mantenimiento de maquinaria pesada" required #nameInput="ngModel" [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
             <div class="error-container">
               <div class="error-feedback" *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
@@ -78,7 +78,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngIf="!workshop?.equipments || workshop?.equipments?.length === 0">
+            <tr *ngIf="!workshop?.equipos || workshop?.equipos?.length === 0">
               <td colspan="4" class="text-center py-5">
                 <div class="text-muted">
                   <i class="fas fa-microchip fs-3 mb-2 opacity-50"></i>
@@ -87,12 +87,12 @@
               </td>
             </tr>
 
-            <tr *ngFor="let eq of workshop.equipments; let i = index" class="animate__fadeIn">
-              <td><span class="text-primary fw-bold font-monospace">{{ eq.code }}</span></td>
-              <td class="fw-semibold text-steel">{{ eq.type.name }}</td>
-              <td><span class="badge bg-light text-dark border px-2">{{ eq.capacity }}</span></td>
+            <tr *ngFor="let eq of workshop.equipos; let i = index" class="animate__fadeIn">
+              <td><span class="text-primary fw-bold font-monospace">{{ eq.código }}</span></td>
+              <td class="fw-semibold text-steel">{{ eq.type.nombre }}</td>
+              <td><span class="badge bg-light text-dark border px-2">{{ eq.capacidad }}</span></td>
               <td class="text-end">
-                <button type="button" class="btn-icon hover-danger" (click)="workshop.equipments.splice(i, 1)">
+                <button type="button" class="btn-icon hover-danger" (click)="workshop.equipos.splice(i, 1)">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
@@ -115,7 +115,7 @@
         <div class="row g-3 align-items-center">
           <div class="col-md-4">
             <label class="label-caps mb-1">Nombre / Código</label>
-            <input required type="text" class="form-control form-control-sm bg-white" placeholder="Ej: Sierra Circular" [(ngModel)]="newEquipment.code" name="equipmentCode" #eqCodeInput="ngModel" [class.is-invalid]="eqCodeInput.invalid && eqCodeInput.touched">
+            <input required type="text" class="form-control form-control-sm bg-white" placeholder="Ej: Sierra Circular" [(ngModel)]="newEquipment.código" name="equipmentCode" #eqCodeInput="ngModel" [class.is-invalid]="eqCodeInput.invalid && eqCodeInput.touched">
             <div class="error-container">
               <div class="error-feedback" *ngIf="eqCodeInput.invalid && eqCodeInput.touched">
                 <i class="fa fa-exclamation-triangle"></i> El código del equipo es obligatorio.
@@ -137,7 +137,7 @@
           </div>
           <div class="col-md-3">
             <label class="label-caps mb-1">Capacidad</label>
-            <input required type="number" step="1" min="1" class="form-control form-control-sm bg-white" placeholder="1" [(ngModel)]="newEquipment.capacity" name="equipmentCapacity" #eqCapacityInput="ngModel" [class.is-invalid]="eqCapacityInput.invalid && eqCapacityInput.touched">
+            <input required type="number" step="1" min="1" class="form-control form-control-sm bg-white" placeholder="1" [(ngModel)]="newEquipment.capacidad" name="equipmentCapacity" #eqCapacityInput="ngModel" [class.is-invalid]="eqCapacityInput.invalid && eqCapacityInput.touched">
             <div class="error-container">
               <div class="error-feedback" *ngIf="eqCapacityInput.invalid && eqCapacityInput.touched">
                 <span *ngIf="eqCapacityInput.errors?.['required']">

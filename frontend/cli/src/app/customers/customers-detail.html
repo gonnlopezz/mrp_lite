@@ -1,4 +1,4 @@
-<div class="container py-3" *ngIf="customer">
+<div class="container py-3" *ngIf="cliente">
 
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
@@ -11,7 +11,7 @@
         <a routerLink="/customers" class="text-decoration-none link-color text-slate transition-base">Clientes</a>
       </li>
       <li class="breadcrumb-item active fw-semibold text-steel" aria-current="page">
-        {{ customer.id ? 'Editar Cliente' : 'Nuevo Cliente' }}
+        {{ cliente.id ? 'Editar Cliente' : 'Nuevo Cliente' }}
       </li>
     </ol>
   </nav>
@@ -21,13 +21,13 @@
       <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
         <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2 d-flex align-items-center">
-          <i class="fas {{ customer.id ? 'fa-pen-to-square' : 'fa-building-user' }} me-3 fs-4 text-steel"></i>
+          <i class="fas {{ cliente.id ? 'fa-pen-to-square' : 'fa-building-user' }} me-3 fs-4 text-steel"></i>
           <div>
             <h5 class="mb-0 fw-bold text-steel tracking-tight">
-              {{ customer.id ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}
+              {{ cliente.id ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}
             </h5>
             <p class="text-muted mb-0" style="font-size: 0.8rem;">
-              {{ customer.id ? 'ID Cliente: #' + customer.id : 'Ingrese la información fiscal requerida.' }}
+              {{ cliente.id ? 'ID Cliente: #' + cliente.id : 'Ingrese la información fiscal requerida.' }}
             </p>
           </div>
         </div>
@@ -38,17 +38,17 @@
               <div class="col-md-5">
                 <label class="label-caps mb-1 d-block">CUIT / Identificación</label>
                 <input type="text" class="form-control form-control-sm bg-white" required id="inputCuit" name="cuit"
-                  placeholder="XX-XXXXXXXX-X" [ngModel]="formatCuit(customer.cuit)"
+                  placeholder="XX-XXXXXXXX-X" [ngModel]="formatCuit(cliente.cuit)"
                   (ngModelChange)="onCuitChange($event)" minlength="13" maxlength="13" #cuitInput="ngModel"
-                  [class.is-invalid]="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && cuitInput.touched">
+                  [class.is-invalid]="(cuitInput.invalid || (cliente.cuit && cliente.cuit.toString().length !== 11)) && cuitInput.touched">
 
                 <div class="error-container">
                   <div class="error-feedback"
-                    *ngIf="(cuitInput.invalid || (customer.cuit && customer.cuit.toString().length !== 11)) && cuitInput.touched">
+                    *ngIf="(cuitInput.invalid || (cliente.cuit && cliente.cuit.toString().length !== 11)) && cuitInput.touched">
                     <span *ngIf="cuitInput.errors?.['required']">
                       <i class="fa fa-exclamation-triangle"></i> El CUIT es obligatorio.
                     </span>
-                    <span *ngIf="!cuitInput.errors?.['required'] && customer.cuit?.toString()?.length !== 11">
+                    <span *ngIf="!cuitInput.errors?.['required'] && cliente.cuit?.toString()?.length !== 11">
                       <i class="fa fa-info-circle"></i> Debe tener 11 dígitos.
                     </span>
                   </div>
@@ -58,7 +58,7 @@
               <div class="col-md-7">
                 <label class="label-caps mb-1 d-block">Razón Social</label>
                 <input type="text" class="form-control form-control-sm bg-white" name="companyName"
-                  [(ngModel)]="customer.companyName" placeholder="Ej: Metalúrgica Industrial S.A." required
+                  [(ngModel)]="cliente.razónSocial" placeholder="Ej: Metalúrgica Industrial S.A." required
                   #nameInput="ngModel" [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
 
                 <div class="error-container">
@@ -74,7 +74,7 @@
                   <span class="badge-soft-secondary" style="font-size: 0.65rem;">OPCIONAL</span>
                 </div>
                 <textarea class="form-control form-control-sm bg-white" rows="4" name="observations"
-                  [(ngModel)]="customer.observations"
+                  [(ngModel)]="cliente.observaciones"
                   placeholder="Horarios de entrega, contactos de compras, requisitos de seguridad..."></textarea>
               </div>
 
@@ -90,8 +90,8 @@
 
               <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save()"
                 [disabled]="customerForm.invalid" style="font-size: 0.85rem;">
-                <i class="fas {{ customer.id ? 'fa-save' : 'fa-check-circle' }} me-2"></i>
-                {{ customer.id ? 'Guardar Cambios' : 'Confirmar Alta' }}
+                <i class="fas {{ cliente.id ? 'fa-save' : 'fa-check-circle' }} me-2"></i>
+                {{ cliente.id ? 'Guardar Cambios' : 'Confirmar Alta' }}
               </button>
             </div>
           </form>

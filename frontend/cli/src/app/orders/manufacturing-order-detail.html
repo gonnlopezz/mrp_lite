@@ -62,7 +62,7 @@
               <!-- Fecha Pedido -->
               <div class="col-md-6 mb-3">
                 <label class="form-label small fw-bold text-secondary mb-1">Fecha de Pedido</label>
-                <input type="date" class="form-control rounded-3 bg-light" [(ngModel)]="order.orderDate"
+                <input type="date" class="form-control rounded-3 bg-light" [(ngModel)]="order.fechaPedido"
                   name="orderDate" readonly />
               </div>
 
@@ -70,7 +70,7 @@
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Fecha de Entrega</label>
                 <input type="date" class="form-control form-control-sm bg-white" required name="deliveryDate"
-                  [(ngModel)]="order.deliveryDate" #deliveryDateInput="ngModel"
+                  [(ngModel)]="order.fechaEntrega" #deliveryDateInput="ngModel"
                   [class.is-invalid]="deliveryDateInput.invalid && deliveryDateInput.touched">
 
                 <div class="error-container">
@@ -100,7 +100,7 @@
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Cantidad</label>
                 <input type="number" class="form-control form-control-sm bg-white" required name="quantity" min="1"
-                  [(ngModel)]="order.quantity" #quantityInput="ngModel"
+                  [(ngModel)]="order.cantidad" #quantityInput="ngModel"
                   [class.is-invalid]="quantityInput.invalid && quantityInput.touched">
 
                 <div class="error-container">
@@ -114,7 +114,7 @@
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Estado</label>
                 <input type="text" class="form-control form-control-sm bg-light" disabled
-                  [value]="order.state || 'PENDIENTE'">
+                  [value]="order.estado || 'PENDIENTE'">
               </div>
 
               <hr class="my-4" style="border-top: 1px solid #f1f5f9; opacity: 1;">

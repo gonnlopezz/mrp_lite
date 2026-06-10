@@ -1,19 +1,19 @@
-import { Period } from './period';
-import { Task } from '../products/task';
-import { Equipment } from '../equipments/equipment';
-import { manufacturingOrder } from '../orders/manufacturingOrder';
+import { Periodo } from './period';
+import { Tarea } from '../products/task';
+import { Equipo } from '../equipments/equipment';
+import { PedidoFabricacion } from '../orders/manufacturingOrder';
 
-export interface Planning {
+export interface Planificacion {
   id: number;
-  period: Period;
-  task: Task;
-  equipment: Equipment;
+  periodo: Periodoo;
+  tarea: Tarea;
+  equipo: Equipo;
 }
 
-export interface PlanningProcess {
+export interface ProcesoPlanificacion {
   id: number;
-  start: string;
-  endDate: string;
-  order: manufacturingOrder;
-  plannings: Planning[];
+  inicio: string;
+  fin: string;
+  pedido: PedidoFabricacion;
+  planificaciones: Planificacion[];
 }

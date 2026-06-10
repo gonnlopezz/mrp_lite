@@ -1,10 +1,10 @@
 
-export interface Equipment {
+export interface Equipo {
     id: number;
-    code: string;
-    capacity: number;
-    type: {
+    código: string;
+    capacidad: number;
+    tipo: {
         id?: number;
-        name: string;       
+        nombre: string;       
     };
 }

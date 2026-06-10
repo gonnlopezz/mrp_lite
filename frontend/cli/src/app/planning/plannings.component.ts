@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Planning, PlanningProcess } from '../planning/planning';
 import { WorkshopService } from '../workshops/workshop.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Workshop } from '../workshops/workshop';
-import { Equipment } from '../equipments/equipment';
-import { manufacturingOrder } from '../orders/manufacturingOrder';
+import { Taller } from '../workshops/workshop';
+import { Equipo } from '../equipments/equipment';
+import { PedidoFabricacion } from '../orders/manufacturingOrder';
 import { OrderService } from '../orders/manufacturing-order.service';
 declare var google: any;
 
@@ -19,9 +19,9 @@ export class PlanningComponent implements OnInit {
     @ViewChild('chartDiv') chartDiv!: ElementRef;
     private chart: any;
 
-    planningProcesses: PlanningProcess[] = [];
-    order?: manufacturingOrder;
-    workshop?: Workshop;
+    planningProcesses: PlanificacionProcess[] = [];
+    order?: PedidoFabricacion;
+    workshop?: Taller;
     loading = true;
     availableDates: string[] = []; // Guardará formatos "2026-05-22"
     selectedDate: string = '';
@@ -34,7 +34,7 @@ export class PlanningComponent implements OnInit {
     entityCode = '';
 
     constructor(
-        private workshopService: WorkshopService,
+        private workshopService: TallerService,
         private orderService: OrderService,
         private route: ActivatedRoute
     ) { }
@@ -63,16 +63,16 @@ export class PlanningComponent implements OnInit {
 
         if (this.isOrderContext) {
             this.orderService.get(id).subscribe((dataPackage: any) => {
-                const order = <manufacturingOrder>dataPackage.data;
+                const order = <PedidoFabricacion>dataPackage.data;
                 this.order = order;
-                this.entityName = `Pedido de ${order.customer?.companyName}`;
+                this.entityName = `Pedido de ${order.cliente?.razónSocial}`;
                 this.entityCode = `Orden #${order.id}`;
             });
         } else {
             this.workshopService.get(id).subscribe((dataPackage: any) => {
-                const workshop = <Workshop>dataPackage.data;
-                this.entityName = workshop.name;
-                this.entityCode = workshop.code;
+                const workshop = <Taller>dataPackage.data;
+                this.entityName = workshop.nombre;
+                this.entityCode = workshop.código;
             });
         }
     }
@@ -90,8 +90,8 @@ export class PlanningComponent implements OnInit {
 
                 // Extraemos las fechas disponibles para el filtro// 1. EXTRAER FECHAS PRIMERO
                 const dates = new Set<string>();
-                this.planningProcesses.forEach(p => p.plannings.forEach(pl => {
-                    dates.add(pl.period.start.split('T')[0]);
+                this.planningProcesses.forEach(p => p.planificaciones.forEach(pl => {
+                    dates.add(pl.periodo.inicio.split('T')[0]);
                 }));
                 this.availableDates = Array.from(dates).sort();
 
@@ -138,18 +138,18 @@ export class PlanningComponent implements OnInit {
 
             const processLabel = `Proceso #${process.id}`;
 
-            process.plannings.forEach(planning => {
-                const start = new Date(planning.period.start);
-                const end = new Date(planning.period.endDate);
+            process.planificaciones.forEach(planning => {
+                const start = new Date(planning.periodo.inicio);
+                const end = new Date(planning.periodo.fin);
 
-                const startDateStr = planning.period.start.split('T')[0];
+                const startDateStr = planning.periodo.inicio.split('T')[0];
 
                 if (startDateStr !== this.selectedDate) return;
 
                 if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
 
-                const taskName = planning.task?.name || 'Tarea';
-                const equipCode = planning.equipment?.code || 'S/E';
+                const taskName = planning.tarea?.name || 'Tarea';
+                const equipCode = planning.equipo?.código || 'S/E';
 
                 uniqueEquipments.add(equipCode);
 
@@ -158,7 +158,7 @@ export class PlanningComponent implements OnInit {
                         <b style="color: ${color};">${processLabel}</b><br/>
                         <b>Tarea:</b> ${taskName}<br/>
                         <b>Equipo:</b> ${equipCode}<br/>
-                        <b>Duración:</b> ${planning.task.duration} min<br/>
+                        <b>Duración:</b> ${planning.tarea.tiempo} min<br/>
                         <b>Inicio:</b> ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}<br/>
                     </div>`;
 

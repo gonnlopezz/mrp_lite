@@ -7,7 +7,7 @@ declare var google: any;
 export class PlanningChartService {
 
   drawBlock(
-    block: WorkshopChartBlock,
+    block: TallerChartBlock,
     container: HTMLElement,
     dayTimeRange: { min: Date; max: Date } | null,
     shiftRange: { min: Date; max: Date } | null = null
@@ -26,7 +26,7 @@ export class PlanningChartService {
     if (shiftRange) {
       filteredRows = block.rows.filter(row => {
         // Una tarea pertenece al turno si empieza antes del fin del turno y termina después del inicio del turno
-        return row.start < shiftRange.max && row.end > shiftRange.min;
+        return row.inicio < shiftRange.max && row.end > shiftRange.min;
       });
     }
 
@@ -59,10 +59,10 @@ export class PlanningChartService {
 
     rows.forEach(row => {
       dataTable.addRow([
-        row.equipmentCode,
+        row.equipoCode,
         { v: row.rowLabel, f: '' },
         row.tooltip,
-        row.start,
+        row.inicio,
         row.end
       ]);
 
@@ -81,7 +81,7 @@ export class PlanningChartService {
     dayTimeRange: { min: Date; max: Date } | null,
     shiftRange: { min: Date; max: Date } | null // 📑 Recibimos el filtro del turno
   ): object {
-    const uniqueEquipments = new Set(rows.map(r => r.equipmentCode)).size;
+    const uniqueEquipments = new Set(rows.map(r => r.equipoCode)).size;
     const height = Math.max(120, uniqueEquipments * 41 + 50);
 
     // 💡 Lógica de renderizado del eje temporal (hAxis)

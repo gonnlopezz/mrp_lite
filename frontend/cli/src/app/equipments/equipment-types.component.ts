@@ -5,7 +5,7 @@ import { PaginationComponent } from '../pagination/pagination.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EquipmentType } from './equipment-type';
+import { TipoEquipo } from './equipment-type';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 import { ToastrModule } from 'ngx-toastr';
@@ -23,10 +23,10 @@ export class EquipmentTypesComponent implements OnInit {
   
   // Lógica para el alta rápida
   showCreateForm: boolean = false;
-  newEquipmentType: EquipmentType = { name: "" };
+  newEquipmentType: TipoEquipo = { nombre: "" };
 
   constructor(
-    private equipmentTypeService: EquipmentTypeService,
+    private equipmentTypeService: TipoEquipoService,
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal
   ) { }
@@ -37,7 +37,7 @@ export class EquipmentTypesComponent implements OnInit {
 
   getEquipmentTypes(): void {
     // Mantenemos el estándar de tu componente Customers (pasando currentPage directo)
-    this.equipmentTypeService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+    this.equipoTypeService.byPage(this.currentPage, 6).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });
@@ -49,15 +49,15 @@ export class EquipmentTypesComponent implements OnInit {
   }
 
   openModal(content: any) {
-    this.newEquipmentType = { name: "" }; // Limpiamos antes de abrir
+    this.newEquipmentType = { nombre: "" }; // Limpiamos antes de abrir
     this.modalService.open(content, { centered: true });
   }
 
   save(modal: any): void { // 3. Recibimos la instancia del modal para cerrarlo
     if (!this.newEquipmentType.name.trim()) return;
 
-    this.equipmentTypeService.save(this.newEquipmentType).subscribe(dataPackage => {
-      this.newEquipmentType = { id: 0, name: "" };
+    this.equipoTypeService.save(this.newEquipmentType).subscribe(dataPackage => {
+      this.newEquipmentType = { id: 0, nombre: "" };
       modal.close();
       this.getEquipmentTypes();
     });
@@ -77,7 +77,7 @@ export class EquipmentTypesComponent implements OnInit {
     
         modalRef.result.then((result) => {
           if (result) {
-            this.equipmentTypeService.delete(id).subscribe(() => {
+            this.equipoTypeService.delete(id).subscribe(() => {
               this.getEquipmentTypes();
             });
           }

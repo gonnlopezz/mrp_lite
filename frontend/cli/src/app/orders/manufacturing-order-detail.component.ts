@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { manufacturingOrder, orderState } from './manufacturingOrder';
-import { Customer } from '../customers/customer';
-import { Product } from '../products/product';
+import { Cliente } from '../customers/customer';
+import { Producto } from '../products/product';
 import { CommonModule, Location } from '@angular/common';
 import { OrderService } from './manufacturing-order.service';
-import { CustomerService } from '../customers/customer.service';
+import { ClienteService } from '../customers/cliente.service';
 import { productService } from '../products/product.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -21,15 +21,15 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from '
 })
 export class ManufacturingOrderDetailComponent implements OnInit {
 
-    order!: manufacturingOrder;
-    customers: Customer[] = [];
-    products: Product[] = [];
-    selectedCustomer: Customer | null = null;
-    selectedProduct: Product | null = null;
+    order!: PedidoFabricacion;
+    customers: Cliente[] = [];
+    products: Producto[] = [];
+    selectedCustomer: Cliente | null = null;
+    selectedProduct: Producto | null = null;
 
     constructor(
         private orderService: OrderService,
-        private customerService: CustomerService,
+        private customerService: ClienteService,
         private productService: productService,
         private route: ActivatedRoute,
         private router: Router,
@@ -53,34 +53,34 @@ export class ManufacturingOrderDetailComponent implements OnInit {
         if (id === 'new' || !id) {
             const todayStr = new Date().toISOString().split('T')[0];
 
-            this.order = <manufacturingOrder>{
-                orderDate: todayStr,      
-                deliveryDate: todayStr,    
-                quantity: 1,
+            this.order = <PedidoFabricacion>{
+                fechaPedido: todayStr,      
+                fechaEntrega: todayStr,    
+                cantidad: 1,
                 state: orderState.PENDIENTE,
                 customer: null as unknown as Customer,
                 product: null as unknown as Product
             };
         } else {
             this.orderService.get(id).subscribe(dataPackage => {
-                this.order = <manufacturingOrder>dataPackage.data;
-                this.selectedCustomer = this.order.customer;
-                this.selectedProduct = this.order.product;
+                this.order = <PedidoFabricacion>dataPackage.data;
+                this.selectedCustomer = this.order.cliente;
+                this.selectedProduct = this.order.producto;
                 this.cdr.markForCheck();
             });
         }
     }
 
     getCustomers(): void {
-        this.customerService.all().subscribe(dataPackage => {
-            this.customers = <Customer[]>dataPackage.data;
+        this.clienteService.all().subscribe(dataPackage => {
+            this.clientes = <Cliente[]>dataPackage.data;
             this.cdr.markForCheck();
         });
     }
 
     getProducts(): void {
-        this.productService.all().subscribe(dataPackage => {
-            this.products = <Product[]>dataPackage.data;
+        this.productoService.all().subscribe(dataPackage => {
+            this.productos = <Producto[]>dataPackage.data;
             this.cdr.markForCheck();
         });
     }
@@ -92,8 +92,8 @@ export class ManufacturingOrderDetailComponent implements OnInit {
             switchMap(term =>
                 term.length < 1
                     ? of([])
-                    : of(this.customers.filter(c =>
-                        c.companyName.toLowerCase().includes(term.toLowerCase())
+                    : of(this.clientes.filter(c =>
+                        c.razónSocial.toLowerCase().includes(term.toLowerCase())
                     )).pipe(
                         map(results => results.slice(0, 10))
                     )
@@ -108,8 +108,8 @@ export class ManufacturingOrderDetailComponent implements OnInit {
             switchMap(term =>
                 term.length < 1
                     ? of([])
-                    : of(this.products.filter(p =>
-                        p.name.toLowerCase().includes(term.toLowerCase())
+                    : of(this.productos.filter(p =>
+                        p.nombre.toLowerCase().includes(term.toLowerCase())
                     )).pipe(
                         map(results => results.slice(0, 10))
                     )
@@ -117,31 +117,31 @@ export class ManufacturingOrderDetailComponent implements OnInit {
             catchError(() => of([]))
         );
 
-    customerInputFormatter = (customer: Customer): string => {
-        return customer?.companyName ? customer.companyName : '';
+    customerInputFormatter = (customer: Cliente): string => {
+        return customer?.razónSocial ? customer.razónSocial : '';
     };
 
-    customerResultFormatter = (customer: Customer): string => {
-        return `${customer.companyName} - CUIT: ${this.formatCuit(customer.cuit)}`;
+    customerResultFormatter = (customer: Cliente): string => {
+        return `${customer.razónSocial} - CUIT: ${this.formatCuit(customer.cuit)}`;
     };
 
-    productInputFormatter = (product: Product): string => {
-        return product?.name ? product.name : '';
+    productInputFormatter = (product: Producto): string => {
+        return product?.name ? product.nombre : '';
     };
 
-    productResultFormatter = (product: Product): string => {
-        return product.name;
+    productResultFormatter = (product: Producto): string => {
+        return product.nombre;
     };
 
-    onCustomerSelected(customer: Customer): void {
+    onCustomerSelected(customer: Cliente): void {
         this.selectedCustomer = customer;
-        this.order.customer = customer;
+        this.order.cliente = customer;
         this.cdr.markForCheck();
     }
 
-    onProductSelected(product: Product): void {
+    onProductSelected(product: Producto): void {
         this.selectedProduct = product;
-        this.order.product = product;
+        this.order.producto = product;
         this.cdr.markForCheck();
     }
 
@@ -168,13 +168,13 @@ export class ManufacturingOrderDetailComponent implements OnInit {
     }
 
     save(): void {
-        if (!this.order.customer || !this.order.product) {
+        if (!this.order.cliente || !this.order.producto) {
             this.toastr.error('Debe seleccionar cliente y producto', 'Error');
             return;
         }
 
         this.orderService.save(this.order).subscribe(dataPackage => {
-            this.order = <manufacturingOrder>dataPackage.data;
+            this.order = <PedidoFabricacion>dataPackage.data;
             this.cdr.markForCheck();
 
             this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {

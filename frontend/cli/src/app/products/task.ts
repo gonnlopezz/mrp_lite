@@ -1,10 +1,10 @@
 
-export interface Task {
+export interface Tarea {
     id: number;
-    name: string;
-    duration: number;
-    type: {
+    nombre: string;
+    tiempo: number;
+    tipo: {
         id?: number;
-        name: string;
+        nombre: string;
     } 
 }

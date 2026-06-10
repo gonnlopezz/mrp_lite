@@ -16,8 +16,8 @@ public interface ClienteRepository
     public Cliente findByCuit(String cuit);
 
     @Query("SELECT c FROM Cliente c" + 
-    " WHERE c.razónSocial ILIKE CONCAT('%', :term, '%')" +
-     "OR CAST(c.cuit AS string) ILIKE CONCAT('%', :term, '%') ORDER BY c.razónSocial ASC")
+    " WHERE c.razonSocial ILIKE CONCAT('%', :term, '%')" +
+     "OR CAST(c.cuit AS string) ILIKE CONCAT('%', :term, '%') ORDER BY c.razonSocial ASC")
     public Page<Cliente> search(String term, Pageable pageable);
 
 }

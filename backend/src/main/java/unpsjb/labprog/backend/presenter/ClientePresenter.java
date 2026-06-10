@@ -55,7 +55,7 @@ public class ClientePresenter {
             return Response.error("El id del cliente debe ser 0 o no estar presente.");
         }
         return Response.ok(service.save(aCliente),
-                "Cliente " + aCliente.getRazónSocial() + " " + aCliente.getCuit() + " registrado correctamente");
+                "Cliente " + aCliente.getRazonSocial() + " " + aCliente.getCuit() + " registrado correctamente");
     }
 
     @RequestMapping(method = RequestMethod.PUT)

@@ -37,7 +37,7 @@
                                 (change)="onFiltersChange()">
                                 <option value="">-- Todos los Talleres --</option>
                                 <option *ngFor="let w of workshops" [value]="w.id">
-                                    {{ w.name }} ({{ w.code }})
+                                    {{ w.nombre }} ({{ w.código }})
                                 </option>
                             </select>
                         </div>

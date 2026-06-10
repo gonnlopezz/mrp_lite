@@ -55,12 +55,12 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="dot"></div>
-                                    <span class="fw-semibold text-steel">{{ product.name }}</span>
+                                    <span class="fw-semibold text-steel">{{ product.nombre }}</span>
                                 </div>
                             </td>
                             <td>
                                 <span class="badge-soft-secondary">
-                                    <i class="fas fa-list-check me-1"></i> {{ product.tasks?.length || 0 }} tareas
+                                    <i class="fas fa-list-check me-1"></i> {{ product.tareas?.length || 0 }} tareas
                                 </span>
                             </td>
                             <td class="text-end">
@@ -85,11 +85,11 @@
                                     <h6 class="label-detail mb-3">Tareas</h6>
 
                                     <div class="d-flex flex-wrap gap-2">
-                                        <div *ngFor="let task of product.tasks" class="equipment-card">
-                                            <span class="text-steel fw-semibold small">{{ task.name }} | {{ task.duration }} minutos</span>
+                                        <div *ngFor="let task of product.tareas" class="equipment-card">
+                                            <span class="text-steel fw-semibold small">{{ task.nombre }} | {{ task.tiempo }} minutos</span>
                                         </div>
 
-                                        <div *ngIf="!product.tasks || product.tasks.length === 0"
+                                        <div *ngIf="!product.tareas || product.tareas.length === 0"
                                             class="text-muted small italic py-2">
                                             <i class="fas fa-info-circle me-1"></i> Este producto no tiene tareas definidas.
                                         </div>

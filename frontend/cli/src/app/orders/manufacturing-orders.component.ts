@@ -39,7 +39,7 @@ export class ManufacturingOrdersComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
-    private planningService: PlanningService,
+    private planningService: PlanificacionService,
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal,
     private toastr: ToastrService,
@@ -174,7 +174,7 @@ export class ManufacturingOrdersComponent implements OnInit {
         if (Array.isArray(data)) {
           this.toastr.success('¡Pedido planificado con éxito!', 'Éxito');
         }
-        else if (data && data.state === 'NO_PLANIFICABLE') {
+        else if (data && data.estado === 'NO_PLANIFICABLE') {
           this.toastr.warning('El pedido no pudo planificarse por completo.', 'Planificación Parcial');
           this.openFailureModal(data, modalContent);
         }

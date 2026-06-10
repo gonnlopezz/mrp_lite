@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DataPackage } from '../data-package';
-import { Workshop } from './workshop';
+import { Taller } from './workshop';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +29,8 @@ export class WorkshopService {
     return this.http.get<DataPackage>(`${this.workshopsUrl}/id/${id}/plannings`);
   }
 
-  save(workshop: Workshop): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.workshopsUrl, workshop);
+  save(taller: Taller): Observable<DataPackage> {
+    return this.http.post<DataPackage>(this.workshopsUrl, taller);
   }
 
   delete(id: number): Observable<void> {

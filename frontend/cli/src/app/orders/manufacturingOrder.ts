@@ -1,17 +1,17 @@
-import { Customer } from "../customers/customer";
-import { Product } from "../products/product";
+import { Cliente } from "../customers/customer";
+import { Producto } from "../products/product";
 
-export interface manufacturingOrder {
+export interface PedidoFabricacion {
     id: number;
-    orderDate: string | Date;    
-    deliveryDate: string | Date; 
-    quantity: number;
-    state: orderState;
-    customer: Customer;
-    product: Product;
+    fechaPedido: string | Date;    
+    fechaEntrega: string | Date; 
+    cantidad: number;
+    estado: EstadoPedido;
+    cliente: Cliente;
+    producto: Productoo;
 }
 
-export enum orderState {
+export enum EstadoPedido {
     PENDIENTE,
     PLANIFICADO,
     NO_PLANIFICABLE,

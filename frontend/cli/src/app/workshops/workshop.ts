@@ -1,8 +1,8 @@
-import { Equipment } from "../equipments/equipment";
+import { Equipo } from "../equipments/equipment";
 
-export interface Workshop {
+export interface Taller {
     id: number;
-    code: string;
-    name: string;
-    equipments: Equipment[];  
+    codigo: string;
+    nombre: string;
+    equipos: Equipo[];  
 }

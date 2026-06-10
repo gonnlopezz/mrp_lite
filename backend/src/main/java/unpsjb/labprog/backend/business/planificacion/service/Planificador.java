@@ -30,7 +30,6 @@ public class Planificador {
     @Autowired
     private PedidoService orderService;
 
-
     @Autowired
     private PlanificacionRepository planningRepository; // Repositorio directo
 
@@ -56,70 +55,58 @@ public class Planificador {
         pedido.validatePlannable();
 
         LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
-        List<ProcesoPlanificacion> resultado = planificarPedidoSeguro(pedido, inicioLimite, new HashMap<>());
+        List<ProcesoPlanificacion> resultado = planificarPedido(pedido, inicioLimite, new HashMap<>());
 
         orderService.save(pedido);
         return resultado;
     }
 
-    public List<ProcesoPlanificacion> planBulkOrders(
-            List<Pedido> pedidos, LocalDateTime inicioEjecucion) {
+    public List<ProcesoPlanificacion> planBulkOrders(List<Pedido> pedidos, LocalDateTime inicioEjecucion) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
-        Map<Long, AgendaTaller> agendasTalleres = new HashMap<>(); // Reutiliza agendas entre pedidos del lote
+        Map<Long, AgendaTaller> agendasTalleres = new HashMap<>();
 
         for (Pedido pedido : pedidos) {
-            resultado.addAll(planificarPedidoSeguro(pedido, inicioEjecucion, agendasTalleres));
+            resultado.addAll(planificarPedido(pedido, inicioEjecucion, agendasTalleres));
         }
 
         orderService.saveAll(pedidos);
         return resultado;
     }
 
-    private List<ProcesoPlanificacion> planificarPedidoSeguro(
-            Pedido pedido, LocalDateTime inicioLimite,
+
+    private List<ProcesoPlanificacion> planificarPedido(Pedido pedido, LocalDateTime inicioLimite,
             Map<Long, AgendaTaller> agendasTalleres) {
+
+        List<Taller> talleres;
         try {
-            List<Taller> talleres = workshopService.findPossibleWorkshops(
-                    pedido.getProducto().requiredEquipmentTypes());
-
-            List<ProcesoPlanificacion> procesos = planificarEnPrimerTallerDisponible(
-                    pedido, talleres, pedido.getFechaEntrega().atStartOfDay(), inicioLimite, agendasTalleres);
-
-            pedido.markAsPlanned();
-            return procesos;
-        } catch (SchedulingException e) {
-            pedido.markAsUnschedulable(e.getMessage(), positiveOrNull(e.getSchedulableQuantity()));
-            return List.of();
+            talleres = workshopService.findPossibleWorkshops(pedido.getProducto().requiredEquipmentTypes());
         } catch (BusinessException e) {
             pedido.markAsUnschedulable(e.getMessage(), null);
             return List.of();
         }
-    }
 
-    private List<ProcesoPlanificacion> planificarEnPrimerTallerDisponible(
-            Pedido pedido, List<Taller> talleres,
-            LocalDateTime deadline, LocalDateTime inicioLimite,
-            Map<Long, AgendaTaller> agendasTalleres) {
+        LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
         int mejorCantidadPlanificable = 0;
 
         for (Taller taller : talleres) {
-            AgendaTaller agendaSimulacion = obtenerAgendaParaSimulacion(taller, agendasTalleres, inicioLimite, deadline);
+            AgendaTaller agenda = obtenerAgendaParaSimulacion(taller, agendasTalleres, inicioLimite, deadline);
             try {
-                List<ProcesoPlanificacion> procesos = planificarUnidades(
-                        pedido, taller, agendaSimulacion, deadline, inicioLimite);
-
-                agendasTalleres.put(taller.getId(), agendaSimulacion);
+                List<ProcesoPlanificacion> procesos = planificarUnidades(pedido, taller, agenda, deadline,
+                        inicioLimite);
+                agendasTalleres.put(taller.getId(), agenda);
+                pedido.markAsPlanned();
                 return procesos;
             } catch (SchedulingException e) {
                 mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
             } catch (BusinessException ignored) {
-                // Taller sin el equipamiento necesario configurado; ignorar y evaluar el
-                // siguiente
+                // Taller sin el equipamiento necesario; ignorar y evaluar el siguiente
             }
         }
 
-        throw new SchedulingException(
-                "El pedido no pudo planificarse en el plazo requerido", mejorCantidadPlanificable);
+        pedido.markAsUnschedulable(
+                "El pedido no pudo planificarse en el plazo requerido",
+                positiveOrNull(mejorCantidadPlanificable));
+        return List.of();
     }
 
     private AgendaTaller obtenerAgendaParaSimulacion(

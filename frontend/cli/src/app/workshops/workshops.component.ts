@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { Workshop } from './workshop';
+import { Taller } from './workshop';
 import { WorkshopService } from './workshop.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +22,7 @@ export class WorkshopsComponent {
   searchTerm: string = '';
 
   constructor(
-    private workshopService: WorkshopService,
+    private workshopService: TallerService,
     private cdr: ChangeDetectorRef,
     private modalService: NgbModal) { }
 

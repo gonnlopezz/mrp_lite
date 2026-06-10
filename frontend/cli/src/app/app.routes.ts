@@ -14,16 +14,16 @@ import { PlanningDashboardComponent } from './planning/planning-dashboard.compon
 
 export const routes: Routes = [
     {path: "", component: HomeComponent},
-    {path: "customers", component: CustomersComponent},
-    {path: "customers/:id", component: CustomersDetailComponent},
-    {path: "workshops", component: WorkshopsComponent},
-    {path: "workshops/equipment-types", component: EquipmentTypesComponent},
-    {path: "workshops/:id", component: WorkshopsDetailComponent},
-    {path: "products", component: ProductsComponent},
-    {path: "products/:id", component: ProductsDetailComponent},
-    {path: "workshops/:id/plannings", component: PlanningComponent},
+    {path: "customers", component: ClientesComponent},
+    {path: "customers/:id", component: ClientesDetailComponent},
+    {path: "workshops", component: TallersComponent},
+    {path: "workshops/equipment-types", component: TipoEquiposComponent},
+    {path: "workshops/:id", component: TallersDetailComponent},
+    {path: "products", component: ProductosComponent},
+    {path: "products/:id", component: ProductosDetailComponent},
+    {path: "workshops/:id/plannings", component: PlanificacionComponent},
     {path: "orders", component: ManufacturingOrdersComponent},
     {path: "orders/:id", component: ManufacturingOrderDetailComponent},
-    {path: "orders/:id/plannings", component: PlanningComponent},
-    {path: "planning-dashboard", component: PlanningDashboardComponent}
+    {path: "orders/:id/plannings", component: PlanificacionComponent},
+    {path: "planning-dashboard", component: PlanificacionDashboardComponent}
 ];

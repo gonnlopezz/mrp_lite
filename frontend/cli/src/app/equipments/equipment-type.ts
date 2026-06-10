@@ -1,4 +1,4 @@
-export interface EquipmentType {
+export interface TipoEquipo {
     id?: number;
-    name: string;
+    nombre: string;
 }

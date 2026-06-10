@@ -20,22 +20,16 @@ public class AgendaTaller {
 
     public static AgendaTaller construirDesde(Taller taller, List<Planificacion> planificaciones,
             LocalDateTime inicio, LocalDateTime fin) {
+
         Map<Long, List<Planificacion>> porEquipo = new HashMap<>();
         for (Planificacion planificacion : planificaciones) {
             Long equipoId = planificacion.getEquipo().getId();
-
-            if (!porEquipo.containsKey(equipoId))
-                porEquipo.put(equipoId, new ArrayList<>());
-
-            porEquipo.get(equipoId).add(planificacion);
+            porEquipo.computeIfAbsent(equipoId, k -> new ArrayList<>()).add(planificacion);
         }
 
         Map<Long, AgendaEquipo> agendas = new HashMap<>();
         for (Equipo equipo : taller.getEquipos()) {
-            List<Planificacion> planificacionesEquipo = porEquipo.get(equipo.getId());
-            if (planificacionesEquipo == null)
-                planificacionesEquipo = new ArrayList<>();
-
+            List<Planificacion> planificacionesEquipo = porEquipo.getOrDefault(equipo.getId(), List.of());
             agendas.put(equipo.getId(), new AgendaEquipo(equipo, planificacionesEquipo, inicio, fin));
         }
 
@@ -58,5 +52,4 @@ public class AgendaTaller {
         return new AgendaTaller(this.taller, copiaAgendas);
     }
 
-    
 }

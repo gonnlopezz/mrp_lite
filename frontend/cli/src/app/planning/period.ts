@@ -1,5 +1,5 @@
-export interface Period {
-    start: string;
-    endDate: string;
-    duration: number;
+export interface Periodo {
+    inicio: string;
+    fin: string;
+    duracion: number;
 }

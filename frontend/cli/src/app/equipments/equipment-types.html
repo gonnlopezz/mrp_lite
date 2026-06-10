@@ -41,7 +41,7 @@
                                     <div class="d-flex align-items-center">
                                         <div class="dot bg-light border"></div>
                                         <span class="fw-semibold text-steel small tracking-wide">
-                                            {{ type.name }}
+                                            {{ type.nombre }}
                                         </span>
                                     </div>
                                 </td>
@@ -98,7 +98,7 @@
             <span class="input-group-text bg-slate-50 border-end-0 text-muted">
                 <i class="fas fa-tag"></i>
             </span>
-            <input type="text" class="form-control border-start-0 ps-0 bg-white" [(ngModel)]="newEquipmentType.name"
+            <input type="text" class="form-control border-start-0 ps-0 bg-white" [(ngModel)]="newEquipmentType.nombre"
                 placeholder="Ej. Herramientas Eléctricas" (keyup.enter)="save(modal)">
         </div>
     </div>
@@ -109,7 +109,7 @@
             Cancelar
         </button>
         <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save(modal)"
-            [disabled]="!newEquipmentType.name.trim()">
+            [disabled]="!newEquipmentType.nombre.trim()">
             Confirmar Registro
         </button>
     </div>

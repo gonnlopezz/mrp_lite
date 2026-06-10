@@ -27,7 +27,7 @@ When('presiono el botón de guardar cliente', async function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                razónSocial: this.companyName,
+                razonSocial: this.companyName,
                 cuit: this.customerCuit,
                 observaciones: this.observations
             })

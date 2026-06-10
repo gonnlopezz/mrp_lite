@@ -1,12 +1,12 @@
 import { CommonModule, Location } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
-import { Workshop } from './workshop';
+import { Taller } from './workshop';
 import { WorkshopService } from './workshop.service';
-import { Equipment } from '../equipments/equipment';
+import { Equipo } from '../equipments/equipment';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { EquipmentType } from '../equipments/equipment-type';
+import { TipoEquipo } from '../equipments/equipment-type';
 import { EquipmentTypeService } from '../equipments/equipment-type.service';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
@@ -19,15 +19,15 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from '
   styles: ``
 })
 export class WorkshopsDetailComponent {
-  workshop!: Workshop;
+  workshop!: Taller;
   showEquipmentForm: boolean = false;
-  equipmentTypes!: EquipmentType[]; 
-  newEquipment!: Equipment;
-  selectedEquipmentType: EquipmentType | null = null;
+  equipmentTypes!: TipoEquipo[]; 
+  newEquipment!: Equipo;
+  selectedEquipmentType: TipoEquipo | null = null;
 
   constructor(
-    private workshopService: WorkshopService,  
-    private equipmentTypeService: EquipmentTypeService, 
+    private workshopService: TallerService,  
+    private equipmentTypeService: TipoEquipoService, 
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
@@ -43,17 +43,17 @@ export class WorkshopsDetailComponent {
   getWorkshops(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if(id === 'new' || !id) {
-      this.workshop = <Workshop>{ code: "", name: "", equipments: <Equipment[]>[] };
+      this.workshop = <Taller>{ código: "", nombre: "", equipos: <Equipo[]>[] };
     } else {
       this.workshopService.get(id).subscribe(dataPackage => {   
-        this.workshop = <Workshop>dataPackage.data;
+        this.workshop = <Taller>dataPackage.data;
       });       
     }
   }
 
   getEquipmentTypes(): void {
-    this.equipmentTypeService.all().subscribe(dataPackage => {
-      this.equipmentTypes = <EquipmentType[]>dataPackage.data;
+    this.equipoTypeService.all().subscribe(dataPackage => {
+      this.equipoTypes = <TipoEquipo[]>dataPackage.data;
     }); 
   }
 
@@ -64,8 +64,8 @@ export class WorkshopsDetailComponent {
       switchMap(term =>
         term.length < 1
           ? of([])
-          : of(this.equipmentTypes.filter(et =>
-            et.name.toLowerCase().includes(term.toLowerCase())
+          : of(this.equipoTypes.filter(et =>
+            et.nombre.toLowerCase().includes(term.toLowerCase())
           )).pipe(
             map(results => results.slice(0, 10))
           )
@@ -73,34 +73,34 @@ export class WorkshopsDetailComponent {
       catchError(() => of([]))
     );
 
-  equipmentTypeInputFormatter = (type: EquipmentType): string => {
-    return type?.name ? type.name : '';
+  equipmentTypeInputFormatter = (type: TipoEquipo): string => {
+    return type?.name ? type.nombre : '';
   };
 
-  equipmentTypeResultFormatter = (type: EquipmentType): string => {
-    return type.name;
+  equipmentTypeResultFormatter = (type: TipoEquipo): string => {
+    return type.nombre;
   };
 
-  onEquipmentTypeSelected(type: EquipmentType): void {
+  onEquipmentTypeSelected(type: TipoEquipo): void {
     this.selectedEquipmentType = type;
     this.newEquipment.type = type;
     this.cdr.markForCheck();
   }
 
   openEquipmentForm(): void {
-    this.newEquipment = {code: "", capacity: 0, type: { name: ""}} as Equipment;
+    this.newEquipment = {código: "", capacity: 0, type: { nombre: ""}} as Equipment;
     this.selectedEquipmentType = null;
     this.showEquipmentForm = true;
   }
 
   addEquipment () {
-    this.workshop.equipments.push(this.newEquipment);
+    this.workshop.equipos.push(this.newEquipment);
     this.showEquipmentForm = false;
   }
 
   save(): void {
     this.workshopService.save(this.workshop).subscribe(dataPackage => {
-      this.workshop = <Workshop>dataPackage.data;
+      this.workshop = <Taller>dataPackage.data;
       this.cdr.markForCheck();
 
       this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {

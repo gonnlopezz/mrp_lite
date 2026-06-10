@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { DataPackage } from '../data-package';
 import { Observable } from 'rxjs/internal/Observable';
 import { HttpClient } from '@angular/common/http';
-import { manufacturingOrder } from './manufacturingOrder';
+import { PedidoFabricacion } from './manufacturingOrder';
 
 @Injectable({
   providedIn: 'root'
@@ -40,8 +40,8 @@ export class OrderService {
     return this.http.get<DataPackage>(`${this.ordersUrl}/id/${id}/plannings`);
   }
 
-  save(workshop: manufacturingOrder): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.ordersUrl, workshop);
+  save(pedido: PedidoFabricacion): Observable<DataPackage> {
+    return this.http.post<DataPackage>(this.ordersUrl, pedido);
   }
 
   delete(id: number): Observable<void> {

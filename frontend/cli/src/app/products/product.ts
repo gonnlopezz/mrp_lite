@@ -1,7 +1,7 @@
-import { Task } from "./task";
+import { Tarea } from "./task";
 
-export interface Product {
+export interface Producto {
     id: number;
-    name: string;
-    tasks: Task[];
+    nombre: string;
+    tareas: Tarea[];
 }

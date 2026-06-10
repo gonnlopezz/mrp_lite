@@ -10,10 +10,10 @@ import { WorkshopService } from '../workshops/workshop.service';
 import { OrderService } from '../orders/manufacturing-order.service';
 import { PlanningService } from './planning.service';
 import { PlanningChartService } from './planning-chart.service';   // <-- nuevo
-import { Workshop } from '../workshops/workshop';
-import { manufacturingOrder } from '../orders/manufacturingOrder';
-import { Product } from '../products/product';
-import { PlanningProcess } from '../planning/planning';
+import { Taller } from '../workshops/workshop';
+import { PedidoFabricacion } from '../orders/manufacturingOrder';
+import { Producto } from '../products/product';
+import { ProcesoPlanificacion } from '../planning/planning';
 import { ColorMode, ChartRow, WorkshopChartBlock, DayOrderSummary, DayProductSummary } from './planning-dashboard';
 import { productService } from '../products/product.service';
 import { RouterModule } from '@angular/router';
@@ -38,25 +38,25 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
 
   @ViewChildren('chartDiv') chartDivs!: QueryList<ElementRef>;
 
-  workshops: Workshop[] = [];
-  orders: manufacturingOrder[] = [];
-  planningProcesses: PlanningProcess[] = [];
+  workshops: Taller[] = [];
+  orders: PedidoFabricacion[] = [];
+  planningProcesses: PlanificacionProcess[] = [];
 
   selectedWorkshopId: string = '';
   selectedOrderId: string = '';
-  selectedOrderObject: manufacturingOrder | null = null;
+  selectedOrderObject: PedidoFabricacion | null = null;
   selectedDate: string = '';
   colorMode: ColorMode = 'by-process';
 
   availableDates: string[] = [];
-  workshopBlocks: WorkshopChartBlock[] = [];
+  workshopBlocks: TallerChartBlock[] = [];
   dayTimeRange: { min: Date; max: Date } | null = null;
 
   loading: boolean = false;
   renderingCharts: boolean = false;
   googleChartsLoaded = false;
 
-  private equipmentWorkshopMap = new Map<number, { code: string; name: string }>();
+  private equipmentWorkshopMap = new Map<number, { código: string; name: string }>();
   private taskProductMap = new Map<number, string>();
 
   selectedShifts: Record<string, string> = {};
@@ -69,11 +69,11 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   };
 
   constructor(
-    private workshopService: WorkshopService,
+    private workshopService: TallerService,
     private orderService: OrderService,
     private productService: productService,
-    private planningService: PlanningService,
-    private chartService: PlanningChartService,
+    private planningService: PlanificacionService,
+    private chartService: PlanificacionChartService,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) { }
@@ -101,7 +101,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     forkJoin({
       workshops: this.workshopService.all(),
       orders: this.orderService.allPlanned(),
-      products: this.productService.all()
+      products: this.productoService.all()
     }).subscribe({
       next: ({ workshops, orders, products }) => {
         this.workshops = workshops.data as Workshop[];
@@ -124,7 +124,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
           ? of([])
           : of(this.orders.filter(o =>
             o.id.toString().includes(term.toLowerCase()) ||
-            (o.customer?.companyName || '').toLowerCase().includes(term.toLowerCase())
+            (o.cliente?.razónSocial || '').toLowerCase().includes(term.toLowerCase())
           )).pipe(
             map(results => results.slice(0, 10))
           )
@@ -132,12 +132,12 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
       catchError(() => of([]))
     );
 
-  orderInputFormatter = (order: manufacturingOrder): string => {
-    return order ? `Orden #${order.id} — ${order.customer?.companyName || 'Cliente'}` : '';
+  orderInputFormatter = (order: PedidoFabricacion): string => {
+    return order ? `Orden #${order.id} — ${order.cliente?.razónSocial || 'Cliente'}` : '';
   };
 
-  orderResultFormatter = (order: manufacturingOrder): string => {
-    return `Orden #${order.id} — ${order.customer?.companyName || 'Cliente'}`;
+  orderResultFormatter = (order: PedidoFabricacion): string => {
+    return `Orden #${order.id} — ${order.cliente?.razónSocial || 'Cliente'}`;
   };
 
   // ─── Fetch principal ─────────────────────────────────────────────────────
@@ -240,7 +240,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     const range = this.SHIFT_RANGES[currentShift];
 
     const shiftMin = new Date(this.selectedDate + 'T00:00:00');
-    shiftMin.setMinutes(shiftMin.getMinutes() + range.start);
+    shiftMin.setMinutes(shiftMin.getMinutes() + range.inicio);
 
     const shiftMax = new Date(this.selectedDate + 'T00:00:00');
     shiftMax.setMinutes(shiftMax.getMinutes() + range.end);
@@ -261,22 +261,22 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   // ─── Mapas de lookup ─────────────────────────────────────────────────────
 
   private buildEquipmentWorkshopMap(): void {
-    this.equipmentWorkshopMap.clear();
+    this.equipoWorkshopMap.clear();
     this.workshops.forEach(workshop =>
-      workshop.equipments?.forEach(equipment =>
-        this.equipmentWorkshopMap.set(equipment.id, {
-          code: workshop.code,
-          name: workshop.name
+      workshop.equipos?.forEach(equipment =>
+        this.equipoWorkshopMap.set(equipment.id, {
+          código: workshop.código,
+          name: workshop.nombre
         })
       )
     );
   }
 
-  private buildTaskProductMap(products: Product[]): void {
-    this.taskProductMap.clear();
+  private buildTaskProductMap(products: Producto[]): void {
+    this.tareaProductMap.clear();
     products.forEach(product =>
-      product.tasks?.forEach(task =>
-        this.taskProductMap.set(task.id, product.name)
+      product.tareas?.forEach(task =>
+        this.tareaProductMap.set(task.id, product.nombre)
       )
     );
   }
@@ -286,8 +286,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
   private computeAvailableDates(): void {
     const dates = new Set<string>();
     this.planningProcesses.forEach(process =>
-      process.plannings?.forEach(planning => {
-        const dateStr = planning.period?.start?.split('T')[0];
+      process.planificaciones?.forEach(planning => {
+        const dateStr = planning.periodo?.inicio?.split('T')[0];
         if (dateStr) dates.add(dateStr);
       })
     );
@@ -311,38 +311,38 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
       const color = colorMap.get(this.colorKey(process)) ?? '#999999';
       const processLabel = `Proceso #${process.id}`;
 
-      process.plannings?.forEach(planning => {
-        const dateStr = planning.period?.start?.split('T')[0];
+      process.planificaciones?.forEach(planning => {
+        const dateStr = planning.periodo?.inicio?.split('T')[0];
         if (dateStr !== this.selectedDate) return;
 
-        const start = new Date(planning.period.start);
-        const end = new Date(planning.period.endDate);
+        const start = new Date(planning.periodo.inicio);
+        const end = new Date(planning.periodo.fin);
         if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
 
-        const workshop = this.equipmentWorkshopMap.get(planning.equipment?.id);
+        const workshop = this.equipoWorkshopMap.get(planning.equipo?.id);
         if (!workshop) return;
 
         const row: ChartRow = {
-          equipmentCode: planning.equipment?.code ?? 'S/E',
+          equipmentCode: planning.equipo?.código ?? 'S/E',
           rowLabel: processLabel,
-          tooltip: this.buildTooltip(processLabel, planning.task?.name ?? 'Tarea', planning.equipment?.code ?? 'S/E', start, end, color),
+          tooltip: this.buildTooltip(processLabel, planning.tarea?.name ?? 'Tarea', planning.equipo?.código ?? 'S/E', start, end, color),
           start, end, color
         };
 
-        if (!blocksMap.has(workshop.code)) {
-          blocksMap.set(workshop.code, {
-            workshopName: workshop.name, workshopCode: workshop.code,
+        if (!blocksMap.has(workshop.código)) {
+          blocksMap.set(workshop.código, {
+            workshopName: workshop.nombre, workshopCode: workshop.código,
             rows: [], ordersOfTheDay: [], productsOfTheDay: []
           });
           // Lo tratamos como any temporalmente para asignarle el rango dinámico
-          (blocksMap.get(workshop.code) as any).timeRange = { min: start, max: end };
+          (blocksMap.get(workshop.código) as any).timeRange = { min: start, max: end };
         } else {
-          const block = blocksMap.get(workshop.code) as any;
+          const block = blocksMap.get(workshop.código) as any;
           if (start < block.timeRange.min) block.timeRange.min = start;
           if (end > block.timeRange.max) block.timeRange.max = end;
         }
 
-        blocksMap.get(workshop.code)!.rows.push(row);
+        blocksMap.get(workshop.código)!.rows.push(row);
       });
     });
 
@@ -350,7 +350,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     blocksMap.forEach((block, workshopCode) => {
       const { orders, products } = this.computeSummaryForWorkshop(workshopCode);
       block.ordersOfTheDay = orders;
-      block.productsOfTheDay = products;
+      block.productosOfTheDay = products;
     });
 
     this.workshopBlocks = Array.from(blocksMap.values());
@@ -365,10 +365,10 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     const productsMap = new Map<string, DayProductSummary>();
 
     this.planningProcesses.forEach(process => {
-      const activeHere = process.plannings?.filter(p => {
-        const dateStr = p.period?.start?.split('T')[0];
-        const workshop = this.equipmentWorkshopMap.get(p.equipment?.id);
-        return dateStr === this.selectedDate && workshop?.code === workshopCode;
+      const activeHere = process.planificaciones?.filter(p => {
+        const dateStr = p.periodo?.inicio?.split('T')[0];
+        const workshop = this.equipoWorkshopMap.get(p.equipo?.id);
+        return dateStr === this.selectedDate && workshop?.código === workshopCode;
       }) ?? [];
 
       if (activeHere.length === 0) return;
@@ -379,9 +379,9 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
           ordersMap.set(order.id, {
             orderId: order.id,
             orderLabel: `Orden #${order.id}`,
-            customerName: order.customer?.companyName ?? 'Cliente',
-            productName: order.product?.name ?? 'Sin producto',
-            quantity: order.quantity ?? 0,
+            customerName: order.cliente?.razónSocial ?? 'Cliente',
+            productName: order.producto?.nombre ?? 'Sin producto',
+            cantidad: order.cantidad ?? 0,
             processCount: 1,
             workshopNames: [workshopCode]
           });
@@ -389,8 +389,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
           ordersMap.get(order.id)!.processCount++;
         }
       } else {
-        const taskId = activeHere[0].task?.id;
-        const productName = taskId ? this.taskProductMap.get(taskId) : null;
+        const taskId = activeHere[0].tarea?.id;
+        const productName = taskId ? this.tareaProductMap.get(taskId) : null;
         if (!productName) return;
 
         if (!productsMap.has(productName)) {
@@ -419,7 +419,7 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     return map;
   }
 
-  private colorKey(process: PlanningProcess): string {
+  private colorKey(process: PlanificacionProcess): string {
     return this.colorMode === 'by-order'
       ? `order-${process.order?.id ?? 'unknown'}`
       : `process-${process.id}`;
@@ -466,8 +466,8 @@ export class PlanningDashboardComponent implements OnInit, AfterViewInit {
     return this.selectedWorkshopId !== '' || this.selectedOrderId !== '' || this.selectedDate !== '';
   }
 
-  getTotalProducts(block: WorkshopChartBlock): number {
-    return block.ordersOfTheDay.reduce((acc, item) => acc + item.quantity, 0);
+  getTotalProducts(block: TallerChartBlock): number {
+    return block.ordersOfTheDay.reduce((acc, item) => acc + item.cantidad, 0);
   }
 
   // ─── Scroll ─────────────────────────────────────────────────

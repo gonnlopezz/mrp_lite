@@ -23,7 +23,7 @@ public class Cliente {
     private long cuit;
 
     @Column(unique = true, nullable = false)
-    private String razónSocial;
+    private String razonSocial;
 
     @Column(nullable = true)
     private String observaciones;

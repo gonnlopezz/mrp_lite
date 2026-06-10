@@ -7,7 +7,7 @@ import { productService } from './product.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Product } from './product';
+import { Producto } from './product';
 
 @Component({
   selector: 'app-products',
@@ -27,7 +27,7 @@ export class ProductsComponent {
     private modalService: NgbModal) { }
 
   getProducts(): void {
-    this.productService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+    this.productoService.byPage(this.currentPage, 6).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });
@@ -41,7 +41,7 @@ export class ProductsComponent {
     }
 
     this.currentPage = 1;
-    this.productService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
+    this.productoService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
     });
@@ -60,7 +60,7 @@ export class ProductsComponent {
 
     modalRef.result.then((result) => {
       if (result) {
-        this.productService.delete(id).subscribe(() => {
+        this.productoService.delete(id).subscribe(() => {
           this.getProducts();
         });
       }
