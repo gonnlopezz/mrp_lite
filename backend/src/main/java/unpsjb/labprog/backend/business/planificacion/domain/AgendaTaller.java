@@ -36,7 +36,6 @@ public class AgendaTaller {
         return new AgendaTaller(taller, agendas);
     }
 
-    // NUEVO FACTORY: Mapea proactivamente todas las agendas sin consultas repetitivas
     public static Map<Long, AgendaTaller> construirTodasDesde(
             List<Taller> talleres, List<Planificacion> planificaciones,
             LocalDateTime inicio, LocalDateTime fin) {

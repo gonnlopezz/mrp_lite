@@ -59,13 +59,13 @@ public class AgendaEquipo {
         return null; 
     }
 
-    public LocalDateTime primerInicioDisponibleDesde(LocalDateTime desde) {
+    public LocalDateTime primerInicioDisponibleDesde(LocalDateTime tiempoActual) {
         for (Periodo hueco : huecosLibres) {
-            if (!hueco.getFin().isBefore(desde)) {
-                return hueco.getInicio().isAfter(desde) ? hueco.getInicio() : desde;
+            if (!hueco.getFin().isBefore(tiempoActual)) {
+                return hueco.getInicio().isAfter(tiempoActual) ? hueco.getInicio() : tiempoActual;
             }
         }
-        return desde;
+        return tiempoActual;
     }
 
     public void ocupar(Periodo periodoReserva) {

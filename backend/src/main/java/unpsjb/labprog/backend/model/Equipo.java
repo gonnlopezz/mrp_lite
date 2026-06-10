@@ -27,7 +27,7 @@ public class Equipo {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String código;
+    private String codigo;
 
     @Column(nullable = false)
     private int capacidad;

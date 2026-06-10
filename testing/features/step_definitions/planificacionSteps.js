@@ -110,7 +110,7 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
         const dateB = new Date(b.periodo.inicio);
         
         if (dateA.getTime() === dateB.getTime()) {
-            return a.equipo.código.localeCompare(b.equipo.código); // Desempate
+            return a.equipo.codigo.localeCompare(b.equipo.codigo); // Desempate
         }
         return dateA - dateB;
     });
@@ -121,7 +121,7 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
         const real = planificacionesReal[index];
         const inicio = real.periodo.inicio.replace('T', ' ').substring(0, 16);
         const fin = real.periodo.fin.replace('T', ' ').substring(0, 16);
-        const equipo = real.equipo.código;
+        const equipo = real.equipo.codigo;
         const tarea = real.tarea.nombre;
         // if (inicio.startsWith('2025-03-05')) {
         //     console.log(`| ${inicio} | ${fin} | ${equipo} | ${tarea}        |`);
@@ -146,7 +146,7 @@ Then('se generaron {int} planificaciones para el equipo {string}', function (can
         }
     });
 
-    const tareasDelEquipo = planificacionesReal.filter(tarea => tarea.equipo.código === codigoEquipo);
+    const tareasDelEquipo = planificacionesReal.filter(tarea => tarea.equipo.codigo === codigoEquipo);
     
     const assert = require('assert');
     assert.strictEqual(tareasDelEquipo.length, cantidadEsperada, 

@@ -25,7 +25,7 @@ Given('se agrega el equipo {string} del tipo {string} y {int}', async function (
     const realType = dataPackage.data;
 
     const equip = {
-        código: equipmentCode,
+        codigo: equipmentCode,
         capacidad: capacity,
         tipo: { 
             id: realType.id,            
