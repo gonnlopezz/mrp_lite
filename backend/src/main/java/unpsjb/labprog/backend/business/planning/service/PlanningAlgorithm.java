@@ -2,7 +2,6 @@ package unpsjb.labprog.backend.business.planning.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,8 +100,5 @@ public class PlanningAlgorithm {
         return result;
     }
 
-    // private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-    //     return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
-    // }
 
 }

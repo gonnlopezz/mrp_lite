@@ -38,7 +38,7 @@ public class PlanningScheduler {
         LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
         Product product = productService.findByName(request.getProductName());
         List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
-        Workshop workshop = resolveWorkshop(request.getWorkshopCode(), requiredTypes);
+        Workshop workshop = workshopService.resolveWorkshop(request.getWorkshopCode(), requiredTypes);
         return algorithm.scheduleForward(product, workshop, start);
     }
 
@@ -67,7 +67,6 @@ public class PlanningScheduler {
         return result;
     }
 
-    // ── planBulkOrders: misma mejora ─────────────────────────────────────────
 
     public List<PlanningProcess> planBulkOrders(
             List<ManufacturingOrder> orders, LocalDateTime executionStart) {
@@ -147,14 +146,6 @@ public class PlanningScheduler {
         return result;
     }
 
-    private Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
-        if (workshopCode != null) {
-            Workshop result = workshopService.findByCode(workshopCode);
-            workshopService.validateEquipmentSupport(workshopCode, requiredTypes);
-            return result;
-        }
-        return workshopService.findByEquipmentTypes(requiredTypes);
-    }
 
     private Map<Long, List<Period>> deepCopyCache(Map<Long, List<Period>> original) {
         Map<Long, List<Period>> copy = new HashMap<>();

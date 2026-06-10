@@ -58,13 +58,25 @@ public class WorkshopService {
 
     public List<Workshop> findAllByEquipmentTypes(List<EquipmentType> types) {
         List<Workshop> result = repository.findAllByEquipmentTypes(types, types.size());
-        if (result.isEmpty()) throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
+        if (result.isEmpty())
+            throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
         return result;
     }
 
     public void validateEquipmentSupport(String code, List<EquipmentType> types) {
         long matchingTypesCount = repository.countMatchingEquipmentTypes(code, types);
-        if(matchingTypesCount != types.size()) throw new BusinessException("El taller " + code + " no cuenta con los equipos necesarios para fabricar el producto");
+        if (matchingTypesCount != types.size())
+            throw new BusinessException(
+                    "El taller " + code + " no cuenta con los equipos necesarios para fabricar el producto");
+    }
+
+    public Workshop resolveWorkshop(String workshopCode, List<EquipmentType> requiredTypes) {
+        if (workshopCode != null) {
+            Workshop result = this.findByCode(workshopCode);
+            this.validateEquipmentSupport(workshopCode, requiredTypes);
+            return result;
+        }
+        return this.findByEquipmentTypes(requiredTypes);
     }
 
     @Transactional
