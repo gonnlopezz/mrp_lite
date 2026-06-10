@@ -130,7 +130,7 @@ public class Planificador {
         }
 
         pedido.markAsUnschedulable("El pedido no pudo planificarse en el plazo requerido",
-                esPositivo(mejorCantidadPlanificable));
+                mejorCantidadPlanificable > 0? mejorCantidadPlanificable : null);
         return List.of();
     }
 
@@ -152,7 +152,4 @@ public class Planificador {
         return resultado;
     }
 
-    private Integer esPositivo(int value) {
-        return value > 0 ? value : null;
-    }
 }
