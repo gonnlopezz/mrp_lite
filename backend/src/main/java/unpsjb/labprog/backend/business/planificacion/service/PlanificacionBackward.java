@@ -1,7 +1,6 @@
 package unpsjb.labprog.backend.business.planificacion.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import org.springframework.stereotype.Component;
 import unpsjb.labprog.backend.exception.SchedulingException;
@@ -34,6 +33,6 @@ public class PlanificacionBackward implements EstrategiaPlanificacion {
             finActual = inicio;
         }
 
-        return new ProcesoPlanificacion(new ArrayList<>(planificaciones), planificaciones.getFirst().getPeriodo().getInicio(), deadline);
+        return new ProcesoPlanificacion(planificaciones, planificaciones.getFirst().getPeriodo().getInicio(), deadline);
     }
 }

@@ -31,7 +31,7 @@ public class Planificador {
     private PedidoService orderService;
 
     @Autowired
-    private PlanificacionRepository planningRepository; // Repositorio directo
+    private PlanificacionRepository planningRepository; 
 
     private final Map<String, EstrategiaPlanificacion> estrategias;
 
@@ -65,9 +65,9 @@ public class Planificador {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
         Map<Long, AgendaTaller> agendasTalleres = new HashMap<>();
 
-        for (Pedido pedido : pedidos) {
+        for (Pedido pedido : pedidos) 
             resultado.addAll(planificarPedido(pedido, inicioEjecucion, agendasTalleres));
-        }
+        
 
         orderService.saveAll(pedidos);
         return resultado;
@@ -103,9 +103,7 @@ public class Planificador {
             }
         }
 
-        pedido.markAsUnschedulable(
-                "El pedido no pudo planificarse en el plazo requerido",
-                positiveOrNull(mejorCantidadPlanificable));
+        pedido.markAsUnschedulable("El pedido no pudo planificarse en el plazo requerido", positiveOrNull(mejorCantidadPlanificable));
         return List.of();
     }
 
@@ -119,16 +117,13 @@ public class Planificador {
         return AgendaTaller.construirDesde(taller, planificaciones, inicio, fin);
     }
 
-    private List<ProcesoPlanificacion> planificarUnidades(
-            Pedido pedido, Taller taller, AgendaTaller agenda,
-            LocalDateTime deadline, LocalDateTime inicioLimite) {
+    private List<ProcesoPlanificacion> planificarUnidades(Pedido pedido, Taller taller, AgendaTaller agenda,LocalDateTime deadline, LocalDateTime inicioLimite) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
 
         EstrategiaPlanificacion estrategia = estrategias.get("BACKWARD");
 
         for (int i = 0; i < pedido.getCantidad(); i++) {
-            ProcesoPlanificacion proceso = estrategia.ejecutar(
-                    pedido.getProducto(), taller, agenda, deadline);
+            ProcesoPlanificacion proceso = estrategia.ejecutar(pedido.getProducto(), taller, agenda, deadline);
 
             if (proceso.getInicio().isBefore(inicioLimite)) {
                 throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido", resultado.size());
