@@ -24,7 +24,7 @@ public class PlanningProcessService {
     PlanningProcessRepository repository;
 
     @Autowired
-    PlanningScheduler scheduler;
+    Planificador scheduler;
 
     @Autowired
     ManufacturingOrderService orderService;

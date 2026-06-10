@@ -14,7 +14,6 @@ public class AgendaEquipo {
     private final Equipment equipo;
     private final List<Period> huecosLibres;
 
-    // Ahora el constructor pide explícitamente los límites de la simulación para evitar el desfasaje de años
     public AgendaEquipo(Equipment equipo, List<Planning> planificaciones, 
                         LocalDateTime inicioHorizonte, LocalDateTime finHorizonte) {
         this.equipo = equipo;
@@ -70,21 +69,31 @@ public class AgendaEquipo {
     }
 
     public void ocupar(Period periodoReserva) {
-        for (int i = 0; i < huecosLibres.size(); i++) {
+        int i = 0;
+        boolean buscando = true;
+
+        while (i < huecosLibres.size() && buscando) {
             Period hueco = huecosLibres.get(i);
 
             if (!periodoReserva.getStart().isBefore(hueco.getStart()) && !periodoReserva.getEndDate().isAfter(hueco.getEndDate())) {
+                
                 huecosLibres.remove(i);
                 
                 if (hueco.getStart().isBefore(periodoReserva.getStart())) {
                     huecosLibres.add(i, new Period(hueco.getStart(), periodoReserva.getStart(), 0));
                     i++;
                 }
+                
                 if (hueco.getEndDate().isAfter(periodoReserva.getEndDate())) {
                     huecosLibres.add(i, new Period(periodoReserva.getEndDate(), hueco.getEndDate(), 0));
                 }
-                break;
+                
+                buscando = false;
+            } else {
+                i++;
             }
         }
     }
+
+    
 }

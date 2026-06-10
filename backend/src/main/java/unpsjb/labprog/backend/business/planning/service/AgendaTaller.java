@@ -18,24 +18,24 @@ public class AgendaTaller {
         this.agendasPorEquipoId = agendas;
     }
 
-    public static AgendaTaller construirDesde(Workshop taller, List<Planning> planificaciones, 
-                                              LocalDateTime inicio, LocalDateTime fin) {
+    public static AgendaTaller construirDesde(Workshop taller, List<Planning> planificaciones,
+            LocalDateTime inicio, LocalDateTime fin) {
         Map<Long, List<Planning>> porEquipo = new HashMap<>();
         for (Planning planificacion : planificaciones) {
             Long equipoId = planificacion.getEquipment().getId();
-            if (!porEquipo.containsKey(equipoId)) {
+
+            if (!porEquipo.containsKey(equipoId))
                 porEquipo.put(equipoId, new ArrayList<>());
-            }
+
             porEquipo.get(equipoId).add(planificacion);
         }
 
         Map<Long, AgendaEquipo> agendas = new HashMap<>();
         for (Equipment equipo : taller.getEquipments()) {
             List<Planning> planificacionesEquipo = porEquipo.get(equipo.getId());
-            if (planificacionesEquipo == null) {
+            if (planificacionesEquipo == null)
                 planificacionesEquipo = new ArrayList<>();
-            }
-            // Pasamos las variables temporales del horizonte
+
             agendas.put(equipo.getId(), new AgendaEquipo(equipo, planificacionesEquipo, inicio, fin));
         }
 
@@ -46,8 +46,8 @@ public class AgendaTaller {
         return agendasPorEquipoId.get(equipo.getId());
     }
 
-    public Workshop getTaller() { 
-        return taller; 
+    public Workshop getTaller() {
+        return taller;
     }
 
     public AgendaTaller copiar() {
@@ -57,4 +57,6 @@ public class AgendaTaller {
         }
         return new AgendaTaller(this.taller, copiaAgendas);
     }
+
+    
 }

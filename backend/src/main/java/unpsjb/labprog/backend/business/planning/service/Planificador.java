@@ -19,7 +19,7 @@ import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
 
 @Service
-public class PlanningScheduler {
+public class Planificador {
 
     @Autowired
     private ProductService productService;
@@ -37,7 +37,7 @@ public class PlanningScheduler {
     private final Map<String, EstrategiaPlanificacion> estrategias;
 
     @Autowired
-    public PlanningScheduler(Map<String, EstrategiaPlanificacion> estrategias) {
+    public Planificador(Map<String, EstrategiaPlanificacion> estrategias) {
         this.estrategias = estrategias;
     }
 
@@ -47,7 +47,6 @@ public class PlanningScheduler {
         Workshop taller = workshopService.resolveWorkshop(
                 request.getWorkshopCode(), producto.requiredEquipmentTypes());
 
-        // Obtenemos la estrategia Forward de manera dinámica
         EstrategiaPlanificacion estrategia = estrategias.get("FORWARD");
         return estrategia.ejecutar(producto, taller, null, inicio);
     }
@@ -66,10 +65,10 @@ public class PlanningScheduler {
     public List<PlanningProcess> planBulkOrders(
             List<ManufacturingOrder> pedidos, LocalDateTime inicioEjecucion) {
         List<PlanningProcess> resultado = new ArrayList<>();
-        Map<Long, AgendaTaller> cacheTalleres = new HashMap<>(); // Reutiliza agendas entre pedidos del lote
+        Map<Long, AgendaTaller> agendasTalleres = new HashMap<>(); // Reutiliza agendas entre pedidos del lote
 
         for (ManufacturingOrder pedido : pedidos) {
-            resultado.addAll(planificarPedidoSeguro(pedido, inicioEjecucion, cacheTalleres));
+            resultado.addAll(planificarPedidoSeguro(pedido, inicioEjecucion, agendasTalleres));
         }
 
         orderService.saveAll(pedidos);
@@ -78,13 +77,13 @@ public class PlanningScheduler {
 
     private List<PlanningProcess> planificarPedidoSeguro(
             ManufacturingOrder pedido, LocalDateTime inicioLimite,
-            Map<Long, AgendaTaller> cacheTalleres) {
+            Map<Long, AgendaTaller> agendasTalleres) {
         try {
             List<Workshop> talleres = workshopService.findPossibleWorkshops(
                     pedido.getProduct().requiredEquipmentTypes());
 
             List<PlanningProcess> procesos = planificarEnPrimerTallerDisponible(
-                    pedido, talleres, pedido.getDeliveryDate().atStartOfDay(), inicioLimite, cacheTalleres);
+                    pedido, talleres, pedido.getDeliveryDate().atStartOfDay(), inicioLimite, agendasTalleres);
 
             pedido.markAsPlanned();
             return procesos;
@@ -100,19 +99,19 @@ public class PlanningScheduler {
     private List<PlanningProcess> planificarEnPrimerTallerDisponible(
             ManufacturingOrder pedido, List<Workshop> talleres,
             LocalDateTime deadline, LocalDateTime inicioLimite,
-            Map<Long, AgendaTaller> cacheTalleres) {
+            Map<Long, AgendaTaller> agendasTalleres) {
         int mejorCantidadPlanificable = 0;
 
         for (Workshop taller : talleres) {
             // 2. Obtenemos la agenda pasando únicamente los 2 parámetros que tu clase
             // requiere
-            AgendaTaller agendaSimulacion = obtenerAgendaParaSimulacion(taller, cacheTalleres, inicioLimite, deadline);
+            AgendaTaller agendaSimulacion = obtenerAgendaParaSimulacion(taller, agendasTalleres, inicioLimite, deadline);
             try {
                 List<PlanningProcess> procesos = planificarUnidades(
                         pedido, taller, agendaSimulacion, deadline, inicioLimite);
 
                 // Confirmamos la simulación exitosa en el caché persistente del lote
-                cacheTalleres.put(taller.getId(), agendaSimulacion);
+                agendasTalleres.put(taller.getId(), agendaSimulacion);
                 return procesos;
             } catch (SchedulingException e) {
                 mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
