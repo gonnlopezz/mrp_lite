@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 import lombok.Getter;
 import lombok.Setter;
-import unpsjb.labprog.backend.model.ManufacturingOrder;
+import unpsjb.labprog.backend.model.Pedido;
 
 @Getter
 @Setter
 public class PlanningFromOrderRequestDTO {
-    private ManufacturingOrder order;
+    private Pedido order;
     private LocalDateTime startDate;
 }

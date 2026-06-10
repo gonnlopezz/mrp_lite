@@ -27,12 +27,12 @@ Given('se fabrica haciendo la siguiente lista de tareas', async function (tabla)
 
 
         return {
-            name: fila.nombreTarea,
-            taskOrder: parseInt(fila.orden),
-            duration: parseInt(fila.tiempo),
-            type: {
+            nombre: fila.nombreTarea,
+            orden: parseInt(fila.orden),
+            tiempo: parseInt(fila.tiempo),
+            tipo: {
                 id: realType.id,
-                name: realType.name
+                nombre: realType.nombre
             }
         };
     }));
@@ -44,8 +44,8 @@ When('presiono el botón de guardar producto', async function () {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                name: this.productName,
-                tasks: this.tasks
+                nombre: this.productName,
+                tareas: this.tasks
             })
         });
 

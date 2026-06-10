@@ -14,7 +14,7 @@ When('presiono el botón de guardar tipoEquipo', async function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                name: this.name
+                nombre: this.name
             })
         });
         

@@ -27,11 +27,11 @@ Given('se encuentra en estado {string}', function (estadoEsperado) {
 When('se solicita generar un pedido para ese cliente fecha de pedido {string} para entregar en la fecha {string} la cantidad de {int} del producto', async function (fechaPedido, fechaEntrega, cantidad) {
 
     this.pedido = {
-        orderDate: fechaPedido,
-        deliveryDate: fechaEntrega,
-        quantity: cantidad,
-        customer: this.customer,
-        product: this.product
+        fechaPedido: fechaPedido,
+        fechaEntrega: fechaEntrega,
+        cantidad: cantidad,
+        cliente: this.customer,
+        producto: this.product
     };
 
 

@@ -1,0 +1,11 @@
+package unpsjb.labprog.backend.business.planificacion.service;
+
+
+import java.time.LocalDateTime;
+import unpsjb.labprog.backend.model.ProcesoPlanificacion;
+import unpsjb.labprog.backend.model.Producto;
+import unpsjb.labprog.backend.model.Taller;
+
+public interface EstrategiaPlanificacion {
+    ProcesoPlanificacion ejecutar(Producto producto, Taller taller, AgendaTaller agenda, LocalDateTime fechaReferencia);
+}

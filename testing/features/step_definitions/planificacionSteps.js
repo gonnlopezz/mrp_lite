@@ -100,17 +100,17 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
 
     let planificacionesReal = [];
     procesos.forEach(proceso => {
-        if (proceso && proceso.plannings) {
-            planificacionesReal.push(...proceso.plannings);
+        if (proceso && proceso.planificaciones) {
+            planificacionesReal.push(...proceso.planificaciones);
         }
     });
 
     planificacionesReal.sort((a, b) => {
-        const dateA = new Date(a.period.start);
-        const dateB = new Date(b.period.start);
+        const dateA = new Date(a.periodo.inicio);
+        const dateB = new Date(b.periodo.inicio);
         
         if (dateA.getTime() === dateB.getTime()) {
-            return a.equipment.code.localeCompare(b.equipment.code); // Desempate
+            return a.equipo.código.localeCompare(b.equipo.código); // Desempate
         }
         return dateA - dateB;
     });
@@ -119,10 +119,10 @@ Then('se generaron las siguientes planificaciones', function (dataTable) {
         `La cantidad de tareas no coincide. Esperadas: ${planificacionesEsperadas.length}, Reales: ${planificacionesReal.length}`);
     planificacionesEsperadas.forEach((esperada, index) => {
         const real = planificacionesReal[index];
-        const inicio = real.period.start.replace('T', ' ').substring(0, 16);
-        const fin = real.period.endDate.replace('T', ' ').substring(0, 16);
-        const equipo = real.equipment.code;
-        const tarea = real.task.name;
+        const inicio = real.periodo.inicio.replace('T', ' ').substring(0, 16);
+        const fin = real.periodo.fin.replace('T', ' ').substring(0, 16);
+        const equipo = real.equipo.código;
+        const tarea = real.tarea.nombre;
         // if (inicio.startsWith('2025-03-05')) {
         //     console.log(`| ${inicio} | ${fin} | ${equipo} | ${tarea}        |`);
         // }
@@ -141,12 +141,12 @@ Then('se generaron {int} planificaciones para el equipo {string}', function (can
 
     let planificacionesReal = [];
     procesos.forEach(proceso => {
-        if (proceso && proceso.plannings) {
-            planificacionesReal.push(...proceso.plannings);
+        if (proceso && proceso.planificaciones) {
+            planificacionesReal.push(...proceso.planificaciones);
         }
     });
 
-    const tareasDelEquipo = planificacionesReal.filter(tarea => tarea.equipment.code === codigoEquipo);
+    const tareasDelEquipo = planificacionesReal.filter(tarea => tarea.equipo.código === codigoEquipo);
     
     const assert = require('assert');
     assert.strictEqual(tareasDelEquipo.length, cantidadEsperada, 

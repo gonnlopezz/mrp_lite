@@ -1,7 +1,7 @@
-TRUNCATE TABLE customer RESTART IDENTITY CASCADE;
-TRUNCATE TABLE planning RESTART IDENTITY CASCADE;
-TRUNCATE TABLE planning_process RESTART IDENTITY CASCADE;
-TRUNCATE TABLE manufacturing_order RESTART IDENTITY CASCADE;
+TRUNCATE TABLE cliente RESTART IDENTITY CASCADE;
+TRUNCATE TABLE planificacion RESTART IDENTITY CASCADE;
+TRUNCATE TABLE proceso_planificacion RESTART IDENTITY CASCADE;
+TRUNCATE TABLE pedido_fabricacion RESTART IDENTITY CASCADE;
 
 DO $$
 DECLARE
@@ -16,7 +16,7 @@ BEGIN
 
     -- 2. GENERACIÓN AUTOMATIZADA DE 100 CLIENTES (IDs del 600 al 699)
     FOR i IN 0..99 LOOP
-        INSERT INTO customer (id, cuit, company_name, observations)
+        INSERT INTO cliente (id, cuit, razon_social, observaciones)
         VALUES (
             600 + i, 
             20450000000 + i, 
@@ -45,7 +45,7 @@ BEGIN
         -- Cantidades controladas variables (entre 2 y 35 unidades) para saturar talleres progresivamente
         v_quantity := (i * 13) % 34 + 2;
 
-        INSERT INTO manufacturing_order (id, order_date, delivery_date, quantity, order_state, customer_id, product_id)
+        INSERT INTO pedido_fabricacion (id, fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
         VALUES (
             2000 + i, 
             v_order_date, 

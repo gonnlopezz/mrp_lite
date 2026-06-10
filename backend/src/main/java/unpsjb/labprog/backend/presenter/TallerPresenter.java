@@ -1,0 +1,73 @@
+package unpsjb.labprog.backend.presenter;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import unpsjb.labprog.backend.Response;
+import unpsjb.labprog.backend.business.taller.TallerService;
+import unpsjb.labprog.backend.model.Taller;
+
+@RestController
+@RequestMapping("/workshops")
+public class TallerPresenter {
+    @Autowired
+    TallerService service;
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<Object> findAll() {
+        return Response.ok(service.findAll());
+    }
+
+    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    public ResponseEntity<Object> findByPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Response.ok(service.findByPage(page, size));
+    }
+
+    @RequestMapping(value = "/search/{term}", method = RequestMethod.GET)
+    public ResponseEntity<Object> search(
+            @PathVariable String term,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Response.ok(service.search(term, page, size));
+    }
+
+    @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Object> findById(@PathVariable("id") int id) {
+        return Response.ok(service.findById(id));
+    }
+
+    @RequestMapping(value = "/code/{code}", method = RequestMethod.GET)
+    public ResponseEntity<Object> findByCode(@PathVariable("code") String code) {
+        return Response.ok(service.findByCode(code));
+    }
+
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Object> create(@RequestBody Taller aTaller) {
+        return Response.ok(service.save(aTaller), "Taller " + aTaller.getCodigo() + " ingresado correctamente");
+    }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public ResponseEntity<Object> update(@RequestBody Taller aTaller) {
+        return Response.ok(service.save(aTaller), "Taller " + aTaller.getCodigo() + " actualizado correctamente");
+    }
+
+    @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Object> delete(@PathVariable("id") int id) {
+        service.delete(id);
+        return Response.ok("Taller id " + id + " eliminado con éxito.");
+    }
+
+    @RequestMapping(value = "/id/{id}/plannings", method = RequestMethod.GET)
+    public ResponseEntity<Object> getPlanningProcesses(@PathVariable Integer id) {
+        return Response.ok(service.getPlanningProcesses(id));
+    }
+}

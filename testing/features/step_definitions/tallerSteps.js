@@ -25,15 +25,15 @@ Given('se agrega el equipo {string} del tipo {string} y {int}', async function (
     const realType = dataPackage.data;
 
     const equip = {
-        code: equipmentCode,
-        capacity: capacity,
-        type: { 
+        código: equipmentCode,
+        capacidad: capacity,
+        tipo: { 
             id: realType.id,            
-            name: realType.name
+            nombre: realType.nombre
          }
     };
 
-    this.taller.equipments.push(equip);
+    this.taller.equipos.push(equip);
 });
 
 When('presiono el botón de guardar taller', async function () {
@@ -45,8 +45,8 @@ When('presiono el botón de guardar taller', async function () {
 
 
             body: JSON.stringify({
-                code: this.workshopCode,
-                name: this.name
+                codigo: this.workshopCode,
+                nombre: this.name
             })
         });
 
