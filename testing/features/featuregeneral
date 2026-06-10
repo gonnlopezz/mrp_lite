@@ -1,0 +1,270 @@
+#language: es
+Característica: Proceso de planificación progresivo
+  Realiza de forma progresiva todo el camino de planificación desde la creación de los productos, talleres y equipos.
+  Aquí solo se prueban los casos positivos, los errores irán por otra característica.
+
+  Escenario: Planificación de un producto sobre un taller seleccionado vacío
+    Dado el producto con nombre "Soporte metálico mediano"
+    Y que existe el taller "ALFA"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 200 con "Producto planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-01-01 00:00 | 2025-01-01 01:00 | A01_amoladora | cortar planchas     |
+      | 2025-01-01 01:00 | 2025-01-01 01:20 | A01_amoladora | cortar perfiles     |
+      | 2025-01-01 01:20 | 2025-01-01 02:50 | A02_soldadora | armado              |
+
+
+  Escenario: Planificación de un producto sobre un taller seleccionado con planificaciones previas
+    Dado el producto con nombre "Soporte metálico mediano"
+    Y que existe el taller "ALFA"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 200 con "Producto planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-01-01 01:20 | 2025-01-01 02:20 | A01_amoladora | cortar planchas     |
+      | 2025-01-01 02:20 | 2025-01-01 02:40 | A01_amoladora | cortar perfiles     |
+      | 2025-01-01 02:50 | 2025-01-01 04:20 | A02_soldadora | armado              |
+
+
+Escenario: Planificación de un producto sobre un taller seleccionado con mayor capacidad
+    Dado el producto con nombre "Andamio básico 2x2x4"
+    Dado que existe el taller "BETA"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 200 con "Producto planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea                   |
+      | 2025-01-01 00:00 | 2025-01-01 00:05 | B01_amoladora | cortar caños            |
+      | 2025-01-01 00:05 | 2025-01-01 00:15 | B02_taladro   | realizar perforaciones  |
+      | 2025-01-01 00:15 | 2025-01-01 00:35 | B03_pistola   | aplicar capa protectora |     
+
+
+Escenario: Planificación de un producto sin indicar el taller, pero solo uno puede hacerlo
+    Dado el producto con nombre "Canasto de basura chico 1,5mts"
+    Cuando se solicita planificar el producto el día "01-01-2025"
+    Entonces se espera el siguiente 200 con "Producto planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-01-01 00:00 | 2025-01-01 00:30 | G01_amoladora | cortar perfiles     |
+      | 2025-01-01 00:30 | 2025-01-01 00:40 | G01_amoladora | cortar malla        |
+      | 2025-01-01 00:40 | 2025-01-01 00:55 | G02_soldadora | soldar canasto      |
+      | 2025-01-01 00:55 | 2025-01-01 01:05 | G02_soldadora | unir pie            |
+      | 2025-01-01 01:05 | 2025-01-01 02:05 | G04_pistola   | pintar antioxidante |
+
+
+  Escenario: Planificación de un producto sin indicar el taller, pero solo uno puede hacerlo y con las planificaciones previas
+    Dado el producto con nombre "Canasto de basura chico 1,5mts"
+    Cuando se solicita planificar el producto el día "01-01-2025"
+    Entonces se espera el siguiente 200 con "Producto planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-01-01 00:40 | 2025-01-01 01:10 | G01_amoladora | cortar perfiles     |
+      | 2025-01-01 01:10 | 2025-01-01 01:20 | G01_amoladora | cortar malla        |
+      | 2025-01-01 01:20 | 2025-01-01 01:35 | G02_soldadora | soldar canasto      |
+      | 2025-01-01 01:35 | 2025-01-01 01:45 | G02_soldadora | unir pie            |
+      | 2025-01-01 02:05 | 2025-01-01 03:05 | G04_pistola   | pintar antioxidante |
+
+
+  Escenario: Intentar planificar un producto que no existe
+    Dado el producto con nombre "Producto Fantasma"
+    Cuando se solicita planificar el producto el día "01-01-2025"
+    Entonces se espera el siguiente 404 con "Producto no encontrado"
+
+ Escenario: Intentar planificar en un taller que no existe
+    Dado el producto con nombre "Soporte metálico mediano"
+    Y que no existe el taller "TALLER_INEXISTENTE"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 404 con "Taller no encontrado"
+
+  Escenario: Planificación automática falla porque ningún taller tiene los equipos necesarios
+    Dado el producto con nombre "Soporte en U para estantería"
+    Cuando se solicita planificar el producto el día "01-01-2025"
+    Entonces se espera el siguiente 409 con "No se encontró un taller con el equipamiento requerido para el producto"
+
+  Escenario: Intentar planificar en un taller que no tiene los equipos requeridos por el producto
+    Dado el producto con nombre "Canasto de basura chico 1,5mts"
+    Y que existe el taller "BETA"
+    Cuando se solicita planificar el producto en el taller el día "01-01-2025"
+    Entonces se espera el siguiente 409 con "El taller BETA no cuenta con los equipos necesarios para fabricar el producto"
+# language: es
+
+Característica: administrar pedidos de fabricación
+   permite generar, recuperar y gestionar los pedidos de fabricación
+
+  Esquema del escenario: Carga de clientes para los pedidos de fabricación
+    Dado que se ingresa el cliente con "<razonSocial>" y <cuit>
+    Cuando presiono el botón de guardar cliente
+    Entonces se espera el siguiente <status> con "<respuesta>"
+    Ejemplos:
+      | razonSocial    | cuit        | status | respuesta                                                   |
+      | Marty McFly    | 27123456781 |    200 | Cliente Marty McFly 27123456781 registrado correctamente    |
+      | Sarah Connor   | 20304958722 |    200 | Cliente Sarah Connor 20304958722 registrado correctamente   |
+      | Luke Skywalker | 23176843593 |    200 | Cliente Luke Skywalker 23176843593 registrado correctamente |
+      | Ellen Ripley   | 27982145634 |    200 | Cliente Ellen Ripley 27982145634 registrado correctamente   |
+      | Frodo Bolsón   | 20654239875 |    200 | Cliente Frodo Bolsón 20654239875 registrado correctamente   |
+
+  Esquema del escenario: Generar nuevos pedidos de fabricación
+    Dado el producto con nombre "<producto>"
+    Y el cliente con <cuit>
+    Cuando se solicita generar un pedido para ese cliente fecha de pedido "<fechaPedido>" para entregar en la fecha "<fechaEntrega>" la cantidad de <cantidad> del producto
+    Entonces se espera el siguiente <status> con "<respuesta>"
+    Ejemplos:
+      | cuit        | fechaPedido  | fechaEntrega | cantidad | producto                  | status | respuesta                                    |
+      | 27123456781 | 2025-02-01   | 2025-02-03   |        1 | Soporte metálico mediano  |    200 | Pedido de fabricación generado correctamente |
+      | 20304958722 | 2025-02-04   | 2025-02-05   |        3 | Soporte metálico mediano  |    200 | Pedido de fabricación generado correctamente |
+      | 23176843593 | 2025-02-08   | 2025-02-10   |       20 | Soporte metálico mediano  |    200 | Pedido de fabricación generado correctamente |
+      | 27982145634 | 2025-02-09   | 2025-02-10   |        1 | Soporte metálico mediano  |    200 | Pedido de fabricación generado correctamente |      
+
+  Esquema del escenario: Generar nuevos pedidos de fabricación para el proceso de planificación
+    Dada el producto con nombre "<producto>"
+    Y el cliente con <cuit>
+    Cuando se solicita generar un pedido para ese cliente fecha de pedido "<fechaPedido>" para entregar en la fecha "<fechaEntrega>" la cantidad de <cantidad> del producto
+    Entonces se espera el siguiente <status> con "<respuesta>"
+    Ejemplos:
+      | cuit        | fechaPedido  | fechaEntrega | cantidad | producto                        | status | respuesta                                    |
+      | 20654239875 | 2025-03-01   | 2025-03-06   |        4 | Canasto de basura chico 1,5mts  |    200 | Pedido de fabricación generado correctamente |
+      | 20654239875 | 2025-03-01   | 2025-03-06   |        3 | Pieza chica en U                |    200 | Pedido de fabricación generado correctamente |
+# language: es
+Característica: Proceso de planificación progresivo
+  Realiza de forma progresiva todo el camino de planificacion desde la creación de los productos, talleres y equipos.
+  Aquí solo se prueban los casos positivos, los errores iran por otra característica.
+
+  Escenario: Planificación de un pedido con un producto para estar terminado en la fecha de entrega.
+    Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-02-2025"
+    Cuando se solicita planificar el pedido el día "01-02-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-02-02 21:10 | 2025-02-02 22:10 | A01_amoladora | cortar planchas     |
+      | 2025-02-02 22:10 | 2025-02-02 22:30 | A01_amoladora | cortar perfiles     |
+      | 2025-02-02 22:30 | 2025-02-03 00:00 | A02_soldadora | armado              |
+
+
+  Escenario: Planificación de un pedido con varios productos para estar terminado en la fecha de entrega.
+    Dado que existe el pedido para el cliente "20304958722" con fecha de entrega "05-02-2025"
+    Cuando se solicita planificar el pedido el día "04-02-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-02-04 18:10 | 2025-02-04 19:10 | A01_amoladora | cortar planchas     |
+      | 2025-02-04 19:10 | 2025-02-04 19:30 | A01_amoladora | cortar perfiles     |
+      | 2025-02-04 19:30 | 2025-02-04 21:00 | A02_soldadora | armado              |
+      | 2025-02-04 19:40 | 2025-02-04 20:40 | A01_amoladora | cortar planchas     |
+      | 2025-02-04 20:40 | 2025-02-04 21:00 | A01_amoladora | cortar perfiles     |
+      | 2025-02-04 21:00 | 2025-02-04 22:30 | A02_soldadora | armado              |
+      | 2025-02-04 21:10 | 2025-02-04 22:10 | A01_amoladora | cortar planchas     |
+      | 2025-02-04 22:10 | 2025-02-04 22:30 | A01_amoladora | cortar perfiles     |
+      | 2025-02-04 22:30 | 2025-02-05 00:00 | A02_soldadora | armado              |
+
+
+  Escenario: Planificación de un pedido con muchos productos para estar terminado en la fecha de entrega.
+    Dado que existe el pedido para el cliente "23176843593" con fecha de entrega "10-02-2025"
+    Cuando se solicita planificar el pedido el día "08-02-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron 40 planificaciones para el equipo "A01_amoladora"
+    Y se generaron 20 planificaciones para el equipo "A02_soldadora"
+
+Escenario: Planificación de un pedido con el taller primera opción completamente ocupado.
+    Dado que existe el pedido para el cliente "27982145634" con fecha de entrega "10-02-2025"
+    Cuando se solicita planificar el pedido el día "09-02-2025"
+    Entonces se espera el siguiente 200 con "Pedido planificado con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea               |
+      | 2025-02-09 22:35 | 2025-02-09 23:05 | G01_amoladora | cortar planchas     |
+      | 2025-02-09 23:05 | 2025-02-09 23:15 | G01_amoladora | cortar perfiles     |
+      | 2025-02-09 23:15 | 2025-02-10 00:00 | G02_soldadora | armado              |
+
+
+
+Escenario: Planificación de todos los pedidos pendientes. Y uso de huecos en equipos.
+    Dado que existen los pedidos pendientes de planificacion antes cargados
+    Cuando se solicita planificar todos los pedidos pendientes el día "02-03-2025"
+    Entonces se espera el siguiente 200 con "Pedidos pendientes planificados con éxito"
+    Y se generaron las siguientes planificaciones
+      | inicio           | fin              | equipo        | tarea                  |
+      | 2025-03-05 18:55 | 2025-03-05 19:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 19:20 | 2025-03-05 19:35 | G02_soldadora | unir ramas             |
+      | 2025-03-05 19:25 | 2025-03-05 19:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 19:35 | 2025-03-05 19:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 19:50 | 2025-03-05 20:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 19:55 | 2025-03-05 20:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 20:00 | 2025-03-05 21:20 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 20:00 | 2025-03-05 21:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 20:25 | 2025-03-05 20:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 20:35 | 2025-03-05 20:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 20:50 | 2025-03-05 21:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 20:55 | 2025-03-05 21:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 21:00 | 2025-03-05 22:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 21:05 | 2025-03-05 21:20 | G02_soldadora | unir ramas             |
+      | 2025-03-05 21:20 | 2025-03-05 22:40 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 21:25 | 2025-03-05 21:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 21:35 | 2025-03-05 21:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 21:50 | 2025-03-05 22:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 21:55 | 2025-03-05 22:25 | G01_amoladora | cortar perfiles        |
+      | 2025-03-05 22:00 | 2025-03-05 23:00 | G04_pistola   | pintar antioxidante    |
+      | 2025-03-05 22:20 | 2025-03-05 22:35 | G02_soldadora | unir ramas             |
+      | 2025-03-05 22:25 | 2025-03-05 22:35 | G01_amoladora | cortar malla           |
+      | 2025-03-05 22:35 | 2025-03-05 22:50 | G02_soldadora | soldar canasto         |
+      | 2025-03-05 22:40 | 2025-03-06 00:00 | G03_taladro   | realizar perforaciones |
+      | 2025-03-05 22:50 | 2025-03-05 23:00 | G02_soldadora | unir pie               |
+      | 2025-03-05 23:00 | 2025-03-06 00:00 | G04_pistola   | pintar antioxidante    |
+
+  # language: es
+  Característica: Generar pedidos que no puedan ser fabricables 
+
+  Esquema del escenario: Generar nuevos pedidos de fabricación no planificables
+    Dada el producto con nombre "<producto>"
+    Y el cliente con <cuit>
+    Cuando se solicita generar un pedido para ese cliente fecha de pedido "<fechaPedido>" para entregar en la fecha "<fechaEntrega>" la cantidad de <cantidad> del producto
+    Entonces se espera el siguiente <status> con "<respuesta>"
+    Ejemplos:
+      | cuit        | fechaPedido  | fechaEntrega | cantidad | producto                      | status | respuesta                                    |
+      | 20654239875 | 2025-06-01   | 2025-06-06   |        3 | Soporte en U para estantería  |    200 | Pedido de fabricación generado correctamente |
+      | 27123456781 | 2025-06-03   | 2025-06-03   |        1 | Soporte en U para estantería  |    200 | Pedido de fabricación generado correctamente |
+
+Escenario: Generación exitosa de un pedido no planificable con alta cantidad de unidades
+    Dado el producto con nombre "Soporte metálico mediano"
+    Y el cliente con 30000000033
+    Cuando se solicita generar un pedido para ese cliente fecha de pedido "2025-02-09" para entregar en la fecha "2025-02-10" la cantidad de 100 del producto
+    Entonces se espera el siguiente status: 200 con la respuesta: "Pedido de fabricación generado correctamente"
+
+    Esquema del escenario: Generar nuevos pedidos de fabricación no planificables y planificables
+    Dada el producto con nombre "<producto>"
+    Y el cliente con <cuit>
+    Cuando se solicita generar un pedido para ese cliente fecha de pedido "<fechaPedido>" para entregar en la fecha "<fechaEntrega>" la cantidad de <cantidad> del producto
+    Entonces se espera el siguiente <status> con "<respuesta>"
+    Ejemplos:
+      | cuit        | fechaPedido | fechaEntrega | cantidad | producto                     | status | respuesta                                    |
+      | 10000000013 | 2025-06-03  | 2025-06-09   |        1 | Soporte en U para estantería |    200 | Pedido de fabricación generado correctamente |
+      | 10000000013 | 2025-06-01  | 2025-06-09   |        3 | Soporte en U para estantería |    200 | Pedido de fabricación generado correctamente |
+      | 10000000013 | 2025-06-01  | 2025-06-15   |        2 | Soporte metálico mediano     |    200 | Pedido de fabricación generado correctamente |# language: es
+Característica: Casos negativos de planificación de pedidos
+Escenario: Intentar planificar un pedido que no existe
+    Dado que no existe ningún pedido con id 99999
+    Cuando se solicita planificar el pedido el día "01-02-2025"
+    Entonces se espera el siguiente 404 con "Pedido no encontrado"
+
+Escenario: Intentar planificar un pedido cuyo estado no admite replanificación
+    Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-02-2025"
+    Cuando se solicita planificar el pedido el día "01-02-2025"
+    Entonces se espera el siguiente 409 con "El pedido ya se encuentra en estado planificado"
+
+Escenario: El producto del pedido requiere un tipo de equipo que ningún taller posee
+    Dado que existe el pedido para el cliente "20654239875" con fecha de entrega "06-06-2025"
+    Cuando se solicita planificar el pedido el día "01-06-2025"
+    Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido"
+
+Escenario: La fecha de entrega coincide con la fecha de ejecución dejando margen de tiempo cero
+    Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-06-2025"
+    Cuando se solicita planificar el pedido el día "03-06-2025"
+    Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido"
+
+Escenario: La cantidad de unidades supera la capacidad de todos los talleres en el plazo requerido
+    Dado que existe el pedido para el cliente "30000000033" con fecha de entrega "10-02-2025"
+    Cuando se solicita planificar el pedido el día "09-02-2025"
+    Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido"
+
+    Escenario: Planificar todos los pedidos pendientes marca el pedido no planificable sin interrumpir la planificación de los demás pedidos pendientes
+    Dado que existen los pedidos pendientes de planificacion antes cargados
+    Cuando se solicita planificar todos los pedidos pendientes el día "02-03-2025"
+    Entonces se espera el siguiente 200 con "Pedidos pendientes planificados con éxito"

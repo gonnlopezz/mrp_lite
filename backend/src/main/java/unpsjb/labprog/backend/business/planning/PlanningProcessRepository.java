@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import unpsjb.labprog.backend.model.Period;
+import unpsjb.labprog.backend.model.Planning;
 import unpsjb.labprog.backend.model.PlanningProcess;
 
 @Repository
@@ -38,4 +40,9 @@ public interface PlanningProcessRepository
                         @Param("workshopId") Long workshopId,
                         @Param("orderId") Long orderId);
 
+        @Query("SELECT p FROM Planning p " +
+                        "JOIN FETCH p.equipment e " +
+                        "WHERE e IN (SELECT eq FROM Workshop w JOIN w.equipments eq WHERE w.id = :tallerId) " +
+                        "ORDER BY e.id ASC, p.period.start ASC")
+        List<Planning> findPlanificacionesPorTaller(@Param("tallerId") Long tallerId);
 }

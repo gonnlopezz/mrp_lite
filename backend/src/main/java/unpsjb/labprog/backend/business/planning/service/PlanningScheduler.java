@@ -5,154 +5,147 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import unpsjb.labprog.backend.business.order.ManufacturingOrderService;
+import unpsjb.labprog.backend.business.planning.PlanningProcessRepository;
 import unpsjb.labprog.backend.business.product.ProductService;
 import unpsjb.labprog.backend.business.workshop.WorkshopService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.exception.SchedulingException;
-import unpsjb.labprog.backend.model.EquipmentType;
-import unpsjb.labprog.backend.model.ManufacturingOrder;
-import unpsjb.labprog.backend.model.Period;
-import unpsjb.labprog.backend.model.PlanningProcess;
-import unpsjb.labprog.backend.model.Product;
-import unpsjb.labprog.backend.model.Workshop;
+import unpsjb.labprog.backend.model.*;
 
 @Service
 public class PlanningScheduler {
 
-    @Autowired
-    ProductService productService;
-    @Autowired
-    WorkshopService workshopService;
-    @Autowired
-    ManufacturingOrderService orderService;
-    @Autowired
-    PlanningAlgorithm algorithm;
+    @Autowired 
+    private ProductService productService;
+    
+    @Autowired 
+    private WorkshopService workshopService;
+    
+    @Autowired 
+    private ManufacturingOrderService orderService;
+    
+    @Autowired 
+    private AlgoritmoPlanificacion algoritmo;
+    
+    @Autowired 
+    private PlanningProcessRepository planningRepository; // Repositorio directo
 
-    public PlanningProcess planForward(PlanningRequestDTO request) {
-        LocalDateTime start = request.getStartDate().toLocalDate().atStartOfDay();
-        Product product = productService.findByName(request.getProductName());
-        List<EquipmentType> requiredTypes = product.requiredEquipmentTypes();
-        Workshop workshop = workshopService.resolveWorkshop(request.getWorkshopCode(), requiredTypes);
-        return algorithm.scheduleForward(product, workshop, start);
+public PlanningProcess planForward(PlanningRequestDTO request) {
+        LocalDateTime inicio = request.getStartDate().toLocalDate().atStartOfDay();
+        Product producto = productService.findByName(request.getProductName());
+        Workshop taller = workshopService.resolveWorkshop(
+            request.getWorkshopCode(), producto.requiredEquipmentTypes());
+        
+        // Eliminamos la agenda y la consulta masiva. 
+        // Pasamos de forma directa los objetos de negocio esenciales.
+        return algoritmo.planificarForward(producto, taller, inicio);
     }
 
     public List<PlanningProcess> planBackward(PlanningFromOrderRequestDTO request) {
-        ManufacturingOrder order = orderService.findById(request.getOrder().getId());
-        order.validatePlannable();
-
-        Product product = productService.findById(order.getProduct().getId());
-        LocalDateTime deadline = order.getDeliveryDate().atStartOfDay();
-        LocalDateTime requestedStart = request.getStartDate().toLocalDate().atStartOfDay();
-        List<PlanningProcess> result = new ArrayList<>();
-
-        try {
-            List<Workshop> workshops = workshopService.findPossibleWorkshops(
-                    product.requiredEquipmentTypes());
-            result = scheduleBackwardOnFirstAvailableWorkshop(
-                    workshops, product, order, deadline, requestedStart, new HashMap<>());
-            order.markAsPlanned();
-        } catch (SchedulingException e) {
-            order.markAsUnschedulable(e.getMessage(), positiveOrNull(e.getSchedulableQuantity()));
-        } catch (BusinessException e) {
-            order.markAsUnschedulable(e.getMessage(), null);
-        }
-
-        orderService.save(order);
-        return result;
+        ManufacturingOrder pedido = orderService.findById(request.getOrder().getId());
+        pedido.validatePlannable();
+        
+        LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
+        List<PlanningProcess> resultado = planificarPedidoSeguro(pedido, inicioLimite, new HashMap<>());
+        
+        orderService.save(pedido);
+        return resultado;
     }
-
 
     public List<PlanningProcess> planBulkOrders(
-            List<ManufacturingOrder> orders, LocalDateTime executionStart) {
+            List<ManufacturingOrder> pedidos, LocalDateTime inicioEjecucion) {
+        List<PlanningProcess> resultado = new ArrayList<>();
+        Map<Long, AgendaTaller> cacheTalleres = new HashMap<>(); // Reutiliza agendas entre pedidos del lote
 
-        List<PlanningProcess> result = new ArrayList<>();
-        Map<Long, List<Period>> runtimeCache = new HashMap<>();
-
-        for (ManufacturingOrder order : orders) {
-            Product product = productService.findById(order.getProduct().getId());
-            try {
-                List<Workshop> possibleWorkshops = workshopService.findPossibleWorkshops(
-                        product.requiredEquipmentTypes());
-                List<PlanningProcess> processes = scheduleBackwardOnFirstAvailableWorkshop(
-                        possibleWorkshops, product, order,
-                        order.getDeliveryDate().atStartOfDay(), executionStart, runtimeCache);
-                result.addAll(processes);
-                order.markAsPlanned();
-            } catch (SchedulingException e) {
-                order.markAsUnschedulable(e.getMessage(), positiveOrNull(e.getSchedulableQuantity()));
-            } catch (BusinessException e) {
-                order.markAsUnschedulable(e.getMessage(), null);
-            }
+        for (ManufacturingOrder pedido : pedidos) {
+            resultado.addAll(planificarPedidoSeguro(pedido, inicioEjecucion, cacheTalleres));
         }
-        orderService.saveAll(orders);
-        return result;
+        
+        orderService.saveAll(pedidos);
+        return resultado;
     }
 
+    private List<PlanningProcess> planificarPedidoSeguro(
+            ManufacturingOrder pedido, LocalDateTime inicioLimite,
+            Map<Long, AgendaTaller> cacheTalleres) {
+        try {
+            List<Workshop> talleres = workshopService.findPossibleWorkshops(
+                pedido.getProduct().requiredEquipmentTypes());
+            
+            List<PlanningProcess> procesos = planificarEnPrimerTallerDisponible(
+                pedido, talleres, pedido.getDeliveryDate().atStartOfDay(), inicioLimite, cacheTalleres);
+            
+            pedido.markAsPlanned();
+            return procesos;
+        } catch (SchedulingException e) {
+            pedido.markAsUnschedulable(e.getMessage(), positiveOrNull(e.getSchedulableQuantity()));
+            return List.of();
+        } catch (BusinessException e) {
+            pedido.markAsUnschedulable(e.getMessage(), null);
+            return List.of();
+        }
+    }
 
-    private List<PlanningProcess> scheduleBackwardOnFirstAvailableWorkshop(
-            List<Workshop> workshops, Product aProduct, ManufacturingOrder aOrder,
-            LocalDateTime deadline, LocalDateTime startLimit,
-            Map<Long, List<Period>> globalCache) {
+    private List<PlanningProcess> planificarEnPrimerTallerDisponible(
+            ManufacturingOrder pedido, List<Workshop> talleres,
+            LocalDateTime deadline, LocalDateTime inicioLimite,
+            Map<Long, AgendaTaller> cacheTalleres) {
+        int mejorCantidadPlanificable = 0;
 
-        int bestSchedulableCount = 0;
-
-        for (Workshop workshop : workshops) {
-            Map<Long, List<Period>> simulationCache = deepCopyCache(globalCache);
+        for (Workshop taller : talleres) {
+            // 2. Obtenemos la agenda pasando únicamente los 2 parámetros que tu clase requiere
+            AgendaTaller agendaSimulacion = obtenerAgendaParaSimulacion(taller, cacheTalleres, inicioLimite, deadline);
             try {
-                List<PlanningProcess> processes = scheduleUnitsBackward(
-                        aOrder, aProduct, workshop, deadline, startLimit, simulationCache);
-                globalCache.clear();
-                globalCache.putAll(simulationCache);
-                return processes;
+                List<PlanningProcess> procesos = planificarUnidades(
+                    pedido, taller, agendaSimulacion, deadline, inicioLimite);
+                
+                // Confirmamos la simulación exitosa en el caché persistente del lote
+                cacheTalleres.put(taller.getId(), agendaSimulacion); 
+                return procesos;
             } catch (SchedulingException e) {
-                bestSchedulableCount = Math.max(bestSchedulableCount, e.getSchedulableQuantity());
-            } catch (BusinessException e) {
-                // Taller sin el equipamiento necesario; ignorar y probar el siguiente
+                mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
+            } catch (BusinessException ignored) {
+                // Taller sin el equipamiento necesario configurado; ignorar y evaluar el siguiente
             }
         }
-
+        
         throw new SchedulingException(
-                "No se encontró taller disponible para el pedido en el plazo requerido.",
-                bestSchedulableCount);
+            "El pedido no pudo planificarse en el plazo requerido", mejorCantidadPlanificable);
     }
 
+    private AgendaTaller obtenerAgendaParaSimulacion(
+        Workshop taller, Map<Long, AgendaTaller> cache, LocalDateTime inicio, LocalDateTime fin) {
+    if (cache.containsKey(taller.getId())) {
+        return cache.get(taller.getId()).copiar();
+    }
+    
+    List<Planning> planificaciones = planningRepository.findPlanificacionesPorTaller(taller.getId());
+    return AgendaTaller.construirDesde(taller, planificaciones, inicio, fin);
+}
 
-    private List<PlanningProcess> scheduleUnitsBackward(
-            ManufacturingOrder aOrder, Product aProduct, Workshop aWorkshop,
-            LocalDateTime deadline, LocalDateTime startLimit,
-            Map<Long, List<Period>> crossUnitCache) {
+    private List<PlanningProcess> planificarUnidades(
+            ManufacturingOrder pedido, Workshop taller, AgendaTaller agenda,
+            LocalDateTime deadline, LocalDateTime inicioLimite) {
+        List<PlanningProcess> resultado = new ArrayList<>();
 
-        List<PlanningProcess> result = new ArrayList<>();
+        for (int i = 0; i < pedido.getQuantity(); i++) {
+            PlanningProcess proceso = algoritmo.planificarBackward(
+                pedido.getProduct(), taller, agenda, deadline);
 
-        for (int i = 0; i < aOrder.getQuantity(); i++) {
-            Map<Long, LocalDateTime> intraUnitCache = new HashMap<>();
-            PlanningProcess process = algorithm.scheduleBackward(
-                    aProduct, aWorkshop, deadline, intraUnitCache, crossUnitCache);
-            process.setOrder(aOrder);
-
-            if (process.getStart().isBefore(startLimit)) {
-                throw new SchedulingException(
-                        "El pedido no se puede planificar dentro del plazo requerido.",
-                        result.size());
+            if (proceso.getStart().isBefore(inicioLimite)) {
+                throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido", resultado.size());
             }
-            result.add(process);
+            
+            proceso.setOrder(pedido);
+            resultado.add(proceso);
         }
-        return result;
-    }
-
-
-    private Map<Long, List<Period>> deepCopyCache(Map<Long, List<Period>> original) {
-        Map<Long, List<Period>> copy = new HashMap<>();
-        for (Map.Entry<Long, List<Period>> entry : original.entrySet()) {
-            copy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-        }
-        return copy;
+        return resultado;
     }
 
     private Integer positiveOrNull(int value) {
