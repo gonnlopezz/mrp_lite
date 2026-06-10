@@ -51,12 +51,7 @@ public class WorkshopService {
         return planningProcessRepository.findAllByWorkshopId(workshopId);
     }
 
-    public Workshop findByEquipmentTypes(List<EquipmentType> types) {
-        return repository.findByEquipmentTypes(types, types.size()).orElseThrow(
-                () -> new BusinessException("No se encontró un taller con el equipamiento requerido para el producto"));
-    }
-
-    public List<Workshop> findAllByEquipmentTypes(List<EquipmentType> types) {
+    public List<Workshop> findPossibleWorkshops(List<EquipmentType> types) {
         List<Workshop> result = repository.findAllByEquipmentTypes(types, types.size());
         if (result.isEmpty())
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
@@ -76,7 +71,7 @@ public class WorkshopService {
             this.validateEquipmentSupport(workshopCode, requiredTypes);
             return result;
         }
-        return this.findByEquipmentTypes(requiredTypes);
+        return this.findPossibleWorkshops(requiredTypes).get(0);
     }
 
     @Transactional

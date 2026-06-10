@@ -52,7 +52,7 @@ public class PlanningScheduler {
         List<PlanningProcess> result = new ArrayList<>();
 
         try {
-            List<Workshop> workshops = workshopService.findAllByEquipmentTypes(
+            List<Workshop> workshops = workshopService.findPossibleWorkshops(
                     product.requiredEquipmentTypes());
             result = scheduleBackwardOnFirstAvailableWorkshop(
                     workshops, product, order, deadline, requestedStart, new HashMap<>());
@@ -77,7 +77,7 @@ public class PlanningScheduler {
         for (ManufacturingOrder order : orders) {
             Product product = productService.findById(order.getProduct().getId());
             try {
-                List<Workshop> possibleWorkshops = workshopService.findAllByEquipmentTypes(
+                List<Workshop> possibleWorkshops = workshopService.findPossibleWorkshops(
                         product.requiredEquipmentTypes());
                 List<PlanningProcess> processes = scheduleBackwardOnFirstAvailableWorkshop(
                         possibleWorkshops, product, order,
