@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
+
+import unpsjb.labprog.backend.business.planificacion.domain.AgendaTaller;
+import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.model.*;
 
 @Component("FORWARD")

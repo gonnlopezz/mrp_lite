@@ -1,4 +1,4 @@
-package unpsjb.labprog.backend.business.planificacion.service;
+package unpsjb.labprog.backend.business.planificacion.domain;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

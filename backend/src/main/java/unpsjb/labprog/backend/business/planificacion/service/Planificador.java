@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import unpsjb.labprog.backend.business.pedido.PedidoService;
 import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
+import unpsjb.labprog.backend.business.planificacion.domain.AgendaTaller;
+import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.business.producto.ProductoService;
 import unpsjb.labprog.backend.business.taller.TallerService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;

@@ -3,6 +3,10 @@ package unpsjb.labprog.backend.business.planificacion.service;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import org.springframework.stereotype.Component;
+
+import unpsjb.labprog.backend.business.planificacion.domain.AgendaEquipo;
+import unpsjb.labprog.backend.business.planificacion.domain.AgendaTaller;
+import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
 
