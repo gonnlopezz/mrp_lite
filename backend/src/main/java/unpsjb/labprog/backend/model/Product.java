@@ -2,6 +2,7 @@ package unpsjb.labprog.backend.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -40,6 +41,12 @@ public class Product {
             if (type != null && !result.contains(type))
                 result.add(type);
         }
+        return result;
+    }
+
+        public List<Task> getReverseTasks() {
+        List<Task> result = new ArrayList<>(this.getTasks());
+        Collections.reverse(result);
         return result;
     }
 

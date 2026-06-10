@@ -29,7 +29,7 @@ public class PlanningAlgorithm {
         for (Task task : aProduct.getTasks()) {
             Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
             LocalDateTime availableTime = equipment.firstAvailableSlotAfter(currentTime);
-            LocalDateTime end = availableTime.plusMinutes(calculateTaskDurationFor(task, equipment));
+            LocalDateTime end = availableTime.plusMinutes(task.calculateDurationFor(equipment));
 
             plannings.add(new Planning(task, equipment, new Period(availableTime, end, task.getDuration())));
             currentTime = end;
@@ -45,9 +45,9 @@ public class PlanningAlgorithm {
         LinkedList<Planning> plannings = new LinkedList<>();
         LocalDateTime currentEnd = deadline;
 
-        for (Task task : reverseTasksOf(aProduct)) {
+        for (Task task : aProduct.getReverseTasks()) {
             Equipment equipment = aWorkshop.findEquipmentForType(task.getType());
-            long duration = calculateTaskDurationFor(task, equipment);
+            long duration = task.calculateDurationFor(equipment);
 
             LocalDateTime end = findAvailableEndBackward(equipment, currentEnd, duration, intraUnitCache,
                     crossUnitCache);
@@ -101,13 +101,8 @@ public class PlanningAlgorithm {
         return result;
     }
 
-    private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
-        return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
-    }
+    // private long calculateTaskDurationFor(Task aTask, Equipment aEquipment) {
+    //     return (long) Math.ceil((double) aTask.getDuration() / aEquipment.getCapacity());
+    // }
 
-    private List<Task> reverseTasksOf(Product aProduct) {
-        List<Task> result = new ArrayList<>(aProduct.getTasks());
-        Collections.reverse(result);
-        return result;
-    }
 }

@@ -30,4 +30,8 @@ public class Task {
 
     @ManyToOne
     private EquipmentType type;
+
+    public long calculateDurationFor(Equipment aEquipment) {
+        return (long) Math.ceil((double) this.getDuration() / aEquipment.getCapacity());
+    }
 }
