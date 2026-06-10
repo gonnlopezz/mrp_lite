@@ -36,6 +36,30 @@ public class AgendaTaller {
         return new AgendaTaller(taller, agendas);
     }
 
+    // NUEVO FACTORY: Mapea proactivamente todas las agendas sin consultas repetitivas
+    public static Map<Long, AgendaTaller> construirTodasDesde(
+            List<Taller> talleres, List<Planificacion> planificaciones,
+            LocalDateTime inicio, LocalDateTime fin) {
+        
+        Map<Long, List<Planificacion>> porEquipo = new HashMap<>();
+        for (Planificacion p : planificaciones) {
+            porEquipo.computeIfAbsent(p.getEquipo().getId(), k -> new ArrayList<>()).add(p);
+        }
+
+        Map<Long, AgendaTaller> agendas = new HashMap<>();
+        for (Taller taller : talleres) {
+            List<Planificacion> planificacionesTaller = new ArrayList<>();
+            for (Equipo equipo : taller.getEquipos()) {
+                List<Planificacion> delEquipo = porEquipo.get(equipo.getId());
+                if (delEquipo != null) {
+                    planificacionesTaller.addAll(delEquipo);
+                }
+            }
+            agendas.put(taller.getId(), AgendaTaller.construirDesde(taller, planificacionesTaller, inicio, fin));
+        }
+        return agendas;
+    }
+
     public AgendaEquipo agendaDe(Equipo equipo) {
         return agendasPorEquipoId.get(equipo.getId());
     }
@@ -51,5 +75,4 @@ public class AgendaTaller {
         }
         return new AgendaTaller(this.taller, copiaAgendas);
     }
-
 }

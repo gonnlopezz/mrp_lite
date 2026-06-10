@@ -25,15 +25,12 @@ public class Planificador {
 
     @Autowired
     private ProductoService productService;
-
     @Autowired
     private TallerService workshopService;
-
     @Autowired
     private PedidoService orderService;
-
     @Autowired
-    private PlanificacionRepository planningRepository; 
+    private PlanificacionRepository planningRepository;
 
     private final Map<String, EstrategiaPlanificacion> estrategias;
 
@@ -57,31 +54,57 @@ public class Planificador {
         pedido.validatePlannable();
 
         LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
-        List<ProcesoPlanificacion> resultado = planificarPedido(pedido, inicioLimite, new HashMap<>());
+        LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
+
+        List<Taller> talleresPosibles;
+        try {
+            talleresPosibles = workshopService.findPossibleWorkshops(pedido.getProducto().requiredEquipmentTypes());
+        } catch (BusinessException e) {
+            pedido.markAsUnschedulable(e.getMessage(), null);
+            orderService.save(pedido);
+            return List.of(); 
+        }
+
+        Map<Long, AgendaTaller> agendas = new HashMap<>();
+        for (Taller taller : talleresPosibles) {
+            List<Planificacion> delTaller = planningRepository.findPlanificacionesPorTaller(taller.getId());
+            agendas.put(taller.getId(), AgendaTaller.construirDesde(taller, delTaller, inicioLimite, deadline));
+        }
+
+        List<ProcesoPlanificacion> resultado = planificarPedido(pedido, inicioLimite, talleresPosibles, agendas);
 
         orderService.save(pedido);
         return resultado;
     }
 
     public List<ProcesoPlanificacion> planBulkOrders(List<Pedido> pedidos, LocalDateTime inicioEjecucion) {
-        List<ProcesoPlanificacion> resultado = new ArrayList<>();
-        Map<Long, AgendaTaller> agendasTalleres = new HashMap<>();
+        if (pedidos.isEmpty())
+            return List.of();
 
-        for (Pedido pedido : pedidos) 
-            resultado.addAll(planificarPedido(pedido, inicioEjecucion, agendasTalleres));
-        
+        LocalDateTime deadlineMaxima = pedidos.get(pedidos.size() - 1).getFechaEntrega().atStartOfDay();
+
+        List<Taller> todosTalleres = workshopService.findAll();
+        List<Planificacion> todasLasPlanificaciones = planningRepository.findAllPlanificacionesOrdenadas();
+
+        Map<Long, AgendaTaller> agendas = AgendaTaller.construirTodasDesde(
+                todosTalleres, todasLasPlanificaciones, inicioEjecucion, deadlineMaxima);
+
+        List<ProcesoPlanificacion> resultado = new ArrayList<>();
+        for (Pedido pedido : pedidos) {
+            resultado.addAll(planificarPedido(pedido, inicioEjecucion, todosTalleres, agendas));
+        }
 
         orderService.saveAll(pedidos);
         return resultado;
     }
 
+    private List<ProcesoPlanificacion> planificarPedido(
+            Pedido pedido, LocalDateTime inicioLimite,
+            List<Taller> talleres, Map<Long, AgendaTaller> agendas) {
 
-    private List<ProcesoPlanificacion> planificarPedido(Pedido pedido, LocalDateTime inicioLimite,
-            Map<Long, AgendaTaller> agendasTalleres) {
-
-        List<Taller> talleres;
+        List<Taller> talleresPosibles;
         try {
-            talleres = workshopService.findPossibleWorkshops(pedido.getProducto().requiredEquipmentTypes());
+            talleresPosibles = workshopService.findPossibleWorkshops(pedido.getProducto().requiredEquipmentTypes());
         } catch (BusinessException e) {
             pedido.markAsUnschedulable(e.getMessage(), null);
             return List.of();
@@ -90,38 +113,30 @@ public class Planificador {
         LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
         int mejorCantidadPlanificable = 0;
 
-        for (Taller taller : talleres) {
-            AgendaTaller agenda = obtenerAgendaParaSimulacion(taller, agendasTalleres, inicioLimite, deadline);
+        for (Taller taller : talleresPosibles) {
+            AgendaTaller agendaSimulacion = agendas.get(taller.getId()).copiar();
             try {
-                List<ProcesoPlanificacion> procesos = planificarUnidades(pedido, taller, agenda, deadline,
+                List<ProcesoPlanificacion> procesos = planificarUnidades(pedido, taller, agendaSimulacion, deadline,
                         inicioLimite);
-                agendasTalleres.put(taller.getId(), agenda);
+
+                agendas.put(taller.getId(), agendaSimulacion);
                 pedido.markAsPlanned();
                 return procesos;
             } catch (SchedulingException e) {
                 mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
             } catch (BusinessException ignored) {
-                // Taller sin el equipamiento necesario; ignorar y evaluar el siguiente
+                // Taller sin el equipamiento necesario configurado
             }
         }
 
-        pedido.markAsUnschedulable("El pedido no pudo planificarse en el plazo requerido", positiveOrNull(mejorCantidadPlanificable));
+        pedido.markAsUnschedulable("El pedido no pudo planificarse en el plazo requerido",
+                esPositivo(mejorCantidadPlanificable));
         return List.of();
     }
 
-    private AgendaTaller obtenerAgendaParaSimulacion(
-            Taller taller, Map<Long, AgendaTaller> cache, LocalDateTime inicio, LocalDateTime fin) {
-        if (cache.containsKey(taller.getId())) {
-            return cache.get(taller.getId()).copiar();
-        }
-
-        List<Planificacion> planificaciones = planningRepository.findPlanificacionesPorTaller(taller.getId());
-        return AgendaTaller.construirDesde(taller, planificaciones, inicio, fin);
-    }
-
-    private List<ProcesoPlanificacion> planificarUnidades(Pedido pedido, Taller taller, AgendaTaller agenda,LocalDateTime deadline, LocalDateTime inicioLimite) {
+    private List<ProcesoPlanificacion> planificarUnidades(Pedido pedido, Taller taller, AgendaTaller agenda,
+            LocalDateTime deadline, LocalDateTime inicioLimite) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
-
         EstrategiaPlanificacion estrategia = estrategias.get("BACKWARD");
 
         for (int i = 0; i < pedido.getCantidad(); i++) {
@@ -137,7 +152,7 @@ public class Planificador {
         return resultado;
     }
 
-    private Integer positiveOrNull(int value) {
+    private Integer esPositivo(int value) {
         return value > 0 ? value : null;
     }
 }

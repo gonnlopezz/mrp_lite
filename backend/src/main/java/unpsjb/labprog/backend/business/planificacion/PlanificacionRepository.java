@@ -44,4 +44,7 @@ public interface PlanificacionRepository
                         "WHERE e IN (SELECT eq FROM Taller w JOIN w.equipos eq WHERE w.id = :tallerId) " +
                         "ORDER BY e.id ASC, p.periodo.inicio ASC")
         List<Planificacion> findPlanificacionesPorTaller(@Param("tallerId") Long tallerId);
+
+        @Query("SELECT p FROM Planificacion p JOIN FETCH p.equipo e ORDER BY e.id ASC, p.periodo.inicio ASC")
+        List<Planificacion> findAllPlanificacionesOrdenadas();
 }
