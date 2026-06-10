@@ -84,7 +84,7 @@ public class Planificador {
         LocalDateTime deadlineMaxima = pedidos.get(pedidos.size() - 1).getFechaEntrega().atStartOfDay();
 
         List<Taller> todosTalleres = workshopService.findAll();
-        List<Planificacion> todasLasPlanificaciones = planningRepository.findAllPlanificacionesOrdenadas();
+        List<Planificacion> todasLasPlanificaciones = planningRepository.findAllPlanificacionesOrdenadas(inicioEjecucion);
 
         Map<Long, AgendaTaller> agendas = AgendaTaller.construirTodasDesde(
                 todosTalleres, todasLasPlanificaciones, inicioEjecucion, deadlineMaxima);

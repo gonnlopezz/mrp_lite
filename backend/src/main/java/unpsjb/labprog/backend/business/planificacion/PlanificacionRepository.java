@@ -45,6 +45,9 @@ public interface PlanificacionRepository
                         "ORDER BY e.id ASC, p.periodo.inicio ASC")
         List<Planificacion> findPlanificacionesPorTaller(@Param("tallerId") Long tallerId);
 
-        @Query("SELECT p FROM Planificacion p JOIN FETCH p.equipo e ORDER BY e.id ASC, p.periodo.inicio ASC")
-        List<Planificacion> findAllPlanificacionesOrdenadas();
+        @Query("SELECT p FROM Planificacion p " +
+                        "JOIN FETCH p.equipo e " +
+                        "WHERE p.periodo.fin >= :fechaInicio " +
+                        "ORDER BY e.id ASC, p.periodo.inicio ASC")
+        List<Planificacion> findAllPlanificacionesOrdenadas(@Param("fechaInicio") LocalDateTime fechaInicio);
 }
