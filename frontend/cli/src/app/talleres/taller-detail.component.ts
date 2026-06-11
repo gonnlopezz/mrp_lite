@@ -1,10 +1,10 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterModule } from '@angular/router';
 import { Taller } from './taller';
 import { TallerService } from './taller.service';
 import { Equipo } from '../equipos/equipo';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { TipoEquipo } from '../equipos/tipo-equipo';
 import { TipoEquipoService } from '../equipos/tipo-equipo.service';
@@ -18,12 +18,15 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from '
   templateUrl: './taller-detail.html',
   styles: ``
 })
-export class TallerDetailComponent {
+export class TallerDetailComponent implements OnInit {
   taller!: Taller;
   showEquipoForm: boolean = false;
   tiposEquipo: TipoEquipo[] = [];
   newEquipo!: Equipo;
   selectedTipoEquipo: TipoEquipo | null = null;
+
+  @ViewChild('tallerForm') tallerForm!: NgForm;
+  @ViewChild('firstInput') firstInputEl!: ElementRef;
 
   constructor(
     private tallerService: TallerService,
@@ -36,17 +39,19 @@ export class TallerDetailComponent {
   ) {}
 
  ngOnInit(): void {
-    this.getTaller();
+    this.route.paramMap.subscribe(params => {
+      this.getTaller(params.get('id'));
+    });
     this.getTiposEquipo();
   }
 
-  getTaller(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+  getTaller(id: string | null): void {
     if(id === 'new' || !id) {
       this.taller = <Taller>{ codigo: "", nombre: "", equipos: <Equipo[]>[] };
     } else {
       this.tallerService.get(id).subscribe(dataPackage => {   
         this.taller = <Taller>dataPackage.data;
+        this.cdr.markForCheck();
       });       
     }
   }
@@ -98,23 +103,52 @@ export class TallerDetailComponent {
     this.showEquipoForm = false;
   }
 
-  save(): void {
+  recentlyCreated: { item: Taller, time: string }[] = [];
+
+  save(andNew: boolean = false): void {
     this.tallerService.save(this.taller).subscribe(dataPackage => {
-      this.taller = <Taller>dataPackage.data;
+      const saved = <Taller>dataPackage.data;
+      this.toastr.success('Taller guardado con éxito!', 'Éxito');
+
+      if (andNew) {
+        this.recentlyCreated.unshift({
+          item: saved,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        });
+        if (this.recentlyCreated.length > 5) {
+          this.recentlyCreated.pop();
+        }
+        if (this.tallerForm) {
+          this.tallerForm.resetForm();
+        }
+        this.taller = <Taller>{ codigo: "", nombre: "", equipos: <Equipo[]>[] };
+        this.selectedTipoEquipo = null;
+        this.showEquipoForm = false;
+
+        setTimeout(() => {
+          if (this.firstInputEl) {
+            this.firstInputEl.nativeElement.focus();
+          }
+        });
+
+        this.cdr.markForCheck();
+      } else {
+        this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
+          this.router.navigate(["/talleres/", + saved.id]);
+        });
+      }
+    });
+  }
+
+  deleteRecentlyCreated(id: number): void {
+    this.tallerService.delete(id).subscribe(() => {
+      this.recentlyCreated = this.recentlyCreated.filter(t => t.item.id !== id);
+      this.toastr.success('Taller eliminado con éxito!', 'Éxito');
       this.cdr.markForCheck();
-
-      this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
-        this.router.navigate(["/talleres/", + this.taller.id]);
-
-        this.toastr.success('Taller guardado con éxito!', 'Éxito');
-
-      });
     });
   }
 
   goBack(): void {
     this.router.navigate(['/talleres']);
   }
-
- 
 }

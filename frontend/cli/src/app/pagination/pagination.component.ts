@@ -15,11 +15,36 @@ export class PaginationComponent {
   @Output() pageChangeRequested = new EventEmitter<number>();
   pages: number[] = [];
 
+  visiblePages: number[] = [];
+
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['totalPages']) {
-      this.pages = Array.from(Array(this.totalPages).keys());
+    this.pages = Array.from(Array(this.totalPages).keys());
+    this.updateVisiblePages();
+  }
+
+  updateVisiblePages(): void {
+    const C = this.number || 0;
+    const N = this.totalPages;
+
+    let start = C - 2;
+    if (start < 0) {
+      start = 0;
+    }
+    if (start > N - 5) {
+      start = N - 5;
+    }
+    if (start < 0) {
+      start = 0;
+    }
+
+    this.visiblePages = [];
+    for (let i = 0; i < 5; i++) {
+      const idx = start + i;
+      if (idx >= 0 && idx < N) {
+        this.visiblePages.push(idx);
+      }
     }
   }
 

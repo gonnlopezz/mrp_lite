@@ -39,7 +39,7 @@
               <!-- Cliente -->
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Cliente</label>
-                <input type="text" class="form-control form-control-sm bg-white" required id="customerInput"
+                <input type="text" #firstInput class="form-control form-control-sm bg-white" required id="customerInput"
                   name="customer" placeholder="Buscar cliente..." [ngModel]="selectedCustomer"
                   [inputFormatter]="customerInputFormatter" [resultFormatter]="customerResultFormatter"
                   [ngbTypeahead]="searchCustomers" (selectItem)="onCustomerSelected($event.item)"
@@ -125,7 +125,13 @@
                   Cancelar
                 </button>
 
-                <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save()"
+                <button *ngIf="!pedido.id" type="button" class="btn btn-outline-primary px-4 fw-bold shadow-sm" (click)="save(true)"
+                  [disabled]="orderForm.invalid || !pedido.cliente || !pedido.producto" style="font-size: 0.85rem;">
+                  <i class="fas fa-plus-circle me-2"></i>
+                  Guardar y Nuevo
+                </button>
+
+                <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" (click)="save(false)"
                   [disabled]="orderForm.invalid || !pedido.cliente || !pedido.producto" style="font-size: 0.85rem;">
                   <i class="fas {{ pedido.id ? 'fa-save' : 'fa-check-circle' }} me-2"></i>
                   {{ pedido.id ? 'Guardar Cambios' : 'Confirmar Pedido' }}
@@ -136,11 +142,60 @@
 
         </div>
 
-        <p class="text-center text-muted mt-3" style="font-size: 0.75rem;">
-          <i class="fas fa-info-circle me-1"></i>
-          Los datos guardados impactarán inmediatamente en el sistema.
-        </p>
-
       </div>
+
+      <!-- Log local de carga rápida (solo visible al crear) -->
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4 animate__fadeIn" *ngIf="!pedido.id && recentlyCreated.length > 0">
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
+          <h6 class="mb-0 fw-bold text-steel">
+            <i class="fas fa-clock-rotate-left me-2 text-primary"></i> Pedidos Creados en esta Sesión
+          </h6>
+          <p class="text-muted mb-0" style="font-size: 0.75rem;">
+            Lista local temporal (últimos 5 elementos cargados).
+          </p>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle custom-table mb-0" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Entrega</th>
+                <th>Hora</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let entry of recentlyCreated" class="animate__fadeIn">
+                <td><span class="text-secondary font-monospace" style="font-size: 0.75rem;">#{{ entry.item.id }}</span></td>
+                <td class="fw-semibold text-steel">{{ entry.item.cliente?.razonSocial }}</td>
+                <td class="text-steel">{{ entry.item.producto?.nombre }}</td>
+                <td><span class="badge bg-light text-dark border px-2">{{ entry.item.cantidad }} U</span></td>
+                <td><span class="text-muted font-monospace" style="font-size: 0.75rem;">{{ entry.item.fechaEntrega | date: 'dd/MM/yyyy' }}</span></td>
+                <td class="text-muted" style="font-size: 0.75rem;">{{ entry.time }}</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-1">
+                    <a [routerLink]="['/pedidos', entry.item.id]" class="btn-icon hover-primary" title="Editar">
+                      <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <button type="button" (click)="deleteRecentlyCreated(entry.item.id)" class="btn-icon hover-danger" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="text-center text-muted mt-3" style="font-size: 0.75rem;">
+        <i class="fas fa-info-circle me-1"></i>
+        Los datos guardados impactarán inmediatamente en el sistema.
+      </p>
+
     </div>
   </div>
+</div>
