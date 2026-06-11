@@ -102,7 +102,7 @@ public class PlanificacionService {
         LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
         LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
 
-        List<Taller> todosTalleres = tallerService.findAll();
+        List<Taller> todosTalleres = tallerService.findAllConEquipos();
 
         List<Taller> talleresAptos = obtenerTalleresPor(pedido, todosTalleres);
         if (talleresAptos.isEmpty()) {
@@ -132,7 +132,7 @@ public class PlanificacionService {
         if (pedidosPendientes.isEmpty())
             return List.of();
 
-        List<Taller> talleresOrdenados = tallerService.findAll();
+        List<Taller> talleresOrdenados = tallerService.findAllConEquipos();
 
         LocalDateTime deadlineMaximo = pedidosPendientes.get(pedidosPendientes.size() - 1).getFechaEntrega()
                 .atStartOfDay();

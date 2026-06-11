@@ -135,7 +135,8 @@
                                 <span class="text-primary fw-bold">{{ pedido.cantidad }}</span>
                             </td>
                             <td><span class="text-muted small">{{ pedido.fechaPedido | date: 'dd/MM/yyyy' }}</span></td>
-                            <td><span class="text-muted small">{{ pedido.fechaEntrega | date: 'dd/MM/yyyy' }}</span></td>
+                            <td><span class="text-muted small">{{ pedido.fechaEntrega | date: 'dd/MM/yyyy' }}</span>
+                            </td>
                             <td>
                                 <span class="badge" [ngClass]="{
     'bg-warning text-dark': $any(pedido.estado) === 'PENDIENTE',
@@ -163,8 +164,8 @@
                                     </button>
 
                                     <button *ngIf="$any(pedido.estado) === 'PLANIFICADO'"
-                                        routerLink="/pedidos/{{pedido.id}}/planificaciones" class="btn-icon hover-success"
-                                        title="Ver planificación">
+                                        routerLink="/pedidos/{{pedido.id}}/planificaciones"
+                                        class="btn-icon hover-success" title="Ver planificación">
                                         <i class="fas fa-calendar-alt"></i>
                                     </button>
 
@@ -266,14 +267,14 @@
         <h6 class="fw-bold text-dark small text-uppercase tracking-wider text-muted mb-3">Disponibilidad de Producción
         </h6>
 
-        <div *ngIf="selectedOrderForModal?.schedulableQuantity; else noPartialProduction" class="row g-2 mb-2">
+        <div *ngIf="selectedOrderForModal?.cantidadPlanificable; else noPartialProduction" class="row g-2 mb-2">
             <div class="col-sm-6">
                 <div class="p-3 border rounded-3 bg-white d-flex align-items-center justify-content-between shadow-sm">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-check-circle text-success fs-5"></i>
                         <span class="text-secondary small fw-medium">Fabricables en fecha:</span>
                     </div>
-                    <strong class="text-success fs-5 font-monospace">{{ selectedOrderForModal?.schedulableQuantity }}
+                    <strong class="text-success fs-5 font-monospace">{{ selectedOrderForModal?.cantidadPlanificable }}
                         U.</strong>
                 </div>
             </div>
@@ -284,7 +285,7 @@
                         <span class="text-secondary small fw-medium">Excedente (Sin cupo):</span>
                     </div>
                     <strong class="text-danger fs-5 font-monospace">{{ selectedOrderForModal?.cantidad -
-                        selectedOrderForModal?.schedulableQuantity }} U.</strong>
+                        selectedOrderForModal?.cantidadPlanificable }} U.</strong>
                 </div>
             </div>
         </div>
@@ -313,31 +314,29 @@
         <h5 class="modal-title fw-bold text-steel tracking-tight">
             <i class="fas fa-clock text-primary me-2"></i> Lanzar Planificación Masiva
         </h5>
-        <button type="button" class="btn-close shadow-none" aria-label="Close" [disabled]="processingPlanning" (click)="modal.dismiss()"></button>
+        <button type="button" class="btn-close shadow-none" aria-label="Close" [disabled]="processingPlanning"
+            (click)="modal.dismiss()"></button>
     </div>
-    
+
     <div class="modal-body px-4 pb-3 bg-white">
         <p class="text-secondary small mb-3">
             Selecciona fecha para iniciar planificación masiva.
         </p>
-        
+
         <div class="mb-2">
             <label class="form-label small fw-bold text-secondary mb-1">Fecha Virtual de la Fábrica</label>
-            <input type="date" 
-                   class="form-control rounded-3 bg-white" 
-                   [(ngModel)]="selectedSimulationDate" 
-                   name="simulationDate"
-                   [disabled]="processingPlanning" />
+            <input type="date" class="form-control rounded-3 bg-white" [(ngModel)]="selectedSimulationDate"
+                name="simulationDate" [disabled]="processingPlanning" />
         </div>
     </div>
-    
+
     <div class="modal-footer border-top-0 px-4 pb-4 pt-1 bg-white d-flex gap-2">
-        <button type="button" class="btn btn-light rounded-3 px-3 fw-medium text-secondary" [disabled]="processingPlanning" (click)="modal.dismiss()">
+        <button type="button" class="btn btn-light rounded-3 px-3 fw-medium text-secondary"
+            [disabled]="processingPlanning" (click)="modal.dismiss()">
             Cancelar
         </button>
-        <button type="button" class="btn btn-primary rounded-3 px-3 fw-medium d-flex align-items-center gap-2 shadow-sm" 
-                [disabled]="processingPlanning" 
-                (click)="executePlanBatch(modal)">
+        <button type="button" class="btn btn-primary rounded-3 px-3 fw-medium d-flex align-items-center gap-2 shadow-sm"
+            [disabled]="processingPlanning" (click)="executePlanBatch(modal)">
             <span *ngIf="processingPlanning" class="spinner-border spinner-border-sm" role="status"></span>
             {{ processingPlanning ? 'Calculando...' : 'Planificar Pendientes' }}
         </button>

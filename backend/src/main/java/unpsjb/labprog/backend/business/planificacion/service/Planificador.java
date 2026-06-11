@@ -60,14 +60,20 @@ public class Planificador {
         EstrategiaPlanificacion estrategia = estrategias.get("BACKWARD");
 
         for (int i = 0; i < pedido.getCantidad(); i++) {
-            ProcesoPlanificacion proceso = estrategia.ejecutar(pedido.getProducto(), taller, agenda, deadline);
+            try {
+                ProcesoPlanificacion proceso = estrategia.ejecutar(pedido.getProducto(), taller, agenda, deadline);
 
-            if (proceso.getInicio().isBefore(inicioLimite))
-                throw new SchedulingException("Excede el tiempo límite de inicio", resultado.size());
+                if (proceso.getInicio().isBefore(inicioLimite)) {
+                    throw new SchedulingException("Excede el tiempo límite de inicio", resultado.size());
+                }
 
-            proceso.setPedido(pedido);
-            resultado.add(proceso);
+                proceso.setPedido(pedido);
+                resultado.add(proceso);
+            } catch (SchedulingException e) {
+                throw new SchedulingException(e.getMessage(), resultado.size());
+            }
         }
         return resultado;
     }
+
 }

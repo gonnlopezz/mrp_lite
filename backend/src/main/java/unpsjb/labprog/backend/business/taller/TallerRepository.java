@@ -33,6 +33,9 @@ public interface TallerRepository
                         "ORDER BY w.codigo ASC")
         List<Taller> findAllByTiposEquipo(List<TipoEquipo> types, int count);
 
+        @Query("SELECT DISTINCT t FROM Taller t LEFT JOIN FETCH t.equipos ORDER BY t.id ASC")
+        List<Taller> findAllConEquipos();
+
         @Query("SELECT w FROM Taller w " +
                         "WHERE w.codigo ILIKE CONCAT('%', :term, '%') " +
                         "OR w.nombre ILIKE CONCAT('%', :term, '%')")

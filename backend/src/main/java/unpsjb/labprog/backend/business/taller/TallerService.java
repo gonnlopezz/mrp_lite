@@ -30,6 +30,10 @@ public class TallerService {
         return result;
     }
 
+    public List<Taller> findAllConEquipos() {
+        return repository.findAllConEquipos();
+    }
+
     public Page<Taller> findByPage(int page, int size) {
         return repository.findAll(PageRequest.of(page, size));
     }

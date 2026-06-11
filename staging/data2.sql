@@ -26,7 +26,7 @@ BEGIN
         v_delivery_date := v_order_date + (i % 4 + 1); -- Fechas entre 17/06 y 20/06
         v_quantity      := (i * 3) % 8 + 2; 
         
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
+        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
         VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, 1);
     END LOOP;
 
@@ -37,7 +37,7 @@ BEGIN
         v_delivery_date := v_order_date + (i % 5 + 2); -- Fechas entre 18/06 y 22/06
         v_quantity      := (i * 7) % 12 + 4;
         
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
+        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
         VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, 2);
     END LOOP;
 
@@ -48,12 +48,12 @@ BEGIN
         IF i % 2 = 0 THEN
             v_delivery_date := v_order_date + (i % 3 + 3); -- Canasto
             v_quantity := 6;
-            INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
+            INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
             VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, 3);
         ELSE
             v_delivery_date := v_order_date + (i % 2 + 4); -- Pieza en U
             v_quantity := 10;
-            INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
+            INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
             VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, 4);
         END IF;
     END LOOP;
@@ -61,7 +61,7 @@ BEGIN
     -- CASO 4: 5 RECHAZOS ESTRUCTURALES (Soporte en U - ID 5)
     -- Le asignamos exactamente UN RECHAZO a cada cliente.
     FOR i IN 0..4 LOOP
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado, cliente_id, producto_id)
+        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
         VALUES (v_order_date, v_order_date + 3, 5, 'PENDIENTE', 500 + i, 5);
     END LOOP;
 
