@@ -46,29 +46,29 @@ public class TallerService {
         return repository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("Taller no encontrado"));
     }
 
-    public List<ProcesoPlanificacion> getPlanningProcesses(Integer workshopId) {
+    public List<ProcesoPlanificacion> obtenerProcesosPlanificacion(Integer workshopId) {
         findById(workshopId);
         return planningProcessRepository.findAllByWorkshopId(workshopId);
     }
 
     public List<Taller> findPossibleWorkshops(List<TipoEquipo> types) {
-        List<Taller> result = repository.findAllByEquipmentTypes(types, types.size());
+        List<Taller> result = repository.findAllByTiposEquipo(types, types.size());
         if (result.isEmpty())
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
         return result;
     }
 
-    public void validateEquipmentSupport(String code, List<TipoEquipo> types) {
-        long matchingTypesCount = repository.countMatchingEquipmentTypes(code, types);
+    public void validarSoporteEquipo(String code, List<TipoEquipo> types) {
+        long matchingTypesCount = repository.contarTiposEquipoCoincidentes(code, types);
         if (matchingTypesCount != types.size())
             throw new BusinessException(
                     "El taller " + code + " no cuenta con los equipos necesarios para fabricar el producto");
     }
 
-    public Taller resolveWorkshop(String workshopCode, List<TipoEquipo> requiredTypes) {
+    public Taller resolverTaller(String workshopCode, List<TipoEquipo> requiredTypes) {
         if (workshopCode != null) {
             Taller result = this.findByCode(workshopCode);
-            this.validateEquipmentSupport(workshopCode, requiredTypes);
+            this.validarSoporteEquipo(workshopCode, requiredTypes);
             return result;
         }
         return this.findPossibleWorkshops(requiredTypes).get(0);

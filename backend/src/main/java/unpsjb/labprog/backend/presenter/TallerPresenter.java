@@ -68,6 +68,6 @@ public class TallerPresenter {
 
     @RequestMapping(value = "/id/{id}/plannings", method = RequestMethod.GET)
     public ResponseEntity<Object> getPlanningProcesses(@PathVariable Integer id) {
-        return Response.ok(service.getPlanningProcesses(id));
+        return Response.ok(service.obtenerProcesosPlanificacion(id));
     }
 }

@@ -39,17 +39,17 @@ public class Planificador {
         this.estrategias = estrategias;
     }
 
-    public ProcesoPlanificacion planForward(PlanningRequestDTO request) {
+    public ProcesoPlanificacion planificarHaciaAdelante(PlanningRequestDTO request) {
         LocalDateTime inicio = request.getStartDate().toLocalDate().atStartOfDay();
         Producto producto = productService.findByName(request.getProductName());
-        Taller taller = workshopService.resolveWorkshop(
+        Taller taller = workshopService.resolverTaller(
                 request.getWorkshopCode(), producto.requiredEquipmentTypes());
 
         EstrategiaPlanificacion estrategia = estrategias.get("FORWARD");
         return estrategia.ejecutar(producto, taller, null, inicio);
     }
 
-    public List<ProcesoPlanificacion> planBackward(PlanningFromOrderRequestDTO request) {
+    public List<ProcesoPlanificacion> planificarHaciaAtras(PlanningFromOrderRequestDTO request) {
         Pedido pedido = orderService.findById(request.getOrder().getId());
         pedido.validatePlannable();
 
@@ -67,7 +67,7 @@ public class Planificador {
 
         Map<Long, AgendaTaller> agendas = new HashMap<>();
         for (Taller taller : talleresPosibles) {
-            List<Planificacion> delTaller = planningRepository.findPlanificacionesPorTaller(taller.getId());
+            List<Planificacion> delTaller = planningRepository.planificacionesPorTaller(taller.getId());
             agendas.put(taller.getId(), AgendaTaller.construirDesde(taller, delTaller, inicioLimite, deadline));
         }
 
@@ -77,14 +77,14 @@ public class Planificador {
         return resultado;
     }
 
-    public List<ProcesoPlanificacion> planBulkOrders(List<Pedido> pedidos, LocalDateTime inicioEjecucion) {
+    public List<ProcesoPlanificacion> planificarPedidosMasivos(List<Pedido> pedidos, LocalDateTime inicioEjecucion) {
         if (pedidos.isEmpty())
             return List.of();
 
         LocalDateTime deadlineMaxima = pedidos.get(pedidos.size() - 1).getFechaEntrega().atStartOfDay();
 
         List<Taller> todosTalleres = workshopService.findAll();
-        List<Planificacion> todasLasPlanificaciones = planningRepository.findAllPlanificacionesOrdenadas(inicioEjecucion);
+        List<Planificacion> todasLasPlanificaciones = planningRepository.todasPlanificacionesOrdenadas(inicioEjecucion);
 
         Map<Long, AgendaTaller> agendas = AgendaTaller.construirTodasDesde(
                 todosTalleres, todasLasPlanificaciones, inicioEjecucion, deadlineMaxima);

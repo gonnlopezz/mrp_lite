@@ -31,12 +31,12 @@ public class PlanificacionService {
 
     @Transactional
     public ProcesoPlanificacion save(PlanningRequestDTO request) {
-        return repository.save(scheduler.planForward(request));
+        return repository.save(scheduler.planificarHaciaAdelante(request));
     }
 
     @Transactional
-    public List<ProcesoPlanificacion> saveFromOrder(PlanningFromOrderRequestDTO request) {
-        return repository.saveAll(scheduler.planBackward(request));
+    public List<ProcesoPlanificacion> guardarDesdePedido(PlanningFromOrderRequestDTO request) {
+        return repository.saveAll(scheduler.planificarHaciaAtras(request));
     }
 
     public Pedido findOrderById(long id) {
@@ -44,13 +44,13 @@ public class PlanificacionService {
     }
 
     @Transactional
-    public List<ProcesoPlanificacion> savePendingOrders(LocalDateTime executionTime) {
+    public List<ProcesoPlanificacion> guardarPedidosPendientes(LocalDateTime executionTime) {
         List<Pedido> pendingOrders = orderService.findByEstadoOrderByFechaEntregaAsc(EstadoPedido.PENDIENTE);
 
         if (pendingOrders.isEmpty())
             return new ArrayList<>();
 
-        List<ProcesoPlanificacion> processes = scheduler.planBulkOrders(pendingOrders, executionTime);
+        List<ProcesoPlanificacion> processes = scheduler.planificarPedidosMasivos(pendingOrders, executionTime);
         repository.saveAll(processes);
         return processes;
     }

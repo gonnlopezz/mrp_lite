@@ -73,7 +73,7 @@ public class PlanificacionPresenter {
     @PostMapping("/order")
     public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
         try {
-            List<ProcesoPlanificacion> result = service.saveFromOrder(request);
+            List<ProcesoPlanificacion> result = service.guardarDesdePedido(request);
 
             if (result.isEmpty()) {
                 Pedido failedOrder = service.findOrderById(request.getOrder().getId());
@@ -99,7 +99,7 @@ public class PlanificacionPresenter {
                 return Response.error("La fecha de inicio (startDate) es obligatoria.");
             }
 
-            List<ProcesoPlanificacion> processes = service.savePendingOrders(request.getStartDate());
+            List<ProcesoPlanificacion> processes = service.guardarPedidosPendientes(request.getStartDate());
 
             return Response.ok(processes, "Pedidos pendientes planificados con éxito");
         } catch (Exception e) {

@@ -23,7 +23,7 @@ public interface TallerRepository
         @Query("SELECT COUNT(DISTINCT e.tipo) FROM Taller w " +
                         "JOIN w.equipos e " +
                         "WHERE w.codigo = :code AND e.tipo IN :types")
-        long countMatchingEquipmentTypes(@Param("code") String code, @Param("types") List<TipoEquipo> types);
+        long contarTiposEquipoCoincidentes(@Param("code") String code, @Param("types") List<TipoEquipo> types);
 
         @Query("SELECT w FROM Taller w " +
                         "JOIN w.equipos e " +
@@ -31,7 +31,7 @@ public interface TallerRepository
                         "GROUP BY w.id " +
                         "HAVING COUNT(DISTINCT e.tipo) = :count " +
                         "ORDER BY w.codigo ASC")
-        List<Taller> findAllByEquipmentTypes(List<TipoEquipo> types, int count);
+        List<Taller> findAllByTiposEquipo(List<TipoEquipo> types, int count);
 
         @Query("SELECT w FROM Taller w " +
                         "WHERE w.codigo ILIKE CONCAT('%', :term, '%') " +
