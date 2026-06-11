@@ -84,9 +84,8 @@ public class AgendaEquipo {
                     i++;
                 }
                 
-                if (hueco.getFin().isAfter(periodoReserva.getFin())) {
+                if (hueco.getFin().isAfter(periodoReserva.getFin())) 
                     huecosLibres.add(i, new Periodo(periodoReserva.getFin(), hueco.getFin(), 0));
-                }
                 
                 buscando = false;
             } else {

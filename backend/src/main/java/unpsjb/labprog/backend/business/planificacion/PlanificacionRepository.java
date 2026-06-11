@@ -2,7 +2,6 @@ package unpsjb.labprog.backend.business.planificacion;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +14,6 @@ import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 @Repository
 public interface PlanificacionRepository
                 extends JpaRepository<ProcesoPlanificacion, Long> {
-
-        @Query("SELECT MAX(p.periodo.fin) FROM Planificacion p WHERE p.equipo.id = :equipmentId")
-        public Optional<LocalDateTime> findMaxEndTimeForEquipment(@Param("equipmentId") Long equipmentId);
 
         @Query("SELECT pp FROM ProcesoPlanificacion pp " +
                         "JOIN FETCH pp.planificaciones p " +

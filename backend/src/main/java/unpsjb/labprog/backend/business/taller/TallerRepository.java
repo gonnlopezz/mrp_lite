@@ -30,15 +30,6 @@ public interface TallerRepository
                         "WHERE e.tipo IN :types " +
                         "GROUP BY w.id " +
                         "HAVING COUNT(DISTINCT e.tipo) = :count " +
-                        "ORDER BY w.codigo ASC " +
-                        "LIMIT 1")
-        Optional<Taller> findByEquipmentTypes(List<TipoEquipo> types, int count);
-
-        @Query("SELECT w FROM Taller w " +
-                        "JOIN w.equipos e " +
-                        "WHERE e.tipo IN :types " +
-                        "GROUP BY w.id " +
-                        "HAVING COUNT(DISTINCT e.tipo) = :count " +
                         "ORDER BY w.codigo ASC")
         List<Taller> findAllByEquipmentTypes(List<TipoEquipo> types, int count);
 

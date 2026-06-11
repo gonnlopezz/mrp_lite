@@ -75,3 +75,4 @@ public class AgendaTaller {
         return new AgendaTaller(this.taller, copiaAgendas);
     }
 }
+

@@ -10,16 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
-import unpsjb.labprog.backend.business.equipo.TipoEquipoRepository;
 import unpsjb.labprog.backend.model.Producto;
 
 @Service
 public class ProductoService {
     @Autowired
     ProductoRepository repository;
-
-    @Autowired
-    TipoEquipoRepository equipmentTypeRepository;
 
     public List<Producto> findAll() {
         List<Producto> result = new ArrayList<>();
