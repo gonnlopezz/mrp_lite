@@ -41,4 +41,14 @@ public interface TallerRepository
                         "OR w.nombre ILIKE CONCAT('%', :term, '%')")
         Page<Taller> search(String term, Pageable pageable);
 
+        // En TallerRepository
+        @Query("SELECT DISTINCT t FROM Taller t " +
+                        "LEFT JOIN FETCH t.equipos " +
+                        "WHERE t.id IN (" +
+                        "  SELECT w.id FROM Taller w JOIN w.equipos e WHERE e.tipo IN :types GROUP BY w.id HAVING COUNT(DISTINCT e.tipo) = :count"
+                        +
+                        ") ORDER BY t.id ASC")
+        List<Taller> findPosiblesTalleresConEquipos(@Param("types") List<TipoEquipo> types,
+                        @Param("count") int count);
+
 }

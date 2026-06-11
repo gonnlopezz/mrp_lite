@@ -45,10 +45,6 @@ public class PlanificacionService {
     @Autowired
     private ProductoService productoService;
 
-    public Pedido findOrderById(long id) {
-        return pedidoService.findById(id);
-    }
-
     public List<ProcesoPlanificacion> findAll() {
         return repository.findAll();
     }
@@ -102,9 +98,9 @@ public class PlanificacionService {
         LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
         LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
 
-        List<Taller> todosTalleres = tallerService.findAllConEquipos();
+        List<Taller> talleresAptos = tallerService
+                .findPossibleWorkshops(pedido.getProducto().requiredEquipmentTypes());
 
-        List<Taller> talleresAptos = obtenerTalleresPor(pedido, todosTalleres);
         if (talleresAptos.isEmpty()) {
             pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);
             pedidoService.save(pedido);
@@ -141,7 +137,7 @@ public class PlanificacionService {
         List<ProcesoPlanificacion> result = new ArrayList<>();
 
         for (Pedido pedido : pedidosPendientes) {
-            List<Taller> talleresAptos = obtenerTalleresPor(pedido, talleresOrdenados);
+            List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleresOrdenados);
 
             if (!talleresAptos.isEmpty()) {
                 List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedidoEnTalleres(
@@ -156,13 +152,4 @@ public class PlanificacionService {
         return repository.saveAll(result);
     }
 
-    private List<Taller> obtenerTalleresPor(Pedido pedido, List<Taller> talleres) {
-        List<Taller> aptos = new ArrayList<>();
-        for (Taller t : talleres) {
-            if (t.soportaEquipamiento(pedido.getProducto().requiredEquipmentTypes())) {
-                aptos.add(t);
-            }
-        }
-        return aptos;
-    }
 }

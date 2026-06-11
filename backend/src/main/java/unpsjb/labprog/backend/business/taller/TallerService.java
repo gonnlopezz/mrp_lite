@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.TipoEquipo;
+import unpsjb.labprog.backend.model.Pedido;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 import unpsjb.labprog.backend.model.Taller;
 
@@ -56,7 +57,7 @@ public class TallerService {
     }
 
     public List<Taller> findPossibleWorkshops(List<TipoEquipo> types) {
-        List<Taller> result = repository.findAllByTiposEquipo(types, types.size());
+        List<Taller> result = repository.findPosiblesTalleresConEquipos(types, types.size());
         if (result.isEmpty())
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
         return result;
@@ -86,6 +87,16 @@ public class TallerService {
     @Transactional
     public void delete(int id) {
         repository.deleteById(id);
+    }
+
+    public List<Taller> filtrarTalleresPor(Pedido pedido, List<Taller> talleres) {
+        List<Taller> result = new ArrayList<>();
+        for (Taller t : talleres) {
+            if (t.soportaEquipamiento(pedido.getProducto().requiredEquipmentTypes())) {
+                result.add(t);
+            }
+        }
+        return result;
     }
 
 }

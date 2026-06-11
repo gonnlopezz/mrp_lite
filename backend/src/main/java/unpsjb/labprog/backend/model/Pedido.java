@@ -55,16 +55,11 @@ public class Pedido {
         this.estado = EstadoPedido.PLANIFICADO;
     }
 
-    public void markAsUnschedulable() {
-        markAsUnschedulable(null, null);
-    }
-
     public void markAsUnschedulable(String reason, Integer schedulableQuantity) {
         this.estado = EstadoPedido.NO_PLANIFICABLE;
         this.motivoFalloPlanning = reason;
         this.cantidadPlanificable = schedulableQuantity;
     }
-    
 
     public void validatePlannable() {
         if (this.estado == EstadoPedido.PLANIFICADO)

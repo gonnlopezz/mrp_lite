@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
+import unpsjb.labprog.backend.business.pedido.PedidoService;
 import unpsjb.labprog.backend.business.planificacion.service.PlanificacionService;
 import unpsjb.labprog.backend.dto.PlanAllPendingRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
@@ -27,6 +28,8 @@ import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 public class PlanificacionPresenter {
     @Autowired
     PlanificacionService service;
+    @Autowired
+    PedidoService pedidoService;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<Object> findAll() {
@@ -76,7 +79,7 @@ public class PlanificacionPresenter {
             List<ProcesoPlanificacion> result = service.planificarPedido(request);
 
             if (result.isEmpty()) {
-                Pedido failedOrder = service.findOrderById(request.getOrder().getId());
+                Pedido failedOrder = pedidoService.findById(request.getOrder().getId());
                 return Response.ok(failedOrder, "El pedido no pudo planificarse en el plazo requerido");
             }
 
