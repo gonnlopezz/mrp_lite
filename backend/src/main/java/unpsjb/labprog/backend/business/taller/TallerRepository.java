@@ -26,7 +26,7 @@ public interface TallerRepository
         long contarTiposEquipoCoincidentes(@Param("code") String code, @Param("types") List<TipoEquipo> types);
 
         @Query("SELECT w FROM Taller w " +
-                        "JOIN w.equipos e " +
+                        "LEFT JOIN w.equipos e " +
                         "WHERE e.tipo IN :types " +
                         "GROUP BY w.id " +
                         "HAVING COUNT(DISTINCT e.tipo) = :count " +

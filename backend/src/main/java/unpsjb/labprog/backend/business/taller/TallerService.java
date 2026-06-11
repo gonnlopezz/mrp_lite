@@ -56,11 +56,18 @@ public class TallerService {
         return planningProcessRepository.findAllByWorkshopId(workshopId);
     }
 
-    public List<Taller> findPossibleWorkshops(List<TipoEquipo> types) {
-        List<Taller> result = repository.findPosiblesTalleresConEquipos(types, types.size());
-        if (result.isEmpty())
-            throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
-        return result;
+    @Transactional
+    public Taller save(Taller workshop) {
+        return repository.save(workshop);
+    }
+
+    @Transactional
+    public void delete(int id) {
+        repository.deleteById(id);
+    }
+
+    public List<Taller> obtenerPosiblesTalleres(List<TipoEquipo> types) {
+        return repository.findPosiblesTalleresConEquipos(types, types.size());
     }
 
     public void validarSoporteEquipo(String code, List<TipoEquipo> types) {
@@ -70,23 +77,19 @@ public class TallerService {
                     "El taller " + code + " no cuenta con los equipos necesarios para fabricar el producto");
     }
 
-    public Taller resolverTaller(String workshopCode, List<TipoEquipo> requiredTypes) {
+    public Taller obtenerTaller(String workshopCode, List<TipoEquipo> requiredTypes) {
         if (workshopCode != null) {
             Taller result = this.findByCode(workshopCode);
             this.validarSoporteEquipo(workshopCode, requiredTypes);
             return result;
         }
-        return this.findPossibleWorkshops(requiredTypes).get(0);
-    }
 
-    @Transactional
-    public Taller save(Taller workshop) {
-        return repository.save(workshop);
-    }
+        List<Taller> result = this.obtenerPosiblesTalleres(requiredTypes);
+        if (result.isEmpty()) {
+            return null;
+        }
 
-    @Transactional
-    public void delete(int id) {
-        repository.deleteById(id);
+        return result.get(0);
     }
 
     public List<Taller> filtrarTalleresPor(Pedido pedido, List<Taller> talleres) {

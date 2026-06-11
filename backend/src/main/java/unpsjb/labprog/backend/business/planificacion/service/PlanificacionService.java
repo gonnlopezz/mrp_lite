@@ -20,6 +20,7 @@ import unpsjb.labprog.backend.business.producto.ProductoService;
 import unpsjb.labprog.backend.business.taller.TallerService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Pedido;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 import unpsjb.labprog.backend.model.Producto;
@@ -80,8 +81,11 @@ public class PlanificacionService {
         LocalDateTime inicio = request.getStartDate().toLocalDate().atStartOfDay();
         Producto producto = productoService.findByName(request.getProductName());
 
-        Taller taller = tallerService.resolverTaller(
+        Taller taller = tallerService.obtenerTaller(
                 request.getWorkshopCode(), producto.requiredEquipmentTypes());
+
+        if (taller == null)
+            throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
 
         LocalDateTime finHorizonte = inicio.plusDays(30);
         Agenda agenda = fabricaAgenda.crearParaTaller(taller, inicio, finHorizonte);
@@ -98,19 +102,19 @@ public class PlanificacionService {
         LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
         LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
 
-        List<Taller> talleresAptos = tallerService
-                .findPossibleWorkshops(pedido.getProducto().requiredEquipmentTypes());
+        List<Taller> talleres = tallerService
+                .obtenerPosiblesTalleres(pedido.getProducto().requiredEquipmentTypes());
 
-        if (talleresAptos.isEmpty()) {
+        if (talleres.isEmpty()) {
             pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);
             pedidoService.save(pedido);
             return List.of();
         }
 
-        Map<Long, Agenda> agendasInstanciadas = fabricaAgenda.crearParaTalleres(talleresAptos, inicioLimite, deadline);
+        Map<Long, Agenda> agendasInstanciadas = fabricaAgenda.crearParaTalleres(talleres, inicioLimite, deadline);
 
         List<ProcesoPlanificacion> result = planificador.planificarPedidoEnTalleres(pedido, inicioLimite,
-                talleresAptos,
+                talleres,
                 agendasInstanciadas);
 
         pedidoService.save(pedido);

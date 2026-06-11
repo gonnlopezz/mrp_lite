@@ -48,7 +48,7 @@ public class AgendaFactory {
         Map<Long, Long> indiceEquipoATaller = indexarEquiposTaller(talleres);
         Map<Long, List<Planificacion>> porTaller = agruparPorTaller(planificaciones, indiceEquipoATaller);
 
-        Map<Long, Agenda> agendas = new HashMap<>(); // Cambiado a HashMap común
+        Map<Long, Agenda> agendas = new HashMap<>();
         for (Taller taller : talleres) {
             List<Planificacion> delTaller = porTaller.getOrDefault(taller.getId(), List.of());
             agendas.put(taller.getId(), new Agenda(taller, delTaller, inicio, fin));
