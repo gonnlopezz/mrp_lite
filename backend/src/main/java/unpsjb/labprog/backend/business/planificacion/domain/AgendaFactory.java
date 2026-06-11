@@ -20,19 +20,11 @@ public class AgendaFactory {
     @Autowired
     private PlanificacionRepository planificacionRepository;
 
-    /**
-     * Crea una Agenda para un único taller (usado en planificación forward manual).
-     * Un único query inicial.
-     */
     public Agenda crearParaTaller(Taller taller, LocalDateTime inicio, LocalDateTime fin) {
         List<Planificacion> planificaciones = planificacionRepository.planificacionesPorTaller(taller.getId());
         return new Agenda(taller, planificaciones, inicio, fin);
     }
 
-    /**
-     * Crea Agendas para múltiples talleres con UN ÚNICO query.
-     * Resuelve el problema N+1 de la versión anterior.
-     */
     public Map<Long, Agenda> crearParaTalleres(List<Taller> talleres,
             LocalDateTime inicio,
             LocalDateTime fin) {
@@ -48,8 +40,6 @@ public class AgendaFactory {
 
         return construirAgendas(talleres, todas, inicio, fin);
     }
-
-    // ─── Métodos privados de construcción ────────────────────────────────────
 
     private Map<Long, Agenda> construirAgendas(List<Taller> talleres,
             List<Planificacion> planificaciones,

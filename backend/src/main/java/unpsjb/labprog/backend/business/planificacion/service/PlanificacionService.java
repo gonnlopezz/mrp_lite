@@ -117,12 +117,11 @@ public class PlanificacionService {
                 talleresAptos,
                 agendasInstanciadas);
 
-        if (result.isEmpty()) {
-            pedidoService.save(pedido);
-            return result;
-        }
-
         pedidoService.save(pedido);
+
+        if (result.isEmpty())
+            return result;
+
         return repository.saveAll(result);
     }
 
