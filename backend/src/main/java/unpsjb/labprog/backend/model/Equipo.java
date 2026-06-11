@@ -38,19 +38,4 @@ public class Equipo {
     @OneToMany(mappedBy = "equipo", fetch = FetchType.LAZY)
     @OrderBy("periodo.fin DESC")
     private List<Planificacion> planificaciones = new ArrayList<>();
-
-    public LocalDateTime firstAvailableSlotAfter(LocalDateTime requestedTime) {
-        if (this.planificaciones == null || this.planificaciones.isEmpty()) 
-            return requestedTime;
-        
-        LocalDateTime result = requestedTime;
-        
-        for(Planificacion p : this.planificaciones) {
-            if (p.getPeriodo().getFin().isAfter(result)) {
-                result = p.getPeriodo().getFin();
-            }
-        }
-        return result;
-    }
-
 }

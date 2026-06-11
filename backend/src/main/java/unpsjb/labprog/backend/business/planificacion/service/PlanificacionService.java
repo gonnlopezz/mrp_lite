@@ -3,6 +3,8 @@ package unpsjb.labprog.backend.business.planificacion.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,47 +14,39 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.pedido.PedidoService;
 import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
+import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
+import unpsjb.labprog.backend.business.planificacion.domain.AgendaFactory;
+import unpsjb.labprog.backend.business.producto.ProductoService;
+import unpsjb.labprog.backend.business.taller.TallerService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningRequestDTO;
 import unpsjb.labprog.backend.model.Pedido;
-import unpsjb.labprog.backend.model.EstadoPedido;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
+import unpsjb.labprog.backend.model.Producto;
+import unpsjb.labprog.backend.model.Taller;
 
 @Service
 public class PlanificacionService {
     @Autowired
-    PlanificacionRepository repository;
+    private PlanificacionRepository repository;
 
     @Autowired
-    Planificador scheduler;
+    private Planificador planificador;
 
     @Autowired
-    PedidoService orderService;
+    private PedidoService pedidoService;
 
-    @Transactional
-    public ProcesoPlanificacion save(PlanningRequestDTO request) {
-        return repository.save(scheduler.planificarHaciaAdelante(request));
-    }
+    @Autowired
+    private TallerService tallerService;
 
-    @Transactional
-    public List<ProcesoPlanificacion> guardarDesdePedido(PlanningFromOrderRequestDTO request) {
-        return repository.saveAll(scheduler.planificarHaciaAtras(request));
-    }
+    @Autowired
+    private AgendaFactory fabricaAgenda;
+
+    @Autowired
+    private ProductoService productoService;
 
     public Pedido findOrderById(long id) {
-        return orderService.findById(id);
-    }
-
-    @Transactional
-    public List<ProcesoPlanificacion> guardarPedidosPendientes(LocalDateTime executionTime) {
-        List<Pedido> pendingOrders = orderService.findByEstadoOrderByFechaEntregaAsc(EstadoPedido.PENDIENTE);
-
-        if (pendingOrders.isEmpty())
-            return new ArrayList<>();
-
-        List<ProcesoPlanificacion> processes = scheduler.planificarPedidosMasivos(pendingOrders, executionTime);
-        repository.saveAll(processes);
-        return processes;
+        return pedidoService.findById(id);
     }
 
     public List<ProcesoPlanificacion> findAll() {
@@ -73,7 +67,6 @@ public class PlanificacionService {
                         "Planificación no encontrada con id: " + id));
     }
 
-
     public List<ProcesoPlanificacion> findFiltered(Long workshopId, Long orderId) {
         if (workshopId == null && orderId == null)
             return this.findAll();
@@ -84,5 +77,93 @@ public class PlanificacionService {
     @Transactional
     public void delete(long id) {
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public ProcesoPlanificacion planificarProducto(PlanningRequestDTO request) {
+        LocalDateTime inicio = request.getStartDate().toLocalDate().atStartOfDay();
+        Producto producto = productoService.findByName(request.getProductName());
+
+        Taller taller = tallerService.resolverTaller(
+                request.getWorkshopCode(), producto.requiredEquipmentTypes());
+
+        LocalDateTime finHorizonte = inicio.plusDays(30);
+        Agenda agenda = fabricaAgenda.crearParaTaller(taller, inicio, finHorizonte);
+
+        ProcesoPlanificacion result = planificador.planificarHaciaAdelanteEspecífico(producto, taller, agenda, inicio);
+        return repository.save(result);
+    }
+
+    @Transactional
+    public List<ProcesoPlanificacion> planificarPedido(PlanningFromOrderRequestDTO request) {
+        Pedido pedido = pedidoService.findById(request.getOrder().getId());
+        pedido.validatePlannable();
+
+        LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
+        LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
+
+        List<Taller> todosTalleres = tallerService.findAll();
+
+        List<Taller> talleresAptos = obtenerTalleresPor(pedido, todosTalleres);
+        if (talleresAptos.isEmpty()) {
+            pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);
+            pedidoService.save(pedido);
+            return List.of();
+        }
+
+        Map<Long, Agenda> agendasInstanciadas = fabricaAgenda.crearParaTalleres(talleresAptos, inicioLimite, deadline);
+
+        List<ProcesoPlanificacion> result = planificador.planificarPedidoEnTalleres(pedido, inicioLimite,
+                talleresAptos,
+                agendasInstanciadas);
+
+        if (result.isEmpty()) {
+            pedidoService.save(pedido);
+            return result;
+        }
+
+        pedidoService.save(pedido);
+        return repository.saveAll(result);
+    }
+
+    @Transactional
+    public List<ProcesoPlanificacion> planificarBatch(LocalDateTime tiempoEjecucion) {
+        List<Pedido> pedidosPendientes = pedidoService.buscarPendientes();
+        if (pedidosPendientes.isEmpty())
+            return List.of();
+
+        List<Taller> talleresOrdenados = tallerService.findAll();
+
+        LocalDateTime deadlineMaximo = pedidosPendientes.get(pedidosPendientes.size() - 1).getFechaEntrega()
+                .atStartOfDay();
+        Map<Long, Agenda> agendasInstanciadas = fabricaAgenda.crearParaTalleres(talleresOrdenados, tiempoEjecucion,
+                deadlineMaximo);
+
+        List<ProcesoPlanificacion> result = new ArrayList<>();
+
+        for (Pedido pedido : pedidosPendientes) {
+            List<Taller> talleresAptos = obtenerTalleresPor(pedido, talleresOrdenados);
+
+            if (!talleresAptos.isEmpty()) {
+                List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedidoEnTalleres(
+                        pedido, tiempoEjecucion, talleresAptos, agendasInstanciadas);
+                result.addAll(procesosPedido);
+            } else {
+                pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);
+            }
+        }
+
+        pedidoService.saveAll(pedidosPendientes);
+        return repository.saveAll(result);
+    }
+
+    private List<Taller> obtenerTalleresPor(Pedido pedido, List<Taller> talleres) {
+        List<Taller> aptos = new ArrayList<>();
+        for (Taller t : talleres) {
+            if (t.soportaEquipamiento(pedido.getProducto().requiredEquipmentTypes())) {
+                aptos.add(t);
+            }
+        }
+        return aptos;
     }
 }

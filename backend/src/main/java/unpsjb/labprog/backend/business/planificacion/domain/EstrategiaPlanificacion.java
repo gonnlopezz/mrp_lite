@@ -7,5 +7,5 @@ import unpsjb.labprog.backend.model.Producto;
 import unpsjb.labprog.backend.model.Taller;
 
 public interface EstrategiaPlanificacion {
-    ProcesoPlanificacion ejecutar(Producto producto, Taller taller, AgendaTaller agenda, LocalDateTime fechaReferencia);
+    ProcesoPlanificacion ejecutar(Producto producto, Taller taller, Agenda agenda, LocalDateTime fechaReferencia);
 }

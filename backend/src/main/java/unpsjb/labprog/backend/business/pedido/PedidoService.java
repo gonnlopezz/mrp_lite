@@ -36,7 +36,8 @@ public class PedidoService {
     }
 
     public Page<Pedido> findByPageAndState(int page, int size, EstadoPedido state) {
-        return repository.findByEstadoOrderByFechaEntregaAsc(state, PageRequest.of(page, size, Sort.by("fechaEntrega").ascending()));
+        return repository.findByEstadoOrderByFechaEntregaAsc(state,
+                PageRequest.of(page, size, Sort.by("fechaEntrega").ascending()));
     }
 
     public Page<Pedido> search(String term, int page, int size) {
@@ -52,7 +53,7 @@ public class PedidoService {
     }
 
     public List<ProcesoPlanificacion> findPlanningProcesses(long orderId) {
-        return planningProcessRepository.findByPedidoId(orderId) ;
+        return planningProcessRepository.findByPedidoId(orderId);
     }
 
     public List<Pedido> findByEstadoOrderByFechaEntregaAsc(EstadoPedido state) {
@@ -72,6 +73,10 @@ public class PedidoService {
     @Transactional
     public void delete(long id) {
         repository.deleteById(id);
+    }
+
+    public List<Pedido> buscarPendientes() {
+        return repository.findByEstadoOrderByFechaEntregaAsc(EstadoPedido.PENDIENTE);
     }
 
 }

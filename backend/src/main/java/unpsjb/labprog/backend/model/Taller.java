@@ -1,6 +1,9 @@
 package unpsjb.labprog.backend.model;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,10 +38,18 @@ public class Taller {
     // Métodos
 
     public Equipo findEquipmentForType(TipoEquipo type) {
-        for(Equipo eq : equipos) {
+        for (Equipo eq : equipos) {
             if (eq.getTipo().equals(type))
                 return eq;
         }
         throw new BusinessException("El taller no cuenta con el tipo de equipo requerido: " + type.getNombre());
+    }
+
+    public boolean soportaEquipamiento(List<TipoEquipo> tiposRequeridos) {
+        Set<TipoEquipo> tiposDisponibles = new HashSet<>();
+        for (Equipo equipo : this.equipos) {
+            tiposDisponibles.add(equipo.getTipo());
+        }
+        return tiposDisponibles.containsAll(tiposRequeridos);
     }
 }

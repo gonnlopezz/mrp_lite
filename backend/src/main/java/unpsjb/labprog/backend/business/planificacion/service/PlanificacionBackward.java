@@ -4,8 +4,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import org.springframework.stereotype.Component;
 
-import unpsjb.labprog.backend.business.planificacion.domain.AgendaEquipo;
-import unpsjb.labprog.backend.business.planificacion.domain.AgendaTaller;
+import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
@@ -14,27 +13,22 @@ import unpsjb.labprog.backend.model.*;
 public class PlanificacionBackward implements EstrategiaPlanificacion {
 
     @Override
-    public ProcesoPlanificacion ejecutar(Producto producto, Taller taller, AgendaTaller agenda, LocalDateTime deadline) {
+    public ProcesoPlanificacion ejecutar(Producto producto, Taller taller, Agenda agenda, LocalDateTime deadline) {
         LinkedList<Planificacion> planificaciones = new LinkedList<>();
         LocalDateTime finActual = deadline;
 
         for (Tarea tarea : producto.getReverseTasks()) {
             Equipo equipo = taller.findEquipmentForType(tarea.getTipo());
-            AgendaEquipo agendaEquipo = agenda.agendaDe(equipo);
-            long duracion = tarea.calculateDurationFor(equipo);
 
-            LocalDateTime fin = agendaEquipo.encontrarFinBackward(finActual, duracion);
-            
-            if (fin == null)  throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido", planificaciones.size());
+            Periodo periodo = agenda.ocuparEspacioBackward(tarea, finActual);
 
-
-            LocalDateTime inicio = fin.minusMinutes(duracion);
-            Periodo periodo = new Periodo(inicio, fin, tarea.getTiempo());
+            if (periodo == null) {
+                throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido",
+                        planificaciones.size());
+            }
 
             planificaciones.addFirst(new Planificacion(tarea, equipo, periodo));
-            agendaEquipo.ocupar(periodo);
-            
-            finActual = inicio;
+            finActual = periodo.getInicio();
         }
 
         return new ProcesoPlanificacion(planificaciones, planificaciones.getFirst().getPeriodo().getInicio(), deadline);
