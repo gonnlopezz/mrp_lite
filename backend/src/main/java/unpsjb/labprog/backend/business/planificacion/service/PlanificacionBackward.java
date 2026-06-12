@@ -18,9 +18,9 @@ public class PlanificacionBackward implements EstrategiaPlanificacion {
         LocalDateTime finActual = deadline;
 
         for (Tarea tarea : producto.getReverseTasks()) {
-            Equipo equipo = taller.findEquipmentForType(tarea.getTipo());
+            Equipo equipo = taller.encontrarEquipamientoPara(tarea.getTipo());
 
-            Periodo periodo = agenda.ocuparEspacioBackward(tarea, finActual);
+            Periodo periodo = agenda.ocuparEspacioBackward(tarea, equipo, finActual);
 
             if (periodo == null) {
                 throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido",

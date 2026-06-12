@@ -21,8 +21,8 @@ public class AgendaFactory {
     private PlanificacionRepository planificacionRepository;
 
     public Agenda crearParaTaller(Taller taller, LocalDateTime inicio, LocalDateTime fin) {
-        List<Planificacion> planificaciones = planificacionRepository.planificacionesPorTaller(taller.getId());
-        return new Agenda(taller, planificaciones, inicio, fin);
+        List<Planificacion> planificaciones = planificacionRepository.planificacionesPorTaller(taller.getId(), inicio);
+        return new Agenda(taller.getEquipos(), planificaciones, inicio, fin);
     }
 
     public Map<Long, Agenda> crearParaTalleres(List<Taller> talleres,
@@ -36,7 +36,7 @@ public class AgendaFactory {
             tallerIds.add(taller.getId());
         }
 
-        List<Planificacion> todas = planificacionRepository.planificacionesPorTalleres(tallerIds);
+        List<Planificacion> todas = planificacionRepository.planificacionesPorTalleres(tallerIds, inicio);
 
         return construirAgendas(talleres, todas, inicio, fin);
     }
@@ -51,7 +51,7 @@ public class AgendaFactory {
         Map<Long, Agenda> agendas = new HashMap<>();
         for (Taller taller : talleres) {
             List<Planificacion> delTaller = porTaller.getOrDefault(taller.getId(), List.of());
-            agendas.put(taller.getId(), new Agenda(taller, delTaller, inicio, fin));
+            agendas.put(taller.getId(), new Agenda(taller.getEquipos(), delTaller, inicio, fin));
         }
 
         return agendas;

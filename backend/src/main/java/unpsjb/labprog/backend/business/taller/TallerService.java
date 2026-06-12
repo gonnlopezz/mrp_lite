@@ -44,7 +44,7 @@ public class TallerService {
     }
 
     public Taller findById(int id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Taller no encontrado"));
     }
 
     public Taller findByCode(String code) {
@@ -71,10 +71,11 @@ public class TallerService {
     }
 
     public void validarSoporteEquipo(String code, List<TipoEquipo> types) {
-        long matchingTypesCount = repository.contarTiposEquipoCoincidentes(code, types);
-        if (matchingTypesCount != types.size())
+        Taller taller = findByCode(code);
+        if (!taller.soportaEquipamiento(types)) {
             throw new BusinessException(
                     "El taller " + code + " no cuenta con los equipos necesarios para fabricar el producto");
+        }
     }
 
     public Taller obtenerTaller(String workshopCode, List<TipoEquipo> requiredTypes) {

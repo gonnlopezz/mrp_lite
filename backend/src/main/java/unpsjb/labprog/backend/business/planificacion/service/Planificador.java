@@ -26,13 +26,9 @@ public class Planificador {
         return estrategia.ejecutar(producto, taller, agenda, inicio);
     }
 
-    /**
-     * Su ÚNICA responsabilidad: Intentar acomodar un pedido en una lista de
-     * talleres in-memory.
-     */
     public List<ProcesoPlanificacion> planificarPedidoEnTalleres(
             Pedido pedido, LocalDateTime inicioLimite, List<Taller> talleresAptos, Map<Long, Agenda> agendas) {
-
+        ordenarTalleresPorDisponibilidad(talleresAptos, agendas);
         LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
         int mejorCantidadPlanificable = 0;
 
@@ -74,6 +70,27 @@ public class Planificador {
             }
         }
         return resultado;
+    }
+
+    private void ordenarTalleresPorDisponibilidad(List<Taller> talleres, Map<Long, Agenda> agendas) {
+        int n = talleres.size();
+        for (int i = 0; i < n - 1; i++) {
+            int indiceMaximo = i;
+            for (int j = i + 1; j < n; j++) {
+                Taller tallerJ = talleres.get(j);
+                Taller tallerMax = talleres.get(indiceMaximo);
+
+                long minutosJ = agendas.get(tallerJ.getId()).obtenerTotalMinutosDisponibles();
+                long minutosMax = agendas.get(tallerMax.getId()).obtenerTotalMinutosDisponibles();
+                if (minutosJ > minutosMax) {
+                    indiceMaximo = j;
+                }
+            }
+
+            Taller temporal = talleres.get(i);
+            talleres.set(i, talleres.get(indiceMaximo));
+            talleres.set(indiceMaximo, temporal);
+        }
     }
 
 }

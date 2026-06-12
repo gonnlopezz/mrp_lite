@@ -111,11 +111,11 @@ public class PlanificacionService {
             return List.of();
         }
 
-        Map<Long, Agenda> agendasInstanciadas = fabricaAgenda.crearParaTalleres(talleres, inicioLimite, deadline);
+        Map<Long, Agenda> agendasTaller = fabricaAgenda.crearParaTalleres(talleres, inicioLimite, deadline);
 
         List<ProcesoPlanificacion> result = planificador.planificarPedidoEnTalleres(pedido, inicioLimite,
                 talleres,
-                agendasInstanciadas);
+                agendasTaller);
 
         pedidoService.save(pedido);
 
@@ -131,21 +131,21 @@ public class PlanificacionService {
         if (pedidosPendientes.isEmpty())
             return List.of();
 
-        List<Taller> talleresOrdenados = tallerService.findAllConEquipos();
+        List<Taller> talleres = tallerService.findAllConEquipos();
 
         LocalDateTime deadlineMaximo = pedidosPendientes.get(pedidosPendientes.size() - 1).getFechaEntrega()
                 .atStartOfDay();
-        Map<Long, Agenda> agendasInstanciadas = fabricaAgenda.crearParaTalleres(talleresOrdenados, tiempoEjecucion,
+        Map<Long, Agenda> agendasTaller = fabricaAgenda.crearParaTalleres(talleres, tiempoEjecucion,
                 deadlineMaximo);
 
         List<ProcesoPlanificacion> result = new ArrayList<>();
 
         for (Pedido pedido : pedidosPendientes) {
-            List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleresOrdenados);
+            List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleres);
 
             if (!talleresAptos.isEmpty()) {
                 List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedidoEnTalleres(
-                        pedido, tiempoEjecucion, talleresAptos, agendasInstanciadas);
+                        pedido, tiempoEjecucion, talleresAptos, agendasTaller);
                 result.addAll(procesosPedido);
             } else {
                 pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);

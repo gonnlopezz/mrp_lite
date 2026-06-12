@@ -20,19 +20,6 @@ public interface TallerRepository
         @Query("Select e FROM Taller e Where e.codigo = ?1")
         Optional<Taller> findByCode(String code);
 
-        @Query("SELECT COUNT(DISTINCT e.tipo) FROM Taller w " +
-                        "JOIN w.equipos e " +
-                        "WHERE w.codigo = :code AND e.tipo IN :types")
-        long contarTiposEquipoCoincidentes(@Param("code") String code, @Param("types") List<TipoEquipo> types);
-
-        @Query("SELECT w FROM Taller w " +
-                        "LEFT JOIN w.equipos e " +
-                        "WHERE e.tipo IN :types " +
-                        "GROUP BY w.id " +
-                        "HAVING COUNT(DISTINCT e.tipo) = :count " +
-                        "ORDER BY w.codigo ASC")
-        List<Taller> findAllByTiposEquipo(List<TipoEquipo> types, int count);
-
         @Query("SELECT DISTINCT t FROM Taller t LEFT JOIN FETCH t.equipos ORDER BY t.id ASC")
         List<Taller> findAllConEquipos();
 
@@ -41,7 +28,6 @@ public interface TallerRepository
                         "OR w.nombre ILIKE CONCAT('%', :term, '%')")
         Page<Taller> search(String term, Pageable pageable);
 
-        // En TallerRepository
         @Query("SELECT DISTINCT t FROM Taller t " +
                         "LEFT JOIN FETCH t.equipos " +
                         "WHERE t.id IN (" +

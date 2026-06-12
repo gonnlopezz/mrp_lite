@@ -38,18 +38,19 @@ public interface PlanificacionRepository
         @Query("SELECT p FROM Planificacion p " +
                         "JOIN FETCH p.equipo e " +
                         "WHERE e IN (SELECT eq FROM Taller w JOIN w.equipos eq WHERE w.id = :tallerId) " +
+                        "AND p.periodo.fin >= :inicio " +
                         "ORDER BY e.id ASC, p.periodo.inicio ASC")
-        List<Planificacion> planificacionesPorTaller(@Param("tallerId") Long tallerId);
+        List<Planificacion> planificacionesPorTaller(
+                        @Param("tallerId") Long tallerId,
+                        @Param("inicio") LocalDateTime inicio);
 
         @Query("SELECT p FROM Planificacion p " +
                         "JOIN FETCH p.equipo e " +
                         "WHERE e IN (SELECT eq FROM Taller w JOIN w.equipos eq WHERE w.id IN :tallerIds) " +
+                        "AND p.periodo.fin >= :inicio " +
                         "ORDER BY e.id ASC, p.periodo.inicio ASC")
-        List<Planificacion> planificacionesPorTalleres(@Param("tallerIds") List<Long> tallerIds);
+        List<Planificacion> planificacionesPorTalleres(
+                        @Param("tallerIds") List<Long> tallerIds,
+                        @Param("inicio") LocalDateTime inicio);
 
-        @Query("SELECT p FROM Planificacion p " +
-                        "JOIN FETCH p.equipo e " +
-                        "WHERE p.periodo.fin >= :fechaInicio " +
-                        "ORDER BY e.id ASC, p.periodo.inicio ASC")
-        List<Planificacion> todasPlanificacionesOrdenadas(@Param("fechaInicio") LocalDateTime fechaInicio);
 }

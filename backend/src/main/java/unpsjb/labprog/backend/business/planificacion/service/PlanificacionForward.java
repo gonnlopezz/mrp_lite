@@ -19,9 +19,9 @@ public class PlanificacionForward implements EstrategiaPlanificacion {
         LocalDateTime tiempoActual = inicio;
 
         for (Tarea tarea : producto.getTareas()) {
-            Equipo equipo = taller.findEquipmentForType(tarea.getTipo());
+            Equipo equipo = taller.encontrarEquipamientoPara(tarea.getTipo());
 
-            Periodo periodo = agenda.ocuparEspacioForward(tarea, tiempoActual);
+            Periodo periodo = agenda.ocuparEspacioForward(tarea, equipo, tiempoActual);
 
             if (periodo == null) {
                 throw new SchedulingException("No se encontró hueco hacia adelante para la tarea: " + tarea.getNombre(),

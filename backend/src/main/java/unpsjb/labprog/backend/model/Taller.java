@@ -35,14 +35,12 @@ public class Taller {
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
     private Collection<Equipo> equipos;
 
-    // Métodos
-
-    public Equipo findEquipmentForType(TipoEquipo type) {
+    public Equipo encontrarEquipamientoPara(TipoEquipo tipo) {
         for (Equipo eq : equipos) {
-            if (eq.getTipo().equals(type))
+            if (eq.getTipo().equals(tipo))
                 return eq;
         }
-        throw new BusinessException("El taller no cuenta con el tipo de equipo requerido: " + type.getNombre());
+        throw new BusinessException("El taller no cuenta con el tipo de equipo requerido: " + tipo.getNombre());
     }
 
     public boolean soportaEquipamiento(List<TipoEquipo> tiposRequeridos) {
