@@ -164,9 +164,9 @@
                                     </button>
 
                                     <button *ngIf="$any(pedido.estado) === 'PLANIFICADO'"
-                                        routerLink="/pedidos/{{pedido.id}}/planificaciones"
-                                        class="btn-icon hover-success" title="Ver planificación">
-                                        <i class="fas fa-calendar-alt"></i>
+                                        routerLink="/planificacion-dashboard" [queryParams]="{ pedidoId: pedido.id }"
+                                        class="btn-icon hover-success" title="Ver en Dashboard">
+                                        <i class="fas fa-chart-line text-info"></i>
                                     </button>
 
                                     <button routerLink="/pedidos/{{pedido.id}}" class="btn-icon hover-primary"

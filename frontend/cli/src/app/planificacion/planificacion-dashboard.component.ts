@@ -210,53 +210,53 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   // ─── Renderizado ─────────────────────────────────────────────────────────
 
   renderAllCharts(): void {
-  if (!this.googleChartsLoaded || !this.hasData) return;
+    if (!this.googleChartsLoaded || !this.hasData) return;
 
-  // 1. Forzamos el acoplamiento de estados en el ciclo de Angular
-  this.cdr.detectChanges();
+    // 1. Forzamos el acoplamiento de estados en el ciclo de Angular
+    this.cdr.detectChanges();
 
-  // 2. Le damos un slot mínimo al event loop para asegurar que el DOM esté listo
-  setTimeout(() => {
-    if (this.chartDivs && this.chartDivs.length > 0) {
-      this.drawCharts(this.chartDivs.toArray());
-    }
-  }, 50);
-}
+    // 2. Le damos un slot mínimo al event loop para asegurar que el DOM esté listo
+    setTimeout(() => {
+      if (this.chartDivs && this.chartDivs.length > 0) {
+        this.drawCharts(this.chartDivs.toArray());
+      }
+    }, 50);
+  }
 
   private drawCharts(divs: ElementRef[]): void {
-  this.workshopBlocks.forEach((block, index) => {
-    const divRef = divs[index];
-    if (!divRef) return;
+    this.workshopBlocks.forEach((block, index) => {
+      const divRef = divs[index];
+      if (!divRef) return;
 
-    // 1. Limpieza física segura del contenedor para forzar un lienzo fresco
-    const container = divRef.nativeElement;
-    container.innerHTML = '';
+      // 1. Limpieza física segura del contenedor para forzar un lienzo fresco
+      const container = divRef.nativeElement;
+      container.innerHTML = '';
 
-    // 2. Creamos un nodo hijo interno para que Google dibuje sin romper la referencia nativa de Angular
-    const chartTarget = document.createElement('div');
-    container.appendChild(chartTarget);
+      // 2. Creamos un nodo hijo interno para que Google dibuje sin romper la referencia nativa de Angular
+      const chartTarget = document.createElement('div');
+      container.appendChild(chartTarget);
 
-    const currentShift = this.getShiftForWorkshop(block.workshopCode);
-    const range = this.SHIFT_RANGES[currentShift];
+      const currentShift = this.getShiftForWorkshop(block.workshopCode);
+      const range = this.SHIFT_RANGES[currentShift];
 
-    const shiftMin = new Date(this.selectedDate + 'T00:00:00');
-    shiftMin.setMinutes(shiftMin.getMinutes() + range.start);
+      const shiftMin = new Date(this.selectedDate + 'T00:00:00');
+      shiftMin.setMinutes(shiftMin.getMinutes() + range.start);
 
-    const shiftMax = new Date(this.selectedDate + 'T00:00:00');
-    shiftMax.setMinutes(shiftMax.getMinutes() + range.end);
+      const shiftMax = new Date(this.selectedDate + 'T00:00:00');
+      shiftMax.setMinutes(shiftMax.getMinutes() + range.end);
 
-    // 3. Pasamos el nuevo nodo hijo seguro al servicio
-    this.chartService.drawBlock(
-      block,
-      chartTarget,
-      (block as any).timeRange,
-      currentShift === 'all' ? null : { min: shiftMin, max: shiftMax }
-    );
-  });
-  
-  this.renderingCharts = false;
-  this.cdr.detectChanges();
-}
+      // 3. Pasamos el nuevo nodo hijo seguro al servicio
+      this.chartService.drawBlock(
+        block,
+        chartTarget,
+        (block as any).timeRange,
+        currentShift === 'all' ? null : { min: shiftMin, max: shiftMax }
+      );
+    });
+
+    this.renderingCharts = false;
+    this.cdr.detectChanges();
+  }
 
   // ─── Mapas de lookup ─────────────────────────────────────────────────────
 
@@ -307,7 +307,11 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     const colorMap = this.buildColorMap();
     const blocksMap = new Map<string, TallerChartBlock>();
 
-    this.planningProcesses.forEach(process => {
+    // ─── REFACTOR CLAVE: Clonamos y ordenamos por ID de proceso de forma ascendente ───
+    // Esto garantiza la consistencia del color index, sin importar el orden del JSON
+    const sortedProcesses = [...this.planningProcesses].sort((a, b) => a.id - b.id);
+
+    sortedProcesses.forEach(process => {
       const color = colorMap.get(this.colorKey(process)) ?? '#999999';
       const processLabel = `Proceso #${process.id}`;
 
@@ -315,8 +319,12 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
         const dateStr = planning.periodo?.inicio?.split('T')[0];
         if (dateStr !== this.selectedDate) return;
 
+        // Limpieza y descarte de segundos/milisegundos para evitar el pisado visual (Tiritas cortas)
         const start = new Date(planning.periodo.inicio);
+        start.setSeconds(0, 0);
         const end = new Date(planning.periodo.fin);
+        end.setSeconds(0, 0);
+
         if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
 
         const workshop = this.equipoWorkshopMap.get(planning.equipo?.id);
@@ -334,7 +342,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
             workshopName: workshop.nombre, workshopCode: workshop.codigo,
             rows: [], ordersOfTheDay: [], productsOfTheDay: []
           });
-          // Lo tratamos como any temporalmente para asignarle el rango dinámico
           (blocksMap.get(workshop.codigo) as any).timeRange = { min: start, max: end };
         } else {
           const block = blocksMap.get(workshop.codigo) as any;
@@ -346,7 +353,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       });
     });
 
-    // El resto del método se mantiene igual mapeando los summaries...
+    // Mapeo final de los summaries
     blocksMap.forEach((block, workshopCode) => {
       const { orders, products } = this.computeSummaryForWorkshop(workshopCode);
       block.ordersOfTheDay = orders;
@@ -354,8 +361,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     });
 
     this.workshopBlocks = Array.from(blocksMap.values());
-
-    // ⚠️ ELIMINAMOS la llamada a 'this.computeDayTimeRange()' ya no es necesaria globalmente
   }
 
   private computeSummaryForWorkshop(workshopCode: string): {
@@ -487,14 +492,14 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   // Control de Fechas
 
   get ngbSelectedDate(): { year: number; month: number; day: number } {
-  // Si por alguna razón no hay fecha, caemos en el día de hoy de forma segura para que no chille Ng-Bootstrap
-  if (!this.selectedDate) {
-    const today = new Date();
-    return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+    // Si por alguna razón no hay fecha, caemos en el día de hoy de forma segura para que no chille Ng-Bootstrap
+    if (!this.selectedDate) {
+      const today = new Date();
+      return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+    }
+    const [year, month, day] = this.selectedDate.split('-').map(Number);
+    return { year, month, day };
   }
-  const [year, month, day] = this.selectedDate.split('-').map(Number);
-  return { year, month, day };
-}
 
   get isToday(): boolean {
     return this.selectedDate === new Date().toISOString().split('T')[0];

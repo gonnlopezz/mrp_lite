@@ -24,6 +24,6 @@ export const routes: Routes = [
     {path: "talleres/:id/planificaciones", component: PlanificacionesComponent},
     {path: "pedidos", component: PedidosComponent},
     {path: "pedidos/:id", component: PedidoDetailComponent},
-    {path: "pedidos/:id/planificaciones", component: PlanificacionesComponent},
+    {path: "pedidos/:id/planificaciones", component: PlanificacionDashboardComponent},
     {path: "planificacion-dashboard", component: PlanificacionDashboardComponent}
 ];

@@ -112,18 +112,6 @@ public class Agenda {
         return null;
     }
 
-    public long obtenerTotalMinutosDisponibles() {
-        long totalMinutos = 0;
-
-        for (List<Periodo> huecos : huecosPorEquipo.values()) {
-            for (Periodo hueco : huecos) {
-                long minutos = java.time.Duration.between(hueco.getInicio(), hueco.getFin()).toMinutes();
-                totalMinutos += minutos;
-            }
-        }
-        return totalMinutos;
-    }
-
     private void actualizarHuecos(List<Periodo> huecos, int indiceHuecoAfectado, Periodo ocupado) {
         Periodo huecoOriginal = huecos.remove(indiceHuecoAfectado);
 
