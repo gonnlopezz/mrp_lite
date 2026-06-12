@@ -54,8 +54,7 @@ export class PlanificacionChartService {
     dataTable.addColumn({ type: 'date', id: 'Inicio' });
     dataTable.addColumn({ type: 'date', id: 'Fin' });
 
-    const colorOrder: string[] = [];
-    const seenLabels = new Set<string>();
+    const labelDataMap = new Map<string, { color: string; minStart: number }>();
 
     rows.forEach(row => {
       dataTable.addRow([
@@ -66,13 +65,21 @@ export class PlanificacionChartService {
         row.end
       ]);
 
-      if (!seenLabels.has(row.rowLabel)) {
-        seenLabels.add(row.rowLabel);
-        colorOrder.push(row.color);
+      const existing = labelDataMap.get(row.rowLabel);
+      const rowStart = row.start.getTime();
+      if (!existing) {
+        labelDataMap.set(row.rowLabel, { color: row.color, minStart: rowStart });
+      } else if (rowStart < existing.minStart) {
+        existing.minStart = rowStart;
       }
     });
 
-    return { dataTable, colors: colorOrder };
+    const sortedLabels = Array.from(labelDataMap.keys()).sort((a, b) => {
+      return labelDataMap.get(a)!.minStart - labelDataMap.get(b)!.minStart;
+    });
+    const colors = sortedLabels.map(label => labelDataMap.get(label)!.color);
+
+    return { dataTable, colors };
   }
 
   private buildChartOptions(

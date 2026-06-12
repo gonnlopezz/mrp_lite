@@ -22,7 +22,11 @@ import { NgbDate, NgbDateStruct, NgbDatepickerModule, NgbDropdownModule, NgbType
 
 const PROCESS_PALETTE = [
   '#3366cc', '#dc3912', '#ff9900', '#109618',
-  '#990099', '#0099c6', '#dd4477', '#66aa00'
+  '#990099', '#0099c6', '#dd4477', '#66aa00',
+  '#b82e2e', '#316395', '#994499', '#22aa99',
+  '#aaaa11', '#6633cc', '#e67300', '#8b0707',
+  '#651067', '#329262', '#5574a6', '#3b3eac',
+  '#b77322', '#16d620', '#b91383', '#f4359e'
 ];
 
 declare var google: any;
@@ -160,7 +164,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       .getPlanningsFiltered(this.selectedWorkshopId, this.selectedOrderId)
       .subscribe({
         next: dataPackage => {
-          this.planningProcesses = dataPackage.data as ProcesoPlanificacion[];
+          this.planningProcesses = (dataPackage.data as ProcesoPlanificacion[] || []).sort((a, b) => a.id - b.id);
           this.computeAvailableDates();
           this.computeWorkshopBlocks();
           this.loading = false;
@@ -416,10 +420,18 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
 
   private buildColorMap(): Map<string, string> {
     const map = new Map<string, string>();
-    let index = 0;
     this.planningProcesses.forEach(process => {
       const key = this.colorKey(process);
-      if (!map.has(key)) map.set(key, PROCESS_PALETTE[index++ % PROCESS_PALETTE.length]);
+      if (!map.has(key)) {
+        let idVal = 0;
+        if (this.colorMode === 'by-order') {
+          idVal = process.pedido?.id ?? (process.id * 17);
+        } else {
+          idVal = process.id;
+        }
+        const hash = (idVal * 131) % PROCESS_PALETTE.length;
+        map.set(key, PROCESS_PALETTE[hash]);
+      }
     });
     return map;
   }
@@ -473,6 +485,11 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
 
   getTotalProducts(block: TallerChartBlock): number {
     return block.ordersOfTheDay.reduce((acc, item) => acc + item.cantidad, 0);
+  }
+
+  getOrderColor(orderId: number): string {
+    const hash = (orderId * 131) % PROCESS_PALETTE.length;
+    return PROCESS_PALETTE[hash];
   }
 
   // ─── Scroll ─────────────────────────────────────────────────
