@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.model.Pedido;
 import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.EstadoPedido;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 
@@ -72,6 +73,16 @@ public class PedidoService {
 
     @Transactional
     public void delete(long id) {
+        Pedido pedido = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
+        if (pedido.getEstado() == EstadoPedido.PLANIFICADO) {
+            throw new BusinessException("No se puede eliminar el pedido porque ya se encuentra planificado.");
+        }
+        if (pedido.getEstado() == EstadoPedido.FINALIZADO) {
+            throw new BusinessException("No se puede eliminar el pedido porque ya se encuentra finalizado.");
+        }
+        if (!planningProcessRepository.findByPedidoId(id).isEmpty()) {
+            throw new BusinessException("No se puede eliminar el pedido porque ya cuenta con una planificación asociada.");
+        }
         repository.deleteById(id);
     }
 

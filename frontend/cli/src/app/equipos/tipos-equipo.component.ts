@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { TipoEquipo } from './tipo-equipo';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { AlertModalComponent } from '../modals/alert-modal.component';
 import { ToastrModule } from 'ngx-toastr';
 
 @Component({
@@ -77,8 +78,19 @@ export class TiposEquipoComponent implements OnInit {
     
         modalRef.result.then((result) => {
           if (result) {
-            this.tipoEquipoService.delete(id).subscribe(() => {
-              this.getTiposEquipo();
+            this.tipoEquipoService.delete(id).subscribe({
+              next: () => {
+                this.getTiposEquipo();
+              },
+              error: (err) => {
+                const errorMsg = err.error?.message || 'Ocurrió un error inesperado al intentar eliminar el tipo de equipo.';
+                const alertRef = this.modalService.open(AlertModalComponent, {
+                  centered: true,
+                  backdrop: 'static'
+                });
+                alertRef.componentInstance.title = 'Error al eliminar';
+                alertRef.componentInstance.message = errorMsg;
+              }
             });
           }
         }).catch(() => {

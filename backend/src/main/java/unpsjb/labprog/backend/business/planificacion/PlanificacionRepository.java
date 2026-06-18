@@ -53,4 +53,7 @@ public interface PlanificacionRepository
                         @Param("tallerIds") List<Long> tallerIds,
                         @Param("inicio") LocalDateTime inicio);
 
+        @Query("SELECT COUNT(pp) > 0 FROM ProcesoPlanificacion pp JOIN pp.planificaciones pl WHERE pl.equipo.id = :equipoId")
+        boolean existsByEquipoId(@Param("equipoId") Long equipoId);
+
 }

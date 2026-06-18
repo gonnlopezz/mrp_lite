@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PedidoService } from './pedido.service';
 import { PlanificacionService } from '../planificacion/planificacion.service';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { AlertModalComponent } from '../modals/alert-modal.component';
 import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
 
@@ -159,8 +160,24 @@ export class PedidosComponent implements OnInit {
     ref.componentInstance.btnOkText = 'Sí, Eliminar';
     ref.componentInstance.isDelete = true;
 
-    ref.result.then(ok => { if (ok) this.pedidoService.delete(id).subscribe(() => this.refresh()); })
-      .catch(() => { });
+    ref.result.then(ok => {
+      if (ok) {
+        this.pedidoService.delete(id).subscribe({
+          next: () => {
+            this.refresh();
+          },
+          error: (err) => {
+            const errorMsg = err.error?.message || 'Ocurrió un error inesperado al intentar eliminar el pedido.';
+            const alertRef = this.modalService.open(AlertModalComponent, {
+              centered: true,
+              backdrop: 'static'
+            });
+            alertRef.componentInstance.title = 'Error al eliminar';
+            alertRef.componentInstance.message = errorMsg;
+          }
+        });
+      }
+    }).catch(() => { });
   }
 
   private planningOrder(orderId: number, modalContent: any): void {

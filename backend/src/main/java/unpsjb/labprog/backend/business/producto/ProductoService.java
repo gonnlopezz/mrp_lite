@@ -10,12 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
+import unpsjb.labprog.backend.business.pedido.PedidoRepository;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Producto;
 
 @Service
 public class ProductoService {
     @Autowired
     ProductoRepository repository;
+
+    @Autowired
+    PedidoRepository pedidoRepository;
 
     public List<Producto> findAll() {
         List<Producto> result = new ArrayList<>();
@@ -51,6 +56,9 @@ public class ProductoService {
 
     @Transactional
     public void delete(int id) {
+        if (pedidoRepository.existsByProductoId(id)) {
+            throw new BusinessException("No se puede eliminar el producto porque tiene pedidos asociados.");
+        }
         repository.deleteById(id);
     }
 }

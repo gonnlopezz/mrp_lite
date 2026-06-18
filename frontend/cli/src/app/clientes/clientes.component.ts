@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { AlertModalComponent } from '../modals/alert-modal.component';
 import { Cliente } from './cliente';
 
 @Component({
@@ -71,8 +72,19 @@ export class ClientesComponent {
 
     modalRef.result.then((result) => {
       if (result) {
-        this.clienteService.delete(id).subscribe(() => {
-          this.getClientes();
+        this.clienteService.delete(id).subscribe({
+          next: () => {
+            this.getClientes();
+          },
+          error: (err) => {
+            const errorMsg = err.error?.message || 'Ocurrió un error inesperado al intentar eliminar el cliente.';
+            const alertRef = this.modalService.open(AlertModalComponent, {
+              centered: true,
+              backdrop: 'static'
+            });
+            alertRef.componentInstance.title = 'Error al eliminar';
+            alertRef.componentInstance.message = errorMsg;
+          }
         });
       }
     }).catch(() => {

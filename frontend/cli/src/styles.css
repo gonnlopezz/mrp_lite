@@ -372,3 +372,11 @@ app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hov
 .orders-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Soft backgrounds for dialogs / badges */
+.bg-danger-soft {
+  background-color: #fee2e2 !important; /* light red tint */
+}
+.bg-warning-soft {
+  background-color: #fef3c7 !important; /* light orange/yellow tint */
+}

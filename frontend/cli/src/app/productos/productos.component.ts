@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { AlertModalComponent } from '../modals/alert-modal.component';
 import { ResultsPage } from '../results-page';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductoService } from './producto.service';
@@ -60,8 +61,19 @@ export class ProductosComponent {
 
     modalRef.result.then((result) => {
       if (result) {
-        this.productoService.delete(id).subscribe(() => {
-          this.getProductos();
+        this.productoService.delete(id).subscribe({
+          next: () => {
+            this.getProductos();
+          },
+          error: (err) => {
+            const errorMsg = err.error?.message || 'Ocurrió un error inesperado al intentar eliminar el producto.';
+            const alertRef = this.modalService.open(AlertModalComponent, {
+              centered: true,
+              backdrop: 'static'
+            });
+            alertRef.componentInstance.title = 'Error al eliminar';
+            alertRef.componentInstance.message = errorMsg;
+          }
         });
       }
     }).catch(() => {

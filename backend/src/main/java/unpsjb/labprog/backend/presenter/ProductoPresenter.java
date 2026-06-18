@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.producto.ProductoService;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Producto;
 
 @RestController
@@ -62,7 +63,13 @@ public class ProductoPresenter {
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") int id) {
-        service.delete(id);
-        return Response.ok("Producto id " + id + " eliminado con éxito.");
+        try {
+            service.delete(id);
+            return Response.ok("Producto id " + id + " eliminado con éxito.");
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 }

@@ -37,4 +37,7 @@ public interface TallerRepository
         List<Taller> findPosiblesTalleresConEquipos(@Param("types") List<TipoEquipo> types,
                         @Param("count") int count);
 
+        @Query("SELECT COUNT(e) > 0 FROM Taller t JOIN t.equipos e WHERE e.tipo.id = :tipoEquipoId")
+        boolean existsEquipoWithTipo(@Param("tipoEquipoId") int tipoEquipoId);
+
 }

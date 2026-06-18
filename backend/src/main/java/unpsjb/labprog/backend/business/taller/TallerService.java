@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.TipoEquipo;
+import unpsjb.labprog.backend.model.Equipo;
 import unpsjb.labprog.backend.model.Pedido;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 import unpsjb.labprog.backend.model.Taller;
@@ -58,11 +59,33 @@ public class TallerService {
 
     @Transactional
     public Taller save(Taller workshop) {
+        if (workshop.getId() != null) {
+            Taller existing = repository.findById(workshop.getId().intValue()).orElse(null);
+            if (existing != null) {
+                for (Equipo existingEquipo : existing.getEquipos()) {
+                    boolean stillExists = false;
+                    for (Equipo newEquipo : workshop.getEquipos()) {
+                        if (newEquipo.getId() != null && newEquipo.getId().equals(existingEquipo.getId())) {
+                            stillExists = true;
+                            break;
+                        }
+                    }
+                    if (!stillExists) {
+                        if (planningProcessRepository.existsByEquipoId(existingEquipo.getId())) {
+                            throw new BusinessException("No se puede eliminar el equipo " + existingEquipo.getCodigo() + " porque tiene planificaciones asociadas.");
+                        }
+                    }
+                }
+            }
+        }
         return repository.save(workshop);
     }
 
     @Transactional
     public void delete(int id) {
+        if (!planningProcessRepository.findAllByWorkshopId(id).isEmpty()) {
+            throw new BusinessException("No se puede eliminar el taller porque tiene planificaciones asociadas.");
+        }
         repository.deleteById(id);
     }
 

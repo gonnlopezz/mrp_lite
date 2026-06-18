@@ -9,12 +9,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import unpsjb.labprog.backend.business.pedido.PedidoRepository;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Cliente;
 
 @Service
 public class ClienteService {
     @Autowired
     ClienteRepository repository;
+
+    @Autowired
+    PedidoRepository pedidoRepository;
 
     public List<Cliente> findAll() {
         List<Cliente> result = new ArrayList<>();
@@ -46,6 +51,9 @@ public class ClienteService {
 
     @Transactional
     public void delete(int id) {
+        if (pedidoRepository.existsByClienteId(id)) {
+            throw new BusinessException("No se puede eliminar el cliente porque tiene pedidos asociados.");
+        }
         repository.deleteById(id);
     }
 }

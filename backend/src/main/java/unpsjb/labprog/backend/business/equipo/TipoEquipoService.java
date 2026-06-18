@@ -9,12 +9,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import unpsjb.labprog.backend.business.taller.TallerRepository;
+import unpsjb.labprog.backend.business.producto.ProductoRepository;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.TipoEquipo;
 
 @Service
 public class TipoEquipoService {
     @Autowired
     TipoEquipoRepository repository;
+
+    @Autowired
+    TallerRepository tallerRepository;
+
+    @Autowired
+    ProductoRepository productoRepository;
 
     public List<TipoEquipo> findAll() {
         List<TipoEquipo> result = new ArrayList<>();
@@ -42,6 +51,12 @@ public class TipoEquipoService {
 
     @Transactional
     public void delete(int id) {
+        if (tallerRepository.existsEquipoWithTipo(id)) {
+            throw new BusinessException("No se puede eliminar el tipo de equipo porque está asignado a un equipo en un taller.");
+        }
+        if (productoRepository.existsTareaWithTipo(id)) {
+            throw new BusinessException("No se puede eliminar el tipo de equipo porque está asignado a una tarea de un producto.");
+        }
         repository.deleteById(id);
     }
 

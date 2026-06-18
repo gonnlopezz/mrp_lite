@@ -7,7 +7,6 @@ import { TalleresComponent } from './talleres/talleres.component';
 import { TallerDetailComponent } from './talleres/taller-detail.component';
 import { ProductosComponent } from './productos/productos.component';
 import { ProductosDetailComponent } from './productos/producto-detail.component';
-import { PlanificacionesComponent } from './planificacion/planificaciones.component';
 import { PedidosComponent } from './pedidos/pedidos.component';
 import { PedidoDetailComponent } from './pedidos/pedido-detail.component';
 import { PlanificacionDashboardComponent } from './planificacion/planificacion-dashboard.component';
@@ -21,9 +20,9 @@ export const routes: Routes = [
     {path: "talleres/:id", component: TallerDetailComponent},
     {path: "productos", component: ProductosComponent},
     {path: "productos/:id", component: ProductosDetailComponent},
-    {path: "talleres/:id/planificaciones", component: PlanificacionesComponent},
+    {path: "talleres/:id/planificaciones", component: PlanificacionDashboardComponent, data: { type: 'workshop' }},
     {path: "pedidos", component: PedidosComponent},
     {path: "pedidos/:id", component: PedidoDetailComponent},
-    {path: "pedidos/:id/planificaciones", component: PlanificacionDashboardComponent},
+    {path: "pedidos/:id/planificaciones", component: PlanificacionDashboardComponent, data: { type: 'order' }},
     {path: "planificacion-dashboard", component: PlanificacionDashboardComponent}
 ];

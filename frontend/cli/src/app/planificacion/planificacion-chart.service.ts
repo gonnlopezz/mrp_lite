@@ -54,7 +54,10 @@ export class PlanificacionChartService {
     dataTable.addColumn({ type: 'date', id: 'Inicio' });
     dataTable.addColumn({ type: 'date', id: 'Fin' });
 
-    const labelDataMap = new Map<string, { color: string; minStart: number }>();
+    // Google Timeline mapea `colors` por orden de PRIMERA APARICIÓN del label
+    // en la tabla, no por fecha. El Map preserva ese orden de inserción:
+    // no hay que reordenarlo nunca.
+    const labelColorMap = new Map<string, string>();
 
     rows.forEach(row => {
       dataTable.addRow([
@@ -64,22 +67,12 @@ export class PlanificacionChartService {
         row.start,
         row.end
       ]);
-
-      const existing = labelDataMap.get(row.rowLabel);
-      const rowStart = row.start.getTime();
-      if (!existing) {
-        labelDataMap.set(row.rowLabel, { color: row.color, minStart: rowStart });
-      } else if (rowStart < existing.minStart) {
-        existing.minStart = rowStart;
+      if (!labelColorMap.has(row.rowLabel)) {
+        labelColorMap.set(row.rowLabel, row.color);
       }
     });
 
-    const sortedLabels = Array.from(labelDataMap.keys()).sort((a, b) => {
-      return labelDataMap.get(a)!.minStart - labelDataMap.get(b)!.minStart;
-    });
-    const colors = sortedLabels.map(label => labelDataMap.get(label)!.color);
-
-    return { dataTable, colors };
+    return { dataTable, colors: Array.from(labelColorMap.values()) };
   }
 
   private buildChartOptions(

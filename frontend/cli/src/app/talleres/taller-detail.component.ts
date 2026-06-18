@@ -8,7 +8,8 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { TipoEquipo } from '../equipos/tipo-equipo';
 import { TipoEquipoService } from '../equipos/tipo-equipo.service';
-import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTypeaheadModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertModalComponent } from '../modals/alert-modal.component';
 import { Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map } from 'rxjs/operators';
 
@@ -35,7 +36,8 @@ export class TallerDetailComponent implements OnInit {
     private location: Location,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private modalService: NgbModal
   ) {}
 
  ngOnInit(): void {
@@ -106,36 +108,47 @@ export class TallerDetailComponent implements OnInit {
   recentlyCreated: { item: Taller, time: string }[] = [];
 
   save(andNew: boolean = false): void {
-    this.tallerService.save(this.taller).subscribe(dataPackage => {
-      const saved = <Taller>dataPackage.data;
-      this.toastr.success('Taller guardado con éxito!', 'Éxito');
+    this.tallerService.save(this.taller).subscribe({
+      next: (dataPackage) => {
+        const saved = <Taller>dataPackage.data;
+        this.toastr.success('Taller guardado con éxito!', 'Éxito');
 
-      if (andNew) {
-        this.recentlyCreated.unshift({
-          item: saved,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        });
-        if (this.recentlyCreated.length > 5) {
-          this.recentlyCreated.pop();
-        }
-        if (this.tallerForm) {
-          this.tallerForm.resetForm();
-        }
-        this.taller = <Taller>{ codigo: "", nombre: "", equipos: <Equipo[]>[] };
-        this.selectedTipoEquipo = null;
-        this.showEquipoForm = false;
-
-        setTimeout(() => {
-          if (this.firstInputEl) {
-            this.firstInputEl.nativeElement.focus();
+        if (andNew) {
+          this.recentlyCreated.unshift({
+            item: saved,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          });
+          if (this.recentlyCreated.length > 5) {
+            this.recentlyCreated.pop();
           }
-        });
+          if (this.tallerForm) {
+            this.tallerForm.resetForm();
+          }
+          this.taller = <Taller>{ codigo: "", nombre: "", equipos: <Equipo[]>[] };
+          this.selectedTipoEquipo = null;
+          this.showEquipoForm = false;
 
-        this.cdr.markForCheck();
-      } else {
-        this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
-          this.router.navigate(["/talleres/", + saved.id]);
+          setTimeout(() => {
+            if (this.firstInputEl) {
+              this.firstInputEl.nativeElement.focus();
+            }
+          });
+
+          this.cdr.markForCheck();
+        } else {
+          this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
+            this.router.navigate(["/talleres/", + saved.id]);
+          });
+        }
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Ocurrió un error inesperado al intentar guardar el taller.';
+        const alertRef = this.modalService.open(AlertModalComponent, {
+          centered: true,
+          backdrop: 'static'
         });
+        alertRef.componentInstance.title = 'Error al guardar taller';
+        alertRef.componentInstance.message = errorMsg;
       }
     });
   }

@@ -16,18 +16,10 @@ import { Producto } from '../productos/producto';
 import { ProcesoPlanificacion } from '../planificacion/planificacion';
 import { ColorMode, ChartRow, TallerChartBlock, DayOrderSummary, DayProductSummary } from './planificacion-dashboard';
 import { ProductoService } from '../productos/producto.service';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgbDate, NgbDateStruct, NgbDatepickerModule, NgbDropdownModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
-
-const PROCESS_PALETTE = [
-  '#3366cc', '#dc3912', '#ff9900', '#109618',
-  '#990099', '#0099c6', '#dd4477', '#66aa00',
-  '#b82e2e', '#316395', '#994499', '#22aa99',
-  '#aaaa11', '#6633cc', '#e67300', '#8b0707',
-  '#651067', '#329262', '#5574a6', '#3b3eac',
-  '#b77322', '#16d620', '#b91383', '#f4359e'
-];
+import { ColorService } from './color.service';
 
 declare var google: any;
 
@@ -62,6 +54,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
 
   private equipoWorkshopMap = new Map<number, { codigo: string; nombre: string }>();
   private tareaProductMap = new Map<number, string>();
+  private currentColorMap = new Map<string, string>();
 
   selectedShifts: Record<string, string> = {};
 
@@ -78,16 +71,48 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     private productoService: ProductoService,
     private planningService: PlanificacionService,
     private chartService: PlanificacionChartService,
+    private colorService: ColorService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.loadSelectData();
     google.charts.load('current', { packages: ['timeline'] });
     google.charts.setOnLoadCallback(() => {
       this.googleChartsLoaded = true;
-      this.fetchAndRender();
+
+      this.route.data.subscribe(routeData => {
+        const routeType = routeData['type'];
+
+        this.route.paramMap.subscribe(params => {
+          const id = params.get('id');
+          if (id) {
+            if (routeType === 'workshop') {
+              this.selectedWorkshopId = id;
+            } else if (routeType === 'order') {
+              this.selectedOrderId = id;
+            }
+          }
+
+          this.route.queryParams.subscribe(queryParams => {
+            if (queryParams['workshopId']) {
+              this.selectedWorkshopId = queryParams['workshopId'];
+            }
+            if (queryParams['pedidoId']) {
+              this.selectedOrderId = queryParams['pedidoId'];
+            }
+
+            this.loadSelectData().subscribe({
+              next: () => {
+                this.fetchAndRender();
+              },
+              error: (err) => console.error('Error cargando datos del dashboard:', err)
+            });
+          });
+        });
+      });
     });
   }
 
@@ -101,20 +126,27 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
 
   // ─── Carga de selects ────────────────────────────────────────────────────
 
-  loadSelectData(): void {
-    forkJoin({
+  loadSelectData(): Observable<any> {
+    return forkJoin({
       workshops: this.workshopService.all(),
       orders: this.pedidoService.allPlanned(),
       products: this.productoService.all()
-    }).subscribe({
-      next: ({ workshops, orders, products }) => {
+    }).pipe(
+      map(({ workshops, orders, products }) => {
         this.workshops = workshops.data as Taller[];
         this.orders = orders.data as PedidoFabricacion[];
         this.buildEquipmentWorkshopMap();
         this.buildTaskProductMap(products.data as Producto[]);
-      },
-      error: (err) => console.error('Error cargando filtros:', err)
-    });
+
+        if (this.selectedOrderId) {
+          const matchedOrder = this.orders.find(o => o.id.toString() === this.selectedOrderId);
+          if (matchedOrder) {
+            this.selectedOrderObject = matchedOrder;
+          }
+        }
+        return true;
+      })
+    );
   }
 
   // ─── Lógica de Typeahead para Pedidos (Formato Solicitado) ────────────────
@@ -165,6 +197,26 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: dataPackage => {
           this.planningProcesses = (dataPackage.data as ProcesoPlanificacion[] || []).sort((a, b) => a.id - b.id);
+
+          // Auto-detect workshop if filtering by order but no workshop is selected yet
+          if (this.selectedOrderId && !this.selectedWorkshopId && this.planningProcesses.length > 0) {
+            for (const process of this.planningProcesses) {
+              if (process.planificaciones && process.planificaciones.length > 0) {
+                const equipId = process.planificaciones[0].equipo?.id;
+                if (equipId) {
+                  const workshop = this.equipoWorkshopMap.get(equipId);
+                  if (workshop) {
+                    const matchedWorkshop = this.workshops.find(w => w.codigo === workshop.codigo);
+                    if (matchedWorkshop) {
+                      this.selectedWorkshopId = matchedWorkshop.id.toString();
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
           this.computeAvailableDates();
           this.computeWorkshopBlocks();
           this.loading = false;
@@ -205,9 +257,10 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   resetFilters(): void {
     this.selectedWorkshopId = '';
     this.selectedOrderId = '';
-    this.selectedOrderObject = null; // <-- Limpieza física del input text
+    this.selectedOrderObject = null;
     this.selectedDate = '';
     this.selectedShifts = {};
+    this.router.navigate(['/planificacion-dashboard'], { queryParams: {} });
     this.onFiltersChange();
   }
 
@@ -305,18 +358,18 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   private computeWorkshopBlocks(): void {
     if (!this.selectedDate || this.planningProcesses.length === 0) {
       this.workshopBlocks = [];
+      this.currentColorMap = new Map();
       return;
     }
 
-    const colorMap = this.buildColorMap();
-    const blocksMap = new Map<string, TallerChartBlock>();
-
-    // ─── REFACTOR CLAVE: Clonamos y ordenamos por ID de proceso de forma ascendente ───
-    // Esto garantiza la consistencia del color index, sin importar el orden del JSON
     const sortedProcesses = [...this.planningProcesses].sort((a, b) => a.id - b.id);
+    this.currentColorMap = this.colorService.assign(
+      sortedProcesses.map(p => this.colorKey(p))
+    );
 
+    const blocksMap = new Map<string, TallerChartBlock>();
     sortedProcesses.forEach(process => {
-      const color = colorMap.get(this.colorKey(process)) ?? '#999999';
+      const color = this.currentColorMap.get(this.colorKey(process)) ?? '#999999';
       const processLabel = `Proceso #${process.id}`;
 
       process.planificaciones?.forEach(planning => {
@@ -416,31 +469,16 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     };
   }
 
-  // ─── Helpers privados ────────────────────────────────────────────────────
 
-  private buildColorMap(): Map<string, string> {
-    const map = new Map<string, string>();
-    this.planningProcesses.forEach(process => {
-      const key = this.colorKey(process);
-      if (!map.has(key)) {
-        let idVal = 0;
-        if (this.colorMode === 'by-order') {
-          idVal = process.pedido?.id ?? (process.id * 17);
-        } else {
-          idVal = process.id;
-        }
-        const hash = (idVal * 131) % PROCESS_PALETTE.length;
-        map.set(key, PROCESS_PALETTE[hash]);
-      }
-    });
-    return map;
-  }
 
   private colorKey(process: ProcesoPlanificacion): string {
-    return this.colorMode === 'by-order'
-      ? `order-${process.pedido?.id ?? 'unknown'}`
+    // Importante: cada proceso "sin pedido" usa su propia clave única,
+    // en vez de colapsar todos en un mismo bucket "order-unknown".
+    return this.colorMode === 'by-order' && process.pedido?.id != null
+      ? `order-${process.pedido.id}`
       : `process-${process.id}`;
   }
+
 
   private buildTooltip(
     processLabel: string,
@@ -488,8 +526,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   }
 
   getOrderColor(orderId: number): string {
-    const hash = (orderId * 131) % PROCESS_PALETTE.length;
-    return PROCESS_PALETTE[hash];
+    return this.currentColorMap.get(`order-${orderId}`) ?? '#999999';
   }
 
   // ─── Scroll ─────────────────────────────────────────────────

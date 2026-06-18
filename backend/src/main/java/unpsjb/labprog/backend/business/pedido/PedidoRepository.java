@@ -26,6 +26,10 @@ public interface PedidoRepository
 
         List<Pedido> findByEstadoOrderByFechaEntregaAsc(EstadoPedido estado);
 
+        boolean existsByClienteId(int clienteId);
+
+        boolean existsByProductoId(int productoId);
+
         Page<Pedido> findByEstadoOrderByFechaEntregaAsc(EstadoPedido estado, Pageable pageable);
 
         @Query("SELECT o FROM Pedido o ORDER BY " +

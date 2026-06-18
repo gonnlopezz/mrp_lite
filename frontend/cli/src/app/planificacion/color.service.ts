@@ -1,0 +1,24 @@
+// color-assignment.service.ts
+import { Injectable } from '@angular/core';
+
+const PALETTE: string[] = [
+    '#4E79A7', '#F28E2B', '#E15759', '#76B7B2',
+    '#59A14F', '#EDC948', '#B07AA1', '#FF9DA7',
+    '#9C755F', '#BAB0AC', '#1B998B', '#D4A017'
+]; // 12 colores con buen contraste entre sí
+
+@Injectable({ providedIn: 'root' })
+export class ColorService {
+    /** Misma clave => mismo color siempre. Asignación secuencial, sin hash. */
+    assign(keysInOrder: string[]): Map<string, string> {
+        const map = new Map<string, string>();
+        let nextIndex = 0;
+        for (const key of keysInOrder) {
+            if (!map.has(key)) {
+                map.set(key, PALETTE[nextIndex % PALETTE.length]);
+                nextIndex++;
+            }
+        }
+        return map;
+    }
+}

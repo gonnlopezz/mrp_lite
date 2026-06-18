@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
+import { AlertModalComponent } from '../modals/alert-modal.component';
 import { ResultsPage } from '../results-page';
 import { PaginationComponent } from '../pagination/pagination.component';
 
@@ -60,8 +61,19 @@ export class TalleresComponent {
 
     modalRef.result.then((result) => {
       if (result) {
-        this.tallerService.delete(id).subscribe(() => {
-          this.getTalleres();
+        this.tallerService.delete(id).subscribe({
+          next: () => {
+            this.getTalleres();
+          },
+          error: (err) => {
+            const errorMsg = err.error?.message || 'Ocurrió un error inesperado al intentar eliminar el taller.';
+            const alertRef = this.modalService.open(AlertModalComponent, {
+              centered: true,
+              backdrop: 'static'
+            });
+            alertRef.componentInstance.title = 'Error al eliminar';
+            alertRef.componentInstance.message = errorMsg;
+          }
         });
       }
     }).catch(() => {

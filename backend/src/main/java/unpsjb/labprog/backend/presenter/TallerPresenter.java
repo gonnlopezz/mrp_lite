@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.taller.TallerService;
+import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.Taller;
 
 @RestController
@@ -52,18 +53,36 @@ public class TallerPresenter {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Object> create(@RequestBody Taller aTaller) {
-        return Response.ok(service.save(aTaller), "Taller " + aTaller.getCodigo() + " ingresado correctamente");
+        try {
+            return Response.ok(service.save(aTaller), "Taller " + aTaller.getCodigo() + " ingresado correctamente");
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<Object> update(@RequestBody Taller aTaller) {
-        return Response.ok(service.save(aTaller), "Taller " + aTaller.getCodigo() + " actualizado correctamente");
+        try {
+            return Response.ok(service.save(aTaller), "Taller " + aTaller.getCodigo() + " actualizado correctamente");
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Object> delete(@PathVariable("id") int id) {
-        service.delete(id);
-        return Response.ok("Taller id " + id + " eliminado con éxito.");
+        try {
+            service.delete(id);
+            return Response.ok("Taller id " + id + " eliminado con éxito.");
+        } catch (BusinessException e) {
+            return Response.conflict(e.getMessage());
+        } catch (Exception e) {
+            return Response.error(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/id/{id}/plannings", method = RequestMethod.GET)
