@@ -18,6 +18,7 @@ export interface DayProductSummary {
 export interface ChartRow {
   equipmentCode: string;
   rowLabel:      string;
+  colorKey?:     string;
   tooltip:       string;
   start:         Date;
   end:           Date;

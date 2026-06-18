@@ -21,6 +21,12 @@ public interface PedidoRepository
         public Page<Pedido> search(String term, Pageable pageable);
 
         @Query("SELECT o FROM Pedido o " +
+                        "Where (o.cliente.razonSocial ILIKE CONCAT('%', :term, '%') " +
+                        "OR o.producto.nombre ILIKE CONCAT('%', :term, '%')) " +
+                        "AND o.estado = :state")
+        public Page<Pedido> searchAndState(String term, EstadoPedido state, Pageable pageable);
+
+        @Query("SELECT o FROM Pedido o " +
                         "WHERE o.cliente.cuit = :cuit AND o.fechaEntrega = :deliveryDate")
         public Pedido findByCustomerCuitAndDeliveryDate(long cuit, LocalDate deliveryDate);
 

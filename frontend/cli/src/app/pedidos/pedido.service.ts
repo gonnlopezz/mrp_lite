@@ -26,7 +26,10 @@ export class PedidoService {
     return this.http.get<DataPackage>(`${this.ordersUrl}/page?page=${page - 1}&size=${size}`);
   }
 
-  search(searchTerm: string, page: number, size: number): Observable<DataPackage> {
+  search(searchTerm: string, page: number, size: number, state?: string): Observable<DataPackage> {
+    if (state) {
+      return this.http.get<DataPackage>(`${this.ordersUrl}/search/${searchTerm}?page=${page - 1}&size=${size}&state=${state}`);
+    }
     return this.http.get<DataPackage>(`${this.ordersUrl}/search/${searchTerm}?page=${page - 1}&size=${size}`);
   }
 

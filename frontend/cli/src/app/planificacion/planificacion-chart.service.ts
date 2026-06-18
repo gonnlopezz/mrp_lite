@@ -54,15 +54,21 @@ export class PlanificacionChartService {
     dataTable.addColumn({ type: 'date', id: 'Inicio' });
     dataTable.addColumn({ type: 'date', id: 'Fin' });
 
-    // Google Timeline mapea `colors` por orden de PRIMERA APARICIÓN del label
-    // en la tabla, no por fecha. El Map preserva ese orden de inserción:
-    // no hay que reordenarlo nunca.
+    // 1. Ordenar filas para que coincidan exactamente con el orden de renderizado de Google Charts
+    // (agrupados por equipo y ordenados cronológicamente por inicio)
+    const sortedRows = [...rows].sort((a, b) => {
+      const cmpEquip = a.equipmentCode.localeCompare(b.equipmentCode);
+      if (cmpEquip !== 0) return cmpEquip;
+      return a.start.getTime() - b.start.getTime();
+    });
+
     const labelColorMap = new Map<string, string>();
 
-    rows.forEach(row => {
+    // 2. Insertamos en el DataTable y construimos el mapa usando las filas ordenadas
+    sortedRows.forEach(row => {
       dataTable.addRow([
         row.equipmentCode,
-        { v: row.rowLabel, f: '' },
+        row.rowLabel, // Usamos la etiqueta directa para el texto de la barra
         row.tooltip,
         row.start,
         row.end

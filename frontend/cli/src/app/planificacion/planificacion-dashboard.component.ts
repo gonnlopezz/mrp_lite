@@ -198,7 +198,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
         next: dataPackage => {
           this.planningProcesses = (dataPackage.data as ProcesoPlanificacion[] || []).sort((a, b) => a.id - b.id);
 
-          // Auto-detect workshop if filtering by order but no workshop is selected yet
           if (this.selectedOrderId && !this.selectedWorkshopId && this.planningProcesses.length > 0) {
             for (const process of this.planningProcesses) {
               if (process.planificaciones && process.planificaciones.length > 0) {
@@ -390,6 +389,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
         const row: ChartRow = {
           equipmentCode: planning.equipo?.codigo ?? 'S/E',
           rowLabel: processLabel,
+          colorKey: this.colorKey(process),
           tooltip: this.buildTooltip(processLabel, planning.tarea?.nombre ?? 'Tarea', planning.equipo?.codigo ?? 'S/E', start, end, color),
           start, end, color
         };

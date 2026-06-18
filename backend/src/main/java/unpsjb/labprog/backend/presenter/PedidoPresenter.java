@@ -48,8 +48,9 @@ public class PedidoPresenter {
     public ResponseEntity<Object> search(
             @PathVariable String term,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return Response.ok(service.search(term, page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) EstadoPedido state) {
+        return Response.ok(service.search(term, state, page, size));
     }
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)

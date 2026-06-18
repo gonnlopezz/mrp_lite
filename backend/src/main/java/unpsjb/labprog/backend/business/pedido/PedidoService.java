@@ -41,7 +41,10 @@ public class PedidoService {
                 PageRequest.of(page, size, Sort.by("fechaEntrega").ascending()));
     }
 
-    public Page<Pedido> search(String term, int page, int size) {
+    public Page<Pedido> search(String term, EstadoPedido state, int page, int size) {
+        if (state != null) {
+            return repository.searchAndState(term, state, PageRequest.of(page, size));
+        }
         return repository.search(term, PageRequest.of(page, size));
     }
 

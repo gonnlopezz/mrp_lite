@@ -64,10 +64,17 @@ export class PedidosComponent implements OnInit {
 
   getPedidos(): void {
     const state = this.activeTab !== 'TODOS' ? this.activeTab : undefined;
-    this.pedidoService.byPage(this.currentPage, 10, state).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.pedidoService.search(this.searchTerm, this.currentPage, 10, state).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.pedidoService.byPage(this.currentPage, 10, state).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   /** Carga los contadores de las 3 bandejas en paralelo. */
@@ -145,12 +152,7 @@ export class PedidosComponent implements OnInit {
 
   onSearch(): void {
     this.currentPage = 1;
-    if (!this.searchTerm.trim()) { this.getPedidos(); return; }
-
-    this.pedidoService.search(this.searchTerm, 1, 10).subscribe(pkg => {
-      this.resultsPage = <ResultsPage>pkg.data;
-      this.cdr.markForCheck();
-    });
+    this.getPedidos();
   }
 
   delete(id: number): void {
