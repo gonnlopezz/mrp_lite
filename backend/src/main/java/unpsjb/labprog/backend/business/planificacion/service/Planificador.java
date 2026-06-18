@@ -27,11 +27,15 @@ public class Planificador {
     }
 
     public List<ProcesoPlanificacion> planificarPedidoEnTalleres(
-            Pedido pedido, LocalDateTime inicioLimite, List<Taller> talleresAptos, Map<Long, Agenda> agendas) {
+            Pedido pedido, LocalDateTime inicioLimite,
+            List<Taller> talleres, Map<Long, Agenda> agendas) {
+
         LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
         int mejorCantidadPlanificable = 0;
 
-        for (Taller taller : talleresAptos) {
+        List<Taller> talleresOrdenados = ordenarPorDisponibilidad(talleres, agendas, deadline);
+
+        for (Taller taller : talleresOrdenados) {
             Agenda agendaSimulacion = agendas.get(taller.getId()).copiar();
             try {
                 List<ProcesoPlanificacion> procesos = planificarUnidades(pedido, taller, agendaSimulacion, deadline,
@@ -43,7 +47,9 @@ public class Planificador {
                 mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
             }
         }
-        pedido.markAsUnschedulable("El pedido no pudo planificarse en el plazo requerido",
+
+        pedido.markAsUnschedulable(
+                "El pedido no pudo planificarse en el plazo requerido",
                 mejorCantidadPlanificable > 0 ? mejorCantidadPlanificable : null);
 
         return List.of();
@@ -71,6 +77,16 @@ public class Planificador {
         return resultado;
     }
 
-    
+    private List<Taller> ordenarPorDisponibilidad(List<Taller> talleres,
+            Map<Long, Agenda> agendas, LocalDateTime deadline) {
+
+        List<Taller> ordenados = new ArrayList<>(talleres);
+
+        ordenados.sort((a, b) -> Long.compare(
+                agendas.get(b.getId()).calcularTiempoLibreHasta(deadline),
+                agendas.get(a.getId()).calcularTiempoLibreHasta(deadline)));
+
+        return ordenados;
+    }
 
 }

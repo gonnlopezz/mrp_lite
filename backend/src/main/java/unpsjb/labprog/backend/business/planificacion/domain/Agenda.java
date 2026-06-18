@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.business.planificacion.domain;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,10 +55,6 @@ public class Agenda {
 
             if (cursor.isBefore(fin)) {
                 huecos.add(new Periodo(cursor, fin, 0));
-            }
-
-            if (huecos.isEmpty() && !inicio.isAfter(fin)) {
-                huecos.add(new Periodo(inicio, fin, 0));
             }
 
             huecosPorEquipo.put(equipo.getId(), huecos);
@@ -123,6 +120,26 @@ public class Agenda {
         if (huecoOriginal.getFin().isAfter(ocupado.getFin())) {
             huecos.add(indiceHuecoAfectado, new Periodo(ocupado.getFin(), huecoOriginal.getFin(), 0));
         }
+    }
+
+    public long calcularTiempoLibreHasta(LocalDateTime deadline) {
+        long totalMinutos = 0;
+
+        for (List<Periodo> huecos : huecosPorEquipo.values()) {
+            for (Periodo hueco : huecos) {
+                totalMinutos += minutosLibresEn(hueco, deadline);
+            }
+        }
+
+        return totalMinutos;
+    }
+
+    private long minutosLibresEn(Periodo hueco, LocalDateTime deadline) {
+        if (hueco.getInicio().isAfter(deadline)) {
+            return 0;
+        }
+        LocalDateTime finEfectivo = hueco.getFin().isAfter(deadline) ? deadline : hueco.getFin();
+        return Math.max(0, ChronoUnit.MINUTES.between(hueco.getInicio(), finEfectivo));
     }
 
     /**
