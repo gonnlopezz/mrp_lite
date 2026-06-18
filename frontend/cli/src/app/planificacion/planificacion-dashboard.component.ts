@@ -198,21 +198,15 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
         next: dataPackage => {
           this.planningProcesses = (dataPackage.data as ProcesoPlanificacion[] || []).sort((a, b) => a.id - b.id);
 
-          if (this.selectedOrderId && !this.selectedWorkshopId && this.planningProcesses.length > 0) {
-            for (const process of this.planningProcesses) {
-              if (process.planificaciones && process.planificaciones.length > 0) {
-                const equipId = process.planificaciones[0].equipo?.id;
-                if (equipId) {
-                  const workshop = this.equipoWorkshopMap.get(equipId);
-                  if (workshop) {
-                    const matchedWorkshop = this.workshops.find(w => w.codigo === workshop.codigo);
-                    if (matchedWorkshop) {
-                      this.selectedWorkshopId = matchedWorkshop.id.toString();
-                      break;
-                    }
-                  }
-                }
-              }
+          if (this.selectedOrderId && !this.selectedWorkshopId) {
+            const matchedWorkshop = this.planningProcesses
+              .map(p => p.planificaciones?.[0]?.equipo?.id)
+              .map(id => id ? this.equipoWorkshopMap.get(id)?.codigo : null)
+              .map(code => this.workshops.find(w => w.codigo === code))
+              .find(w => w != null);
+
+            if (matchedWorkshop) {
+              this.selectedWorkshopId = matchedWorkshop.id.toString();
             }
           }
 
