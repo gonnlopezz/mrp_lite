@@ -28,24 +28,22 @@ export class ProductosComponent {
     private modalService: NgbModal) { }
 
   getProductos(): void {
-    this.productoService.byPage(this.currentPage, 6).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.productoService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.productoService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   onSearch(): void {
-    if (!this.searchTerm.trim()) {
-      this.currentPage = 1;
-      this.getProductos();
-      return;
-    }
-
     this.currentPage = 1;
-    this.productoService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    this.getProductos();
   }
 
   delete(id: number): void {

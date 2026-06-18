@@ -28,24 +28,22 @@ export class ClientesComponent {
   ) { }
 
   getClientes(): void {
-    this.clienteService.byPage(this.currentPage, 10).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.clienteService.search(this.searchTerm, this.currentPage, 10).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.clienteService.byPage(this.currentPage, 10).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   onSearch(): void {
-    if (!this.searchTerm.trim()) {
-      this.currentPage = 1;
-      this.getClientes();
-      return;
-    }
-
     this.currentPage = 1;
-    this.clienteService.search(this.searchTerm, this.currentPage, 10).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    this.getClientes();
   }
 
 

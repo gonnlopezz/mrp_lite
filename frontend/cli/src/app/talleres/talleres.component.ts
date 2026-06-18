@@ -28,24 +28,22 @@ export class TalleresComponent {
     private modalService: NgbModal) { }
 
   getTalleres(): void {
-    this.tallerService.byPage(this.currentPage, 6).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      this.tallerService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    } else {
+      this.tallerService.byPage(this.currentPage, 6).subscribe(dataPackage => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   onSearch(): void {
-    if (!this.searchTerm.trim()) {
-      this.currentPage = 1;
-      this.getTalleres();
-      return;
-    }
-
     this.currentPage = 1;
-    this.tallerService.search(this.searchTerm, this.currentPage, 6).subscribe(dataPackage => {
-      this.resultsPage = <ResultsPage>dataPackage.data;
-      this.cdr.markForCheck();
-    });
+    this.getTalleres();
   }
 
   delete(id: number): void {
