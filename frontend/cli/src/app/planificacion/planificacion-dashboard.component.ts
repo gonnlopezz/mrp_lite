@@ -130,7 +130,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       products: this.productoService.all()
     }).pipe(
       map(({ workshops, orders, products }) => {
-        this.workshops = workshops.data as Taller[];
+        this.workshops = (workshops.data as Taller[]).sort((a, b) => a.codigo.localeCompare(b.codigo));
         this.orders = orders.data as PedidoFabricacion[];
         this.buildEquipmentWorkshopMap();
         this.buildTaskProductMap(products.data as Producto[]);
@@ -385,7 +385,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       block.productsOfTheDay = products;
     });
 
-    this.workshopBlocks = Array.from(blocksMap.values());
+    this.workshopBlocks = Array.from(blocksMap.values()).sort((a, b) => a.workshopCode.localeCompare(b.workshopCode));
   }
 
   private computeSummaryForWorkshop(workshopCode: string): {

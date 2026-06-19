@@ -258,3 +258,12 @@ INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, client
 INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) VALUES
 ('2026-07-20', '2026-07-23', 5,  'PENDIENTE', 500, 5),
 ('2026-07-20', '2026-07-23', 5,  'PENDIENTE', 501, 5);
+
+
+-- Caso 1: Se planifica en ALFA-2 (Primer puesto del ranking por alta disponibilidad el 21/07)
+INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) 
+VALUES ('2026-07-20', '2026-07-28', 10, 'PENDIENTE', 500, 7);
+
+-- Caso 2: Se desvía y planifica en GAMA (ALFA-2 colapsa por la tarde debido al amontonamiento masivo)
+INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) 
+VALUES ('2026-07-22', '2026-07-28', 1, 'PENDIENTE', 501, 7);

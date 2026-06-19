@@ -70,7 +70,7 @@ public class Agenda {
         if (huecos == null)
             return null;
 
-        long duracionEfectivaMinutos = tarea.calculateDurationFor(equipo);
+        long duracionEfectivaMinutos = tarea.calcularDuracionPara(equipo);
 
         for (int i = 0; i < huecos.size(); i++) {
             Periodo hueco = huecos.get(i);
@@ -94,7 +94,7 @@ public class Agenda {
         if (huecos == null)
             return null;
 
-        long duracionTarea = tarea.calculateDurationFor(equipo);
+        long duracionTarea = tarea.calcularDuracionPara(equipo);
 
         for (int i = huecos.size() - 1; i >= 0; i--) {
             Periodo hueco = huecos.get(i);

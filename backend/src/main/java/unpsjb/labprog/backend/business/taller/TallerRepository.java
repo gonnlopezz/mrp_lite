@@ -20,7 +20,7 @@ public interface TallerRepository
         @Query("Select e FROM Taller e Where e.codigo = ?1")
         Optional<Taller> findByCode(String code);
 
-        @Query("SELECT DISTINCT t FROM Taller t LEFT JOIN FETCH t.equipos ORDER BY t.id ASC")
+        @Query("SELECT DISTINCT t FROM Taller t LEFT JOIN FETCH t.equipos ORDER BY t.codigo ASC")
         List<Taller> findAllConEquipos();
 
         @Query("SELECT w FROM Taller w " +

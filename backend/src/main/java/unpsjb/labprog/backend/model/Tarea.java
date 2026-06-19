@@ -31,7 +31,7 @@ public class Tarea {
     @ManyToOne
     private TipoEquipo tipo;
 
-    public long calculateDurationFor(Equipo aEquipment) {
-        return (long) Math.ceil((double) this.getTiempo() / aEquipment.getCapacidad());
+    public long calcularDuracionPara(Equipo equipo) {
+        return (long) Math.ceil((double) this.getTiempo() / equipo.getCapacidad());
     }
 }
