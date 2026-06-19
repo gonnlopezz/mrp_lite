@@ -22,10 +22,9 @@ public class PlanificacionBackward implements EstrategiaPlanificacion {
 
             Periodo periodo = agenda.ocuparEspacioBackward(tarea, equipo, finActual);
 
-            if (periodo == null) {
+            if (periodo == null)
                 throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido",
                         planificaciones.size());
-            }
 
             planificaciones.addFirst(new Planificacion(tarea, equipo, periodo));
             finActual = periodo.getInicio();

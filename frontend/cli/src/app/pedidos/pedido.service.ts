@@ -44,7 +44,9 @@ export class PedidoService {
   }
 
   save(pedido: PedidoFabricacion): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.ordersUrl, pedido);
+    return pedido.id ?
+      this.http.put<DataPackage>(this.ordersUrl, pedido) :
+      this.http.post<DataPackage>(this.ordersUrl, pedido);
   }
 
   delete(id: number): Observable<void> {

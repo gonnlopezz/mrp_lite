@@ -80,13 +80,13 @@ public class Planificador {
     private List<Taller> ordenarPorDisponibilidad(List<Taller> talleres,
             Map<Long, Agenda> agendas, LocalDateTime deadline) {
 
-        List<Taller> ordenados = new ArrayList<>(talleres);
+        List<Taller> resultado = new ArrayList<>(talleres);
 
-        ordenados.sort((a, b) -> Long.compare(
+        resultado.sort((a, b) -> Long.compare(
                 agendas.get(b.getId()).calcularTiempoLibreHasta(deadline),
                 agendas.get(a.getId()).calcularTiempoLibreHasta(deadline)));
 
-        return ordenados;
+        return resultado;
     }
 
 }

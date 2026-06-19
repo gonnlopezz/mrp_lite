@@ -31,39 +31,40 @@ public class Agenda {
         huecos.forEach((k, v) -> this.huecosPorEquipo.put(k, new ArrayList<>(v)));
     }
 
+    private Map<Long, List<Planificacion>> agruparPorEquipo(List<Planificacion> planificaciones) {
+        Map<Long, List<Planificacion>> agrupadasPorEquipo = new HashMap<>();
+        for (Planificacion p : planificaciones) {
+            agrupadasPorEquipo.computeIfAbsent(p.getEquipo().getId(), k -> new ArrayList<>()).add(p);
+        }
+        return agrupadasPorEquipo;
+    }
+
     private void inicializarAgenda(Collection<Equipo> equipos, List<Planificacion> planificaciones,
             LocalDateTime inicio, LocalDateTime fin) {
-        Map<Long, List<Planificacion>> pPorEquipo = new HashMap<>();
-        for (Planificacion p : planificaciones) {
-            pPorEquipo.computeIfAbsent(p.getEquipo().getId(), k -> new ArrayList<>()).add(p);
-        }
+        Map<Long, List<Planificacion>> agrupadasPorEquipo = agruparPorEquipo(planificaciones);
 
         for (Equipo equipo : equipos) {
             List<Periodo> huecos = new ArrayList<>();
-            List<Planificacion> delEquipo = pPorEquipo.getOrDefault(equipo.getId(), List.of());
+            List<Planificacion> planificacionesDelEquipo = agrupadasPorEquipo.getOrDefault(equipo.getId(),
+                    List.of());
 
             LocalDateTime cursor = inicio;
-            for (Planificacion plan : delEquipo) {
+            for (Planificacion plan : planificacionesDelEquipo) {
                 Periodo ocupado = plan.getPeriodo();
-                if (ocupado.getInicio().isAfter(cursor)) {
+                if (ocupado.getInicio().isAfter(cursor))
                     huecos.add(new Periodo(cursor, ocupado.getInicio(), 0));
-                }
-                if (ocupado.getFin().isAfter(cursor)) {
+
+                if (ocupado.getFin().isAfter(cursor))
                     cursor = ocupado.getFin();
-                }
             }
 
-            if (cursor.isBefore(fin)) {
+            if (cursor.isBefore(fin))
                 huecos.add(new Periodo(cursor, fin, 0));
-            }
 
             huecosPorEquipo.put(equipo.getId(), huecos);
         }
     }
 
-    /**
-     * Evalúa y reserva el espacio en la línea de tiempo hacia adelante.
-     */
     public Periodo ocuparEspacioForward(Tarea tarea, Equipo equipo, LocalDateTime tiempoActual) {
         List<Periodo> huecos = huecosPorEquipo.get(equipo.getId());
         if (huecos == null)
@@ -88,20 +89,20 @@ public class Agenda {
         return null;
     }
 
-    public Periodo ocuparEspacioBackward(Tarea tarea, Equipo equipo, LocalDateTime deadlineMaximo) {
+    public Periodo ocuparEspacioBackward(Tarea tarea, Equipo equipo, LocalDateTime deadline) {
         List<Periodo> huecos = huecosPorEquipo.get(equipo.getId());
         if (huecos == null)
             return null;
 
-        long duracionEfectivaMinutos = tarea.calculateDurationFor(equipo);
+        long duracionTarea = tarea.calculateDurationFor(equipo);
 
         for (int i = huecos.size() - 1; i >= 0; i--) {
             Periodo hueco = huecos.get(i);
-            LocalDateTime finEfectivo = hueco.getFin().isBefore(deadlineMaximo) ? hueco.getFin() : deadlineMaximo;
-            LocalDateTime inicioEstimado = finEfectivo.minusMinutes(duracionEfectivaMinutos);
+            LocalDateTime fin = hueco.getFin().isBefore(deadline) ? hueco.getFin() : deadline;
+            LocalDateTime inicio = fin.minusMinutes(duracionTarea);
 
-            if (!inicioEstimado.isBefore(hueco.getInicio())) {
-                Periodo nuevoPeriodoOcupado = new Periodo(inicioEstimado, finEfectivo, tarea.getTiempo());
+            if (!inicio.isBefore(hueco.getInicio())) {
+                Periodo nuevoPeriodoOcupado = new Periodo(inicio, fin, tarea.getTiempo());
                 actualizarHuecos(huecos, i, nuevoPeriodoOcupado);
                 return nuevoPeriodoOcupado;
             }
@@ -117,35 +118,30 @@ public class Agenda {
             indiceHuecoAfectado++;
         }
 
-        if (huecoOriginal.getFin().isAfter(ocupado.getFin())) {
+        if (huecoOriginal.getFin().isAfter(ocupado.getFin()))
             huecos.add(indiceHuecoAfectado, new Periodo(ocupado.getFin(), huecoOriginal.getFin(), 0));
-        }
     }
 
     public long calcularTiempoLibreHasta(LocalDateTime deadline) {
-        long totalMinutos = 0;
+        long resultado = 0;
 
         for (List<Periodo> huecos : huecosPorEquipo.values()) {
             for (Periodo hueco : huecos) {
-                totalMinutos += minutosLibresEn(hueco, deadline);
+                resultado += minutosLibresEn(hueco, deadline);
             }
         }
 
-        return totalMinutos;
+        return resultado;
     }
 
     private long minutosLibresEn(Periodo hueco, LocalDateTime deadline) {
-        if (hueco.getInicio().isAfter(deadline)) {
+        if (hueco.getInicio().isAfter(deadline))
             return 0;
-        }
+
         LocalDateTime finEfectivo = hueco.getFin().isAfter(deadline) ? deadline : hueco.getFin();
         return Math.max(0, ChronoUnit.MINUTES.between(hueco.getInicio(), finEfectivo));
     }
 
-    /**
-     * Clonación profunda para Rollback seguro durante las simulaciones del
-     * Planificador.
-     */
     public Agenda copiar() {
         return new Agenda(this.huecosPorEquipo);
     }

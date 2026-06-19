@@ -26,7 +26,9 @@ export class TipoEquipoService {
   }
 
   save(tipoEquipo: TipoEquipo): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.tipoEquiposUrl, tipoEquipo);
+    return tipoEquipo.id ?
+      this.http.put<DataPackage>(this.tipoEquiposUrl, tipoEquipo) :
+      this.http.post<DataPackage>(this.tipoEquiposUrl, tipoEquipo);
   }
 
   delete(id: number): Observable<DataPackage> {

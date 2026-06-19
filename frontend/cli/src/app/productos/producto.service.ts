@@ -26,7 +26,9 @@ export class ProductoService {
   }
 
   save(producto: Producto): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.productsUrl, producto);
+    return producto.id ?
+      this.http.put<DataPackage>(this.productsUrl, producto) :
+      this.http.post<DataPackage>(this.productsUrl, producto);
   }
 
   delete(id: number): Observable<DataPackage> {

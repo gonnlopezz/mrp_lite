@@ -69,13 +69,13 @@ public class AgendaFactory {
 
     private Map<Long, List<Planificacion>> agruparPorTaller(List<Planificacion> planificaciones,
             Map<Long, Long> indiceEquipoATaller) {
-        Map<Long, List<Planificacion>> resultado = new HashMap<>();
+        Map<Long, List<Planificacion>> agrupadasPorTaller = new HashMap<>();
         for (Planificacion p : planificaciones) {
             Long tallerId = indiceEquipoATaller.get(p.getEquipo().getId());
             if (tallerId != null) {
-                resultado.computeIfAbsent(tallerId, k -> new ArrayList<>()).add(p);
+                agrupadasPorTaller.computeIfAbsent(tallerId, k -> new ArrayList<>()).add(p);
             }
         }
-        return resultado;
+        return agrupadasPorTaller;
     }
 }

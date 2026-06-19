@@ -30,7 +30,9 @@ export class TallerService {
   }
 
   save(taller: Taller): Observable<DataPackage> {
-    return this.http.post<DataPackage>(this.workshopsUrl, taller);
+    return taller.id ?
+      this.http.put<DataPackage>(this.workshopsUrl, taller) :
+      this.http.post<DataPackage>(this.workshopsUrl, taller);
   }
 
   delete(id: number): Observable<void> {

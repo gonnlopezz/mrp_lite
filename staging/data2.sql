@@ -251,6 +251,7 @@ INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, client
 ('2026-07-24', '2026-07-27', 13, 'PENDIENTE', 503, 6),
 ('2026-07-24', '2026-07-27', 9,  'PENDIENTE', 504, 8);
 
+
 -- =========================================================================
 -- GRUPO D: 2 RECHAZOS ESTRUCTURALES CONTROLADOS (Producto ID 5 no fabricable)
 -- =========================================================================

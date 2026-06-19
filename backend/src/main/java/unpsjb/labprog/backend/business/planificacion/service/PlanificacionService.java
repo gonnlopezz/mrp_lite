@@ -113,16 +113,16 @@ public class PlanificacionService {
 
         Map<Long, Agenda> agendasTaller = fabricaAgenda.crearParaTalleres(talleres, inicioLimite, deadline);
 
-        List<ProcesoPlanificacion> result = planificador.planificarPedido(pedido, inicioLimite,
+        List<ProcesoPlanificacion> resultado = planificador.planificarPedido(pedido, inicioLimite,
                 talleres,
                 agendasTaller);
 
         pedidoService.save(pedido);
 
-        if (result.isEmpty())
-            return result;
+        if (resultado.isEmpty())
+            return resultado;
 
-        return repository.saveAll(result);
+        return repository.saveAll(resultado);
     }
 
     @Transactional
@@ -138,7 +138,7 @@ public class PlanificacionService {
         Map<Long, Agenda> agendasTaller = fabricaAgenda.crearParaTalleres(talleres, tiempoEjecucion,
                 deadlineMaximo);
 
-        List<ProcesoPlanificacion> result = new ArrayList<>();
+        List<ProcesoPlanificacion> resultado = new ArrayList<>();
 
         for (Pedido pedido : pedidosPendientes) {
             List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleres);
@@ -146,14 +146,14 @@ public class PlanificacionService {
             if (!talleresAptos.isEmpty()) {
                 List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedido(
                         pedido, tiempoEjecucion, talleresAptos, agendasTaller);
-                result.addAll(procesosPedido);
+                resultado.addAll(procesosPedido);
             } else {
                 pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);
             }
         }
 
         pedidoService.saveAll(pedidosPendientes);
-        return repository.saveAll(result);
+        return repository.saveAll(resultado);
     }
 
 }
