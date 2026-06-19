@@ -1,23 +1,17 @@
-/* ==========================================================================
-   1. VARIABLES, FUENTES Y RESET
-   ========================================================================== */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 @import '@fontsource-variable/inter';
 
 :root {
-  /* Brand Colors */
   --mrp-blue: #2563eb;
   --mrp-navy: #1e293b;
   --mrp-navy-hover: #334155;
   --mrp-link: #60a5fa;
 
-  /* Steel UI Scale */
   --steel-100: #f1f5f9;
   --steel-600: #475569;
   --steel-900: #0f172a;
 
-  /* Slate & States */
   --slate-50: #f8fafc;
   --slate-100: #f1f5f9;
   --transition-base: all 0.2s ease-in-out;
@@ -36,9 +30,6 @@ label {
   color: var(--steel-600);
 }
 
-/* ==========================================================================
-   2. NAVEGACIÓN Y ESTRUCTURA (NAVBAR, BREADCRUMBS)
-   ========================================================================== */
 .navbar.bg-dark-mrp {
   background-color: var(--mrp-navy) !important;
   border-bottom: none !important;
@@ -93,10 +84,6 @@ label {
   color: var(--mrp-link);
 }
 
-
-/* ==========================================================================
-   3. TABLAS Y COMPONENTES DE LISTADO (MASTER-DETAIL)
-   ========================================================================== */
 table.custom-table thead th {
   padding: 0.75rem 1rem;
   font-size: 0.7rem;
@@ -124,7 +111,6 @@ table.custom-table tbody tr:hover {
   background-color: #f8fafc;
 }
 
-/* Detail Expansion (Talleres) */
 .detail-container {
   background-color: var(--slate-50) !important;
   border-left: 4px solid var(--mrp-blue) !important;
@@ -146,9 +132,6 @@ table.custom-table tbody tr:hover {
   transform: translateY(-2px);
 }
 
-/* ==========================================================================
-   4. BOTONES Y ACCIONES
-   ========================================================================== */
 .btn-primary {
   font-size: 0.85rem;
   font-weight: 600;
@@ -194,9 +177,6 @@ table.custom-table tbody tr:hover {
   color: white;
 }
 
-/* ==========================================================================
-   5. FORMULARIOS Y VALIDACIÓN
-   ========================================================================== */
 .form-control {
   border: 1px solid #e2e8f0;
   color: var(--steel-900);
@@ -213,9 +193,9 @@ table.custom-table tbody tr:hover {
 }
 
 .error-container {
-    min-height: 20px; /* Ajustalo para que coincida con la altura de tu texto */
+    min-height: 20px;
     margin-top: 4px;
-    display: block; /* Aseguramos que ocupe su lugar */
+    display: block;
 }
 
 .error-feedback {
@@ -225,11 +205,7 @@ table.custom-table tbody tr:hover {
     display: flex;
     align-items: center;
     gap: 5px;
-    /* Ya no necesita el min-height aquí porque lo tiene el padre */
 }
-/* ==========================================================================
-   6. ALERTAS, TOASTS Y MODALES
-   ========================================================================== */
 .mrp-custom-toast {
   background-color: #ffffff !important;
   color: var(--steel-900) !important;
@@ -262,9 +238,6 @@ table.custom-table tbody tr:hover {
   justify-content: center;
 }
 
-/* ==========================================================================
-   7. UTILIDADES Y ANIMACIONES
-   ========================================================================== */
 .label-caps {
   font-size: 0.7rem;
   font-weight: 700;
@@ -298,15 +271,10 @@ table.custom-table tbody tr:hover {
   }
 }
 
-/* ==========================================================================
-   PAGINACIÓN (CORRECCIÓN DE ESTADO DESACTIVADO)
-   ========================================================================== */
 .table-footer-compact {
   display: flex;
   justify-content: center;
-  /* Llevamos todo al medio */
   flex-direction: column;
-  /* Uno abajo del otro */
   align-items: center;
   gap: 10px;
 }
@@ -318,7 +286,6 @@ app-pagination .pagination {
 
 app-pagination .pagination .page-item .page-link {
   border: 1px solid #e2e8f0;
-  /* Borde suave por defecto */
   color: var(--steel-600);
   padding: 0.35rem 0.75rem;
   font-size: 0.8rem;
@@ -327,7 +294,6 @@ app-pagination .pagination .page-item .page-link {
   transition: var(--transition-base);
 }
 
-/* Estado Activo (La página actual) */
 app-pagination .pagination .page-item.active .page-link {
   background-color: var(--mrp-navy);
   border-color: var(--mrp-navy);
@@ -335,20 +301,14 @@ app-pagination .pagination .page-item.active .page-link {
   box-shadow: 0 4px 6px -1px rgba(30, 41, 59, 0.2);
 }
 
-/* Estado Desactivado (Flechas cuando no hay más páginas) */
 app-pagination .pagination .page-item.disabled .page-link {
   background-color: #f8fafc !important;
-  /* Gris casi blanco */
   color: #cbd5e1 !important;
-  /* Texto "lavado" */
   border-color: #f1f5f9 !important;
-  /* Borde que casi no se ve */
   cursor: not-allowed;
   pointer-events: none;
-  /* Clave: hace que no se pueda clickear */
 }
 
-/* Hover solo para los que NO están activos ni deshabilitados */
 app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
   background-color: var(--slate-50);
   color: var(--mrp-blue);
@@ -356,27 +316,24 @@ app-pagination .pagination .page-item:not(.active):not(.disabled) .page-link:hov
   transform: translateY(-1px);
 }
 
-/* Timeline */
-
 .timeline-container {
   width: 100%;
-  overflow-x: auto; /* Esto hace que aparezca la barrita abajo */
+  overflow-x: auto;
   white-space: nowrap;
-  padding-bottom: 10px; /* Para que la barra no pise el gráfico */
+  padding-bottom: 10px;
 }
 
 .timeline-content {
-  min-width: 2000px; /* Obliga al gráfico a estirarse, ajustá este número según la cantidad de días */
+  min-width: 2000px;
 }
 
 .orders-scroll::-webkit-scrollbar {
   display: none;
 }
 
-/* Soft backgrounds for dialogs / badges */
 .bg-danger-soft {
-  background-color: #fee2e2 !important; /* light red tint */
+  background-color: #fee2e2 !important;
 }
 .bg-warning-soft {
-  background-color: #fef3c7 !important; /* light orange/yellow tint */
+  background-color: #fef3c7 !important;
 }

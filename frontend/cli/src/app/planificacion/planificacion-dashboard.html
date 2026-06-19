@@ -1,6 +1,5 @@
 <div class="container py-4">
 
-    <!-- ── Breadcrumb ─────────────────────────────────────────────────────── -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
             <li class="breadcrumb-item">
@@ -16,7 +15,6 @@
 
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-        <!-- ── Header: título + filtros ──────────────────────────────────────── -->
         <div class="card-header bg-white border-bottom py-4 px-4">
             <div class="row align-items-center g-3">
 
@@ -30,7 +28,6 @@
                 <div class="col-md-8">
                     <div class="row g-2 justify-content-end align-items-end">
 
-                        <!-- Filtro taller -->
                         <div class="col-sm-4">
                             <label class="form-label small fw-bold text-secondary mb-1">Taller</label>
                             <select class="form-select form-select-sm rounded-3" [(ngModel)]="selectedWorkshopId"
@@ -42,7 +39,6 @@
                             </select>
                         </div>
 
-                        <!-- Filtro pedido -->
                         <div class="col-sm-4">
                             <label class="form-label small fw-bold text-secondary mb-1">Pedido</label>
                             <div class="position-relative">
@@ -60,7 +56,6 @@
                             </div>
                         </div>
 
-                        <!-- Toggle + botón reset -->
                         <div class="col-sm-4">
                             <label class="form-label small fw-bold text-secondary mb-1">Colorear por</label>
                             <div class="d-flex gap-2 align-items-center">
@@ -79,7 +74,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Botón reset: aparece solo si hay filtros activos -->
                                 <button class="btn btn-sm btn-outline-secondary rounded-circle px-2"
                                     *ngIf="hasActiveFilters" (click)="resetFilters()" title="Restablecer filtros">
                                     <i class="fas fa-times"></i>
@@ -93,7 +87,6 @@
             </div>
         </div>
 
-        <!-- ── Body ───────────────────────────────────────────────────────────── -->
         <div class="card-body p-4 bg-light-subtle">
 
             <div class="text-center py-5" *ngIf="loading">
@@ -182,11 +175,9 @@
                         </span>
                     </div>
 
-                    <!-- Bloque por taller -->
                     <div *ngFor="let block of workshopBlocks; let i = index"
                         class="bg-white rounded-4 shadow-sm border mb-3 overflow-hidden">
 
-                        <!-- 🔥 HEADER DEL TALLER CON FILTRO DE TURNOS CRONOLÓGICO INDEPENDIENTE -->
                         <div class="bg-white border-bottom py-3 px-4 d-flex align-items-center gap-2 flex-wrap">
                             <span class="badge bg-primary font-monospace px-2 py-1.5" style="font-size: 0.78rem;">
                                 {{ block.workshopCode }}
@@ -205,7 +196,6 @@
                                     </span>
                                 </div>
 
-                                <!-- Selector de rango de 8 horas sin salto de medianoche -->
                                 <div class="btn-group btn-group-sm border rounded-3 overflow-hidden shadow-sm" role="group" aria-label="Filtro de Turnos">
                                     <button type="button" class="btn btn-sm px-3 border-0"
                                         [class.btn-primary]="getShiftForWorkshop(block.workshopCode) === 'all'"
@@ -239,23 +229,19 @@
                             </div>
                         </div>
 
-                        <!-- Resumen de órdenes y productos del taller -->
                         <div class="px-4 pt-3 pb-1"
                             *ngIf="block.ordersOfTheDay.length > 0 || block.productsOfTheDay.length > 0">
 
                             <div class="position-relative d-flex align-items-center gap-2">
 
-                                <!-- Flecha izquierda -->
                                 <button class="btn btn-sm btn-outline-secondary rounded-circle px-2 flex-shrink-0"
                                     (click)="scrollOrders(ordersScroll, 'left')">
                                     <i class="fas fa-chevron-left"></i>
                                 </button>
 
-                                <!-- Contenedor scrolleable sin scrollbar -->
                                 <div #ordersScroll class="d-flex gap-2 align-items-center flex-grow-1"
                                     style="overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
 
-                                    <!-- Órdenes -->
                                     <div *ngFor="let item of block.ordersOfTheDay"
                                         class="d-flex align-items-center gap-2 bg-light border rounded-3 px-3 py-2 flex-shrink-0"
                                         [style.border-left]="colorMode === 'by-order' ? '4px solid ' + getOrderColor(item.orderId) : null">
@@ -278,7 +264,6 @@
                                         </span>
                                     </div>
 
-                                    <!-- Productos sin orden -->
                                     <div *ngFor="let item of block.productsOfTheDay"
                                         class="d-flex align-items-center gap-2 bg-warning-subtle border border-warning-subtle rounded-3 px-3 py-2 flex-shrink-0">
                                         <i class="fas fa-cube text-warning"></i>
@@ -297,7 +282,6 @@
 
                                 </div>
 
-                                <!-- Flecha derecha -->
                                 <button class="btn btn-sm btn-outline-secondary rounded-circle px-2 flex-shrink-0"
                                     (click)="scrollOrders(ordersScroll, 'right')">
                                     <i class="fas fa-chevron-right"></i>
@@ -306,7 +290,6 @@
                             </div>
                         </div>
 
-                        <!-- Chart -->
                         <div class="px-3 py-3">
                             <div #chartDiv [attr.data-workshop]="block.workshopCode"
                                 style="width: 100%; overflow: hidden;">

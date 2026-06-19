@@ -36,7 +36,6 @@
           <form #orderForm="ngForm">
             <div class="row g-3">
 
-              <!-- Cliente -->
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Cliente</label>
                 <input type="text" #firstInput class="form-control form-control-sm bg-white" required id="customerInput"
@@ -52,21 +51,18 @@
                 </div>
               </div>
 
-              <!-- CUIT del Cliente (Read-only) -->
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">CUIT del Cliente</label>
                 <input type="text" class="form-control form-control-sm bg-light" disabled
                   [value]="pedido.cliente?.cuit ? formatCuit(pedido.cliente.cuit) : ''">
               </div>
 
-              <!-- Fecha Pedido -->
               <div class="col-md-6 mb-3">
                 <label class="form-label small fw-bold text-secondary mb-1">Fecha de Pedido</label>
                 <input type="date" class="form-control rounded-3 bg-light" [(ngModel)]="pedido.fechaPedido"
                   name="orderDate" readonly />
               </div>
 
-              <!-- Fecha Entrega -->
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Fecha de Entrega</label>
                 <input type="date" class="form-control form-control-sm bg-white" required name="deliveryDate"
@@ -80,7 +76,6 @@
                 </div>
               </div>
 
-              <!-- Producto -->
               <div class="col-12">
                 <label class="label-caps mb-1 d-block">Producto</label>
                 <input type="text" class="form-control form-control-sm bg-white" required id="productInput"
@@ -96,7 +91,6 @@
                 </div>
               </div>
 
-              <!-- Cantidad -->
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Cantidad</label>
                 <input type="number" class="form-control form-control-sm bg-white" required name="quantity" min="1"
@@ -110,7 +104,6 @@
                 </div>
               </div>
 
-              <!-- Estado (Read-only) -->
               <div class="col-md-6">
                 <label class="label-caps mb-1 d-block">Estado</label>
                 <input type="text" class="form-control form-control-sm bg-light" disabled
@@ -144,7 +137,6 @@
 
       </div>
 
-      <!-- Log local de carga rápida (solo visible al crear) -->
       <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4 animate__fadeIn" *ngIf="!pedido.id && recentlyCreated.length > 0">
         <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-2">
           <h6 class="mb-0 fw-bold text-steel">

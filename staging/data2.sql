@@ -178,98 +178,82 @@ INSERT INTO producto_tareas (producto_id, tareas_id) VALUES
 (10, 26), (10, 27), (10, 28);
 
 -- =========================================================================
--- 9. BLOQUE ANÓNIMO EXCLUSIVO PARA GENERACIÓN DE BUCLES (50 PEDIDOS)
+-- 9. REGISTRO DETERMINISTA - CONCENTRACIÓN CRÍTICA EN JULIO 2026
+-- CONFIGURACIÓN: 23 pedidos al 24/07, 4 pedidos al 25/07. Volúmenes: 5 a 15 (picos de 30)
+-- Total: 50 Pedidos Exactos
 -- =========================================================================
-DO $BODY$
-DECLARE
-    i INT;
-    v_global_counter INT := 1;
-    v_customer_id INT;
-    v_product_id INT;
-    v_order_date DATE;
-    v_delivery_date DATE;
-    v_quantity INT;
-BEGIN
 
-    -- CASO LOTES 1: 15 Pedidos Base (Productos 1 y 2) -> Foco en ALFA y BETA
-    FOR i IN 1..15 LOOP
-        v_customer_id := 500 + (i % 5);
-        v_product_id  := (i % 2) + 1;
-        v_quantity    := (i * 3) % 6 + 3; 
+-- =========================================================================
+-- GRUPO A: LOS 23 PEDIDOS CRÍTICOS APUNTANDO AL 24 DE JULIO (AMONTONAMIENTO COMPRIMIDO)
+-- =========================================================================
+INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) VALUES
+-- Productos con Sierra (Para activar ALFA y DELTA)
+('2026-07-22', '2026-07-24', 15, 'PENDIENTE', 500, 6),
+('2026-07-22', '2026-07-24', 8,  'PENDIENTE', 501, 6),
+('2026-07-22', '2026-07-24', 30, 'PENDIENTE', 502, 6), -- Pico de stress 1
+('2026-07-22', '2026-07-24', 12, 'PENDIENTE', 504, 6),
+('2026-07-22', '2026-07-24', 5,  'PENDIENTE', 500, 6),
 
-        IF i <= 6 THEN v_order_date := '2026-06-16';
-        ELSIF i <= 11 THEN v_order_date := '2026-06-28';
-        ELSE v_order_date := '2026-06-30';
-        END IF;
+-- Productos Base e intermedios (Operaciones mecánicas rápidas)
+('2026-07-22', '2026-07-24', 10, 'PENDIENTE', 503, 1),
+('2026-07-22', '2026-07-24', 14, 'PENDIENTE', 504, 1),
+('2026-07-22', '2026-07-24', 7,  'PENDIENTE', 500, 2),
+('2026-07-22', '2026-07-24', 11, 'PENDIENTE', 501, 2),
 
-        IF v_global_counter <= 20 THEN v_delivery_date := '2026-06-20';
-        ELSIF v_global_counter <= 40 THEN v_delivery_date := '2026-06-22';
-        ELSE v_delivery_date := '2026-06-24';
-        END IF;
+-- Complejos con Taladro (Para saturar GAMA y forzar desvío a BETA)
+('2026-07-22', '2026-07-24', 13, 'PENDIENTE', 501, 3),
+('2026-07-22', '2026-07-24', 6,  'PENDIENTE', 502, 4),
+('2026-07-22', '2026-07-24', 9,  'PENDIENTE', 503, 3),
+('2026-07-22', '2026-07-24', 15, 'PENDIENTE', 504, 4),
+('2026-07-22', '2026-07-24', 5,  'PENDIENTE', 500, 3),
+('2026-07-22', '2026-07-24', 12, 'PENDIENTE', 502, 4),
 
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
-        VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, v_product_id);
+-- Catálogo / Gabinetes (Saturan la pintura de GAMA y ALFA-2 instantáneamente por volumen de órdenes)
+('2026-07-22', '2026-07-24', 8,  'PENDIENTE', 502, 7),
+('2026-07-22', '2026-07-24', 14, 'PENDIENTE', 503, 7),
+('2026-07-22', '2026-07-24', 30, 'PENDIENTE', 504, 7), -- Pico de stress 2
+('2026-07-22', '2026-07-24', 6,  'PENDIENTE', 500, 7),
+('2026-07-22', '2026-07-24', 11, 'PENDIENTE', 501, 7),
+('2026-07-22', '2026-07-24', 7,  'PENDIENTE', 502, 7),
+('2026-07-22', '2026-07-24', 13, 'PENDIENTE', 503, 7),
+('2026-07-22', '2026-07-24', 9,  'PENDIENTE', 504, 7);
 
-        v_global_counter := v_global_counter + 1;
-    END LOOP;
+-- =========================================================================
+-- GRUPO B: LOS 4 PEDIDOS DIRIGIDOS AL 25 DE JULIO
+-- =========================================================================
+INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) VALUES
+('2026-07-23', '2026-07-25', 12, 'PENDIENTE', 500, 8),
+('2026-07-23', '2026-07-25', 7,  'PENDIENTE', 501, 9),
+('2026-07-23', '2026-07-25', 15, 'PENDIENTE', 502, 10),
+('2026-07-23', '2026-07-25', 10, 'PENDIENTE', 503, 6);
 
-    -- CASO LOTES 2: 15 Pedidos Complejos Exclusivos (Productos 3 y 4) -> Foco en GAMA
-    FOR i IN 1..15 LOOP
-        v_customer_id := 500 + ((i + 1) % 5);
-        v_product_id  := (i % 2) + 3;
-        v_quantity    := (i * 5) % 8 + 4;
+-- =========================================================================
+-- GRUPO C: PEDIDOS RESTANTES PARA COMPLETAR EL FLUJO (21 PEDIDOS)
+-- =========================================================================
+INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) VALUES
+('2026-07-20', '2026-07-22', 14, 'PENDIENTE', 500, 1),
+('2026-07-20', '2026-07-22', 8,  'PENDIENTE', 501, 2),
+('2026-07-20', '2026-07-22', 5,  'PENDIENTE', 502, 3),
+('2026-07-20', '2026-07-22', 11, 'PENDIENTE', 503, 4),
+('2026-07-21', '2026-07-23', 13, 'PENDIENTE', 504, 6),
+('2026-07-21', '2026-07-23', 6,  'PENDIENTE', 501, 8),
+('2026-07-21', '2026-07-23', 9,  'PENDIENTE', 502, 9),
+('2026-07-21', '2026-07-23', 15, 'PENDIENTE', 503, 10),
+('2026-07-21', '2026-07-23', 7,  'PENDIENTE', 504, 8),
+('2026-07-23', '2026-07-26', 12, 'PENDIENTE', 500, 1),
+('2026-07-23', '2026-07-26', 5,  'PENDIENTE', 501, 2),
+('2026-07-23', '2026-07-26', 10, 'PENDIENTE', 502, 3),
+('2026-07-23', '2026-07-26', 8,  'PENDIENTE', 503, 4),
+('2026-07-23', '2026-07-26', 14, 'PENDIENTE', 504, 6),
+('2026-07-24', '2026-07-27', 6,  'PENDIENTE', 500, 8),
+('2026-07-24', '2026-07-27', 11, 'PENDIENTE', 501, 9),
+('2026-07-24', '2026-07-27', 7,  'PENDIENTE', 502, 10),
+('2026-07-24', '2026-07-27', 13, 'PENDIENTE', 503, 6),
+('2026-07-24', '2026-07-27', 9,  'PENDIENTE', 504, 8);
 
-        IF i <= 5 THEN v_order_date := '2026-06-20';
-        ELSIF i <= 10 THEN v_order_date := '2026-06-25';
-        ELSE v_order_date := '2026-07-02';
-        END IF;
-
-        IF v_global_counter <= 20 THEN v_delivery_date := '2026-06-20';
-        ELSIF v_global_counter <= 40 THEN v_delivery_date := '2026-06-22';
-        ELSE v_delivery_date := '2026-06-24';
-        END IF;
-
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
-        VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, v_product_id);
-
-        v_global_counter := v_global_counter + 1;
-    END LOOP;
-
-    -- CASO LOTES 3: 18 Pedidos Catálogo (Balanceo estructural con Gabinetes ID 7)
-    FOR i IN 1..18 LOOP
-        v_customer_id := 500 + ((i + 2) % 5);
-        
-        IF i <= 6 THEN v_product_id := 7;
-        ELSE v_product_id := 6 + (i % 5);
-        END IF;
-        
-        v_quantity    := ((i * 4) % 10) + 2;
-
-        IF i <= 6 THEN v_order_date := '2026-06-25';
-        ELSIF i <= 12 THEN v_order_date := '2026-07-02';
-        ELSE v_order_date := '2026-07-08';
-        END IF;
-
-        IF v_global_counter <= 20 THEN v_delivery_date := '2026-06-20';
-        ELSIF v_global_counter <= 40 THEN v_delivery_date := '2026-06-22';
-        ELSE v_delivery_date := '2026-06-24';
-        END IF;
-
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
-        VALUES (v_order_date, v_delivery_date, v_quantity, 'PENDIENTE', v_customer_id, v_product_id);
-
-        v_global_counter := v_global_counter + 1;
-    END LOOP;
-
-    -- CASO LOTES 4: 2 RECHAZOS ESTRUCTURALES CONTROLADOS (Producto ID 5)
-    FOR i IN 0..1 LOOP
-        v_order_date    := '2026-06-16';
-        v_delivery_date := '2026-06-24';
-
-        INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id)
-        VALUES (v_order_date, v_delivery_date, 5, 'PENDIENTE', 500 + i, 5);
-
-        v_global_counter := v_global_counter + 1;
-    END LOOP;
-
-END $BODY$;
+-- =========================================================================
+-- GRUPO D: 2 RECHAZOS ESTRUCTURALES CONTROLADOS (Producto ID 5 no fabricable)
+-- =========================================================================
+INSERT INTO pedido (fecha_pedido, fecha_entrega, cantidad, estado_pedido, cliente_id, producto_id) VALUES
+('2026-07-20', '2026-07-23', 5,  'PENDIENTE', 500, 5),
+('2026-07-20', '2026-07-23', 5,  'PENDIENTE', 501, 5);

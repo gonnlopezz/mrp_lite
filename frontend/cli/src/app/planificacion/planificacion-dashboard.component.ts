@@ -1,4 +1,3 @@
-// planning-dashboard.component.ts
 import {
   Component, OnInit, AfterViewInit,
   ViewChildren, QueryList, ElementRef, ChangeDetectorRef
@@ -59,10 +58,10 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   selectedShifts: Record<string, string> = {};
 
   readonly SHIFT_RANGES: Record<string, { start: number; end: number }> = {
-    all: { start: 0, end: 1440 },  // 24 hs completas
-    night: { start: 0, end: 480 },  // 00:00 a 08:00 (Noche / Madrugada)
-    morning: { start: 480, end: 960 },  // 08:00 a 16:00 (Mañana)
-    afternoon: { start: 960, end: 1440 }   // 16:00 a 24:00 (Tarde / Cierre)
+    all: { start: 0, end: 1440 },
+    night: { start: 0, end: 480 },
+    morning: { start: 480, end: 960 },
+    afternoon: { start: 960, end: 1440 }
   };
 
   constructor(
@@ -124,8 +123,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // ─── Carga de selects ────────────────────────────────────────────────────
-
   loadSelectData(): Observable<any> {
     return forkJoin({
       workshops: this.workshopService.all(),
@@ -148,8 +145,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       })
     );
   }
-
-  // ─── Lógica de Typeahead para Pedidos (Formato Solicitado) ────────────────
 
   searchOrders = (text$: Observable<string>) =>
     text$.pipe(
@@ -175,8 +170,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
   orderResultFormatter = (order: PedidoFabricacion): string => {
     return `Orden #${order.id} — ${order.cliente?.razonSocial || 'Cliente'}`;
   };
-
-  // ─── Fetch principal ─────────────────────────────────────────────────────
 
   onFiltersChange(): void {
     this.fetchAndRender();
@@ -222,8 +215,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       });
   }
 
-  // ─── Carrusel ────────────────────────────────────────────────────────────
-
   changeDate(direction: 'prev' | 'next'): void {
     const index = this.availableDates.indexOf(this.selectedDate);
     if (direction === 'prev' && index > 0)
@@ -236,16 +227,12 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     this.renderAllCharts();
   }
 
-  // ─── Color mode ──────────────────────────────────────────────────────────
-
   setColorMode(mode: ColorMode): void {
     if (this.colorMode === mode) return;
     this.colorMode = mode;
     this.computeWorkshopBlocks();
     this.renderAllCharts();
   }
-
-  // ─── Filtros ─────────────────────────────────────────────────────────────
 
   resetFilters(): void {
     this.selectedWorkshopId = '';
@@ -257,15 +244,11 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     this.onFiltersChange();
   }
 
-  // ─── Renderizado ─────────────────────────────────────────────────────────
-
   renderAllCharts(): void {
     if (!this.googleChartsLoaded || !this.hasData) return;
 
-    // 1. Forzamos el acoplamiento de estados en el ciclo de Angular
     this.cdr.detectChanges();
 
-    // 2. Le damos un slot mínimo al event loop para asegurar que el DOM esté listo
     setTimeout(() => {
       if (this.chartDivs && this.chartDivs.length > 0) {
         this.drawCharts(this.chartDivs.toArray());
@@ -278,11 +261,9 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       const divRef = divs[index];
       if (!divRef) return;
 
-      // 1. Limpieza física segura del contenedor para forzar un lienzo fresco
       const container = divRef.nativeElement;
       container.innerHTML = '';
 
-      // 2. Creamos un nodo hijo interno para que Google dibuje sin romper la referencia nativa de Angular
       const chartTarget = document.createElement('div');
       container.appendChild(chartTarget);
 
@@ -295,7 +276,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       const shiftMax = new Date(this.selectedDate + 'T00:00:00');
       shiftMax.setMinutes(shiftMax.getMinutes() + range.end);
 
-      // 3. Pasamos el nuevo nodo hijo seguro al servicio
       this.chartService.drawBlock(
         block,
         chartTarget,
@@ -307,8 +287,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     this.renderingCharts = false;
     this.cdr.detectChanges();
   }
-
-  // ─── Mapas de lookup ─────────────────────────────────────────────────────
 
   private buildEquipmentWorkshopMap(): void {
     this.equipoWorkshopMap.clear();
@@ -330,8 +308,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       )
     );
   }
-
-  // ─── Compute ─────────────────────────────────────────────────────────────
 
   private computeAvailableDates(): void {
     const dates = new Set<string>();
@@ -369,7 +345,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
         const dateStr = planning.periodo?.inicio?.split('T')[0];
         if (dateStr !== this.selectedDate) return;
 
-        // Limpieza y descarte de segundos/milisegundos para evitar el pisado visual (Tiritas cortas)
         const start = new Date(planning.periodo.inicio);
         start.setSeconds(0, 0);
         const end = new Date(planning.periodo.fin);
@@ -404,7 +379,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       });
     });
 
-    // Mapeo final de los summaries
     blocksMap.forEach((block, workshopCode) => {
       const { orders, products } = this.computeSummaryForWorkshop(workshopCode);
       block.ordersOfTheDay = orders;
@@ -466,8 +440,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
 
 
   private colorKey(process: ProcesoPlanificacion): string {
-    // Importante: cada proceso "sin pedido" usa su propia clave única,
-    // en vez de colapsar todos en un mismo bucket "order-unknown".
     return this.colorMode === 'by-order' && process.pedido?.id != null
       ? `order-${process.pedido.id}`
       : `process-${process.id}`;
@@ -497,8 +469,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     </div>`;
   }
 
-  // ─── Getters de template ─────────────────────────────────────────────────
-
   get hasData(): boolean {
     return this.planningProcesses.length > 0 && !!this.selectedDate;
   }
@@ -523,9 +493,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     return this.currentColorMap.get(`order-${orderId}`) ?? '#999999';
   }
 
-  // ─── Scroll ─────────────────────────────────────────────────
-
-
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -537,10 +504,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
       behavior: 'smooth'
     });
   }
-  // Control de Fechas
-
   get ngbSelectedDate(): { year: number; month: number; day: number } {
-    // Si por alguna razón no hay fecha, caemos en el día de hoy de forma segura para que no chille Ng-Bootstrap
     if (!this.selectedDate) {
       const today = new Date();
       return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
@@ -553,7 +517,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     return this.selectedDate === new Date().toISOString().split('T')[0];
   }
 
-  // Arrow function obligatoria: ng-bootstrap llama esto sin contexto de clase
   isDateDisabled = (date: NgbDateStruct): boolean => {
     const pad = (n: number) => String(n).padStart(2, '0');
     return !this.availableDates.includes(
@@ -592,7 +555,6 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     this.renderAllCharts();
   }
 
-  // Lógica de turnos
   getShiftForWorkshop(workshopCode: string): string {
     return this.selectedShifts[workshopCode] || 'all';
   }
@@ -602,7 +564,7 @@ export class PlanificacionDashboardComponent implements OnInit, AfterViewInit {
     this.selectedShifts[workshopCode] = shift;
 
     this.renderingCharts = true;
-    this.renderAllCharts(); // Fuerza el redibujado instantáneo
+    this.renderAllCharts();
   }
 }
 

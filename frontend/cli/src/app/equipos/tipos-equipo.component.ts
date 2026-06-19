@@ -22,7 +22,6 @@ export class TiposEquipoComponent implements OnInit {
   resultsPage: ResultsPage = <ResultsPage>{};
   currentPage: number = 1;
   
-  // Lógica para el alta rápida
   showCreateForm: boolean = false;
   newEquipmentType: TipoEquipo = { nombre: "" };
 
@@ -37,7 +36,6 @@ export class TiposEquipoComponent implements OnInit {
   }
 
   getTiposEquipo(): void {
-    // Mantenemos el estándar de tu componente Customers (pasando currentPage directo)
     this.tipoEquipoService.byPage(this.currentPage, 6).subscribe(dataPackage => {
       this.resultsPage = <ResultsPage>dataPackage.data;
       this.cdr.markForCheck();
@@ -50,11 +48,11 @@ export class TiposEquipoComponent implements OnInit {
   }
 
   openModal(content: any) {
-    this.newEquipmentType = { nombre: "" }; // Limpiamos antes de abrir
+    this.newEquipmentType = { nombre: "" };
     this.modalService.open(content, { centered: true });
   }
 
-  save(modal: any): void { // 3. Recibimos la instancia del modal para cerrarlo
+  save(modal: any): void {
     if (!this.newEquipmentType.nombre.trim()) return;
 
     this.tipoEquipoService.save(this.newEquipmentType).subscribe(dataPackage => {

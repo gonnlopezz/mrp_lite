@@ -29,7 +29,6 @@ export class PedidosComponent implements OnInit {
   activeTab: OrderTab = 'TODOS';
   processingPlanning: boolean = false;
 
-  // Propiedad para enlazar la fecha seleccionada en el input del modal de simulación
   selectedSimulationDate: string = '';
 
   tabCounts: Record<OrderTab, number> = {
@@ -51,16 +50,12 @@ export class PedidosComponent implements OnInit {
     this.loadTabCounts();
   }
 
-  // ─── Tabs ────────────────────────────────────────────────────────────────
-
   setTab(tab: OrderTab): void {
     if (this.activeTab === tab) return;
     this.activeTab = tab;
     this.currentPage = 1;
     this.getPedidos();
   }
-
-  // ─── Datos ───────────────────────────────────────────────────────────────
 
   getPedidos(): void {
     const state = this.activeTab !== 'TODOS' ? this.activeTab : undefined;
@@ -77,7 +72,6 @@ export class PedidosComponent implements OnInit {
     }
   }
 
-  /** Carga los contadores de las 3 bandejas en paralelo. */
   private loadTabCounts(): void {
     forkJoin({
       pending: this.pedidoService.byPage(1, 1, 'PENDIENTE'),
@@ -94,26 +88,20 @@ export class PedidosComponent implements OnInit {
     });
   }
 
-  /** Refresca tabla Y contadores tras cualquier acción que cambie estados. */
   private refresh(): void {
     this.getPedidos();
     this.loadTabCounts();
   }
 
-  // ─── Acciones Masivas (Simulador Temporal) ───────────────────────────────
-
   abrirModalPlanificacion(content: any): void {
     const ahora = new Date();
     const tzOffset = ahora.getTimezoneOffset() * 60000;
 
-    // Setea por defecto "AAAA-MM-DD" en hora local (ej: "2026-06-05")
     this.selectedSimulationDate = new Date(ahora.getTime() - tzOffset).toISOString().split('T')[0];
 
-    // Abre el modal centrado
     this.modalService.open(content, { centered: true, backdrop: 'static' });
   }
 
-  /** Ejecuta el motor mandando la fecha con las 00:00:00 hardcodeadas */
   executePlanBatch(modalRef: any): void {
     if (!this.selectedSimulationDate) {
       this.toastr.warning('Debe seleccionar una fecha de inicio para la corrida.', 'Atención');
@@ -123,8 +111,6 @@ export class PedidosComponent implements OnInit {
     this.processingPlanning = true;
     this.cdr.markForCheck();
 
-    // 💡 Magia de Clean Architecture: El usuario ve solo la fecha, 
-    // pero a Spring Boot le llega el LocalDateTime perfecto que necesita.
     const fechaFormateadaJava = `${this.selectedSimulationDate}T00:00:00`;
 
     this.planningService.runMassivePlanning(fechaFormateadaJava).subscribe({
@@ -143,8 +129,6 @@ export class PedidosComponent implements OnInit {
       }
     });
   }
-  // ─── Acciones Individuales y Filtros ─────────────────────────────────────
-
   onPageChangeRequested(page: number): void {
     this.currentPage = page;
     this.getPedidos();

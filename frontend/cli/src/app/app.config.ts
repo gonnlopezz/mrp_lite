@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
       positionClass: 'toast-top-right',
       preventDuplicates: true,
       progressBar: true,
-      toastClass: 'ngx-toastr mrp-custom-toast' // Nuestra clase personalizada
+      toastClass: 'ngx-toastr mrp-custom-toast'
     }),
   ]
 };
