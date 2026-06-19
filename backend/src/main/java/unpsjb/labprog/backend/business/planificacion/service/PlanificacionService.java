@@ -113,7 +113,7 @@ public class PlanificacionService {
 
         Map<Long, Agenda> agendasTaller = fabricaAgenda.crearParaTalleres(talleres, inicioLimite, deadline);
 
-        List<ProcesoPlanificacion> result = planificador.planificarPedidoEnTalleres(pedido, inicioLimite,
+        List<ProcesoPlanificacion> result = planificador.planificarPedido(pedido, inicioLimite,
                 talleres,
                 agendasTaller);
 
@@ -144,7 +144,7 @@ public class PlanificacionService {
             List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleres);
 
             if (!talleresAptos.isEmpty()) {
-                List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedidoEnTalleres(
+                List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedido(
                         pedido, tiempoEjecucion, talleresAptos, agendasTaller);
                 result.addAll(procesosPedido);
             } else {

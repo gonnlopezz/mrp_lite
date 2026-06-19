@@ -26,7 +26,7 @@ public class Planificador {
         return estrategia.ejecutar(producto, taller, agenda, inicio);
     }
 
-    public List<ProcesoPlanificacion> planificarPedidoEnTalleres(
+    public List<ProcesoPlanificacion> planificarPedido(
             Pedido pedido, LocalDateTime inicioLimite,
             List<Taller> talleres, Map<Long, Agenda> agendas) {
 
