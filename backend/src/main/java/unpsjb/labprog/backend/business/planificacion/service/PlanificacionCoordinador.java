@@ -87,11 +87,11 @@ public class PlanificacionCoordinador {
                 agendasTaller);
 
         pedidoService.save(pedido);
+        if (!resultado.isEmpty()) {
+            planificacionService.saveAll(resultado);
+        }
 
-        if (resultado.isEmpty())
-            return resultado;
-
-        return planificacionService.saveAll(resultado);
+        return resultado;
     }
 
     @Transactional
@@ -102,13 +102,26 @@ public class PlanificacionCoordinador {
 
         List<Taller> talleres = tallerService.findAllConEquipos();
 
-        LocalDateTime deadlineMaximo = pedidosPendientes.get(pedidosPendientes.size() - 1).getFechaEntrega()
-                .atStartOfDay();
         Map<Long, Agenda> agendasTaller = fabricaAgenda.crearParaTalleres(talleres, tiempoEjecucion,
-                deadlineMaximo);
+                calcularDeadlineMaximo(pedidosPendientes));
 
+        List<ProcesoPlanificacion> resultado = ejecutarPlanificacionBatch(pedidosPendientes, talleres, agendasTaller, tiempoEjecucion);
+
+        pedidoService.saveAll(pedidosPendientes);
+        if (!resultado.isEmpty()) {
+            planificacionService.saveAll(resultado);
+        }
+
+        return resultado;
+    }
+
+    private LocalDateTime calcularDeadlineMaximo(List<Pedido> pedidos) {
+        return pedidos.get(pedidos.size() - 1).getFechaEntrega().atStartOfDay();
+    }
+
+    private List<ProcesoPlanificacion> ejecutarPlanificacionBatch(
+            List<Pedido> pedidosPendientes, List<Taller> talleres, Map<Long, Agenda> agendasTaller, LocalDateTime tiempoEjecucion) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
-
         for (Pedido pedido : pedidosPendientes) {
             List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleres);
 
@@ -120,8 +133,6 @@ public class PlanificacionCoordinador {
                 pedido.markAsUnschedulable("No existen talleres con el equipamiento requerido", null);
             }
         }
-
-        pedidoService.saveAll(pedidosPendientes);
-        return planificacionService.saveAll(resultado);
+        return resultado;
     }
 }

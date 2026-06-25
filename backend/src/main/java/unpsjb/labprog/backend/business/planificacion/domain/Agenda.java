@@ -44,25 +44,34 @@ public class Agenda {
         Map<Long, List<Planificacion>> agrupadasPorEquipo = agruparPorEquipo(planificaciones);
 
         for (Equipo equipo : equipos) {
-            List<Periodo> huecos = new ArrayList<>();
             List<Planificacion> planificacionesDelEquipo = agrupadasPorEquipo.getOrDefault(equipo.getId(),
                     List.of());
-
-            LocalDateTime cursor = inicio;
-            for (Planificacion plan : planificacionesDelEquipo) {
-                Periodo ocupado = plan.getPeriodo();
-                if (ocupado.getInicio().isAfter(cursor))
-                    huecos.add(new Periodo(cursor, ocupado.getInicio(), 0));
-
-                if (ocupado.getFin().isAfter(cursor))
-                    cursor = ocupado.getFin();
-            }
-
-            if (cursor.isBefore(fin))
-                huecos.add(new Periodo(cursor, fin, 0));
-
+            List<Periodo> huecos = calcularHuecosParaEquipo(planificacionesDelEquipo, inicio, fin);
             huecosPorEquipo.put(equipo.getId(), huecos);
         }
+    }
+
+    private List<Periodo> calcularHuecosParaEquipo(List<Planificacion> planificaciones,
+            LocalDateTime inicio, LocalDateTime fin) {
+        List<Periodo> huecos = new ArrayList<>();
+        LocalDateTime cursor = inicio;
+
+        for (Planificacion plan : planificaciones) {
+            Periodo ocupado = plan.getPeriodo();
+            if (ocupado.getInicio().isAfter(cursor)) {
+                huecos.add(new Periodo(cursor, ocupado.getInicio(), 0));
+            }
+
+            if (ocupado.getFin().isAfter(cursor)) {
+                cursor = ocupado.getFin();
+            }
+        }
+
+        if (cursor.isBefore(fin)) {
+            huecos.add(new Periodo(cursor, fin, 0));
+        }
+
+        return huecos;
     }
 
     public Periodo ocuparEspacioForward(Tarea tarea, Equipo equipo, LocalDateTime tiempoActual) {

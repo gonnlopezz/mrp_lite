@@ -31,14 +31,17 @@ public class AgendaFactory {
         if (talleres.isEmpty())
             return Map.of();
 
+        List<Planificacion> todas = planificacionRepository.planificacionesPorTalleres(extraerTallerIds(talleres), inicio);
+
+        return construirAgendas(talleres, todas, inicio, fin);
+    }
+
+    private List<Long> extraerTallerIds(List<Taller> talleres) {
         List<Long> tallerIds = new ArrayList<>();
         for (Taller taller : talleres) {
             tallerIds.add(taller.getId());
         }
-
-        List<Planificacion> todas = planificacionRepository.planificacionesPorTalleres(tallerIds, inicio);
-
-        return construirAgendas(talleres, todas, inicio, fin);
+        return tallerIds;
     }
 
     private Map<Long, Agenda> construirAgendas(List<Taller> talleres,
