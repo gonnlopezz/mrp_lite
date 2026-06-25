@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.pedido.PedidoService;
-import unpsjb.labprog.backend.business.planificacion.service.PlanificacionFacade;
+import unpsjb.labprog.backend.business.planificacion.service.PlanificacionCoordinador;
 import unpsjb.labprog.backend.business.planificacion.service.PlanificacionService;
 import unpsjb.labprog.backend.dto.PlanAllPendingRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
@@ -30,7 +30,7 @@ public class PlanificacionPresenter {
     @Autowired
     PlanificacionService service;
     @Autowired
-    PlanificacionFacade facade;
+    PlanificacionCoordinador facade;
     @Autowired
     PedidoService pedidoService;
 

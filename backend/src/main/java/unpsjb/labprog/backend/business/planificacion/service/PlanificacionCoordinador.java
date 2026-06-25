@@ -23,7 +23,7 @@ import unpsjb.labprog.backend.model.Producto;
 import unpsjb.labprog.backend.model.Taller;
 
 @Service
-public class PlanificacionFacade {
+public class PlanificacionCoordinador {
 
     private static final int HORIZONTE_PLANIFICACION_DIAS = 30;
 
