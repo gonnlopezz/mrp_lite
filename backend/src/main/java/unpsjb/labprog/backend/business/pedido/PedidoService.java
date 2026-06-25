@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.model.Pedido;
-import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
+import unpsjb.labprog.backend.business.planificacion.service.PlanificacionService;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.EstadoPedido;
+import unpsjb.labprog.backend.model.Pedido;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 
 @Service
@@ -24,7 +24,7 @@ public class PedidoService {
     PedidoRepository repository;
 
     @Autowired
-    PlanificacionRepository planningProcessRepository;
+    PlanificacionService planificacionService;
 
     public List<Pedido> findAll() {
         List<Pedido> result = new ArrayList<>();
@@ -57,7 +57,7 @@ public class PedidoService {
     }
 
     public List<ProcesoPlanificacion> findPlanningProcesses(long orderId) {
-        return planningProcessRepository.findByPedidoId(orderId);
+        return planificacionService.findByPedidoId(orderId);
     }
 
     public List<Pedido> findByEstadoOrderByFechaEntregaAsc(EstadoPedido state) {
@@ -83,8 +83,9 @@ public class PedidoService {
         if (pedido.getEstado() == EstadoPedido.FINALIZADO) {
             throw new BusinessException("No se puede eliminar el pedido porque ya se encuentra finalizado.");
         }
-        if (!planningProcessRepository.findByPedidoId(id).isEmpty()) {
-            throw new BusinessException("No se puede eliminar el pedido porque ya cuenta con una planificación asociada.");
+        if (!planificacionService.findByPedidoId(id).isEmpty()) {
+            throw new BusinessException(
+                    "No se puede eliminar el pedido porque ya cuenta con una planificación asociada.");
         }
         repository.deleteById(id);
     }

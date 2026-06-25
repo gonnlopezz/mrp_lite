@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.persistence.EntityNotFoundException;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.pedido.PedidoService;
+import unpsjb.labprog.backend.business.planificacion.service.PlanificacionFacade;
 import unpsjb.labprog.backend.business.planificacion.service.PlanificacionService;
 import unpsjb.labprog.backend.dto.PlanAllPendingRequestDTO;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;
@@ -28,6 +29,8 @@ import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 public class PlanificacionPresenter {
     @Autowired
     PlanificacionService service;
+    @Autowired
+    PlanificacionFacade facade;
     @Autowired
     PedidoService pedidoService;
 
@@ -62,7 +65,7 @@ public class PlanificacionPresenter {
             request.setWorkshopCode(null);
         }
         try {
-            return Response.ok(service.planificarProducto(request), "Producto planificado con éxito");
+            return Response.ok(facade.planificarProducto(request), "Producto planificado con éxito");
         } catch (BusinessException e) {
             return Response.conflict(e.getMessage());
         } catch (EntityNotFoundException e) {
@@ -76,7 +79,7 @@ public class PlanificacionPresenter {
     @PostMapping("/order")
     public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
         try {
-            List<ProcesoPlanificacion> result = service.planificarPedido(request);
+            List<ProcesoPlanificacion> result = facade.planificarPedido(request);
 
             if (result.isEmpty()) {
                 Pedido failedOrder = pedidoService.findById(request.getOrder().getId());
@@ -102,7 +105,7 @@ public class PlanificacionPresenter {
                 return Response.error("La fecha de inicio (startDate) es obligatoria.");
             }
 
-            List<ProcesoPlanificacion> processes = service.planificarBatch(request.getStartDate());
+            List<ProcesoPlanificacion> processes = facade.planificarBatch(request.getStartDate());
 
             return Response.ok(processes, "Pedidos pendientes planificados con éxito");
         } catch (Exception e) {

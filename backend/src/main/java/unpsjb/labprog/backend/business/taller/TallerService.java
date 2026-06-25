@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
+import unpsjb.labprog.backend.business.planificacion.service.PlanificacionService;
 import unpsjb.labprog.backend.exception.BusinessException;
 import unpsjb.labprog.backend.model.TipoEquipo;
 import unpsjb.labprog.backend.model.Equipo;
@@ -24,7 +24,7 @@ public class TallerService {
     TallerRepository repository;
 
     @Autowired
-    PlanificacionRepository planningProcessRepository;
+    PlanificacionService planificacionService;
 
     public List<Taller> findAll() {
         List<Taller> result = new ArrayList<>();
@@ -54,7 +54,7 @@ public class TallerService {
 
     public List<ProcesoPlanificacion> obtenerProcesosPlanificacion(Integer workshopId) {
         findById(workshopId);
-        return planningProcessRepository.findAllByWorkshopId(workshopId);
+        return planificacionService.findAllByWorkshopId(workshopId);
     }
 
     @Transactional
@@ -71,8 +71,9 @@ public class TallerService {
                         }
                     }
                     if (!stillExists) {
-                        if (planningProcessRepository.existsByEquipoId(existingEquipo.getId())) {
-                            throw new BusinessException("No se puede eliminar el equipo " + existingEquipo.getCodigo() + " porque tiene planificaciones asociadas.");
+                        if (planificacionService.existsByEquipoId(existingEquipo.getId())) {
+                            throw new BusinessException("No se puede eliminar el equipo " + existingEquipo.getCodigo()
+                                    + " porque tiene planificaciones asociadas.");
                         }
                     }
                 }
@@ -83,7 +84,7 @@ public class TallerService {
 
     @Transactional
     public void delete(int id) {
-        if (!planningProcessRepository.findAllByWorkshopId(id).isEmpty()) {
+        if (!planificacionService.findAllByWorkshopId(id).isEmpty()) {
             throw new BusinessException("No se puede eliminar el taller porque tiene planificaciones asociadas.");
         }
         repository.deleteById(id);

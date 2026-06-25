@@ -1,0 +1,1096 @@
+ Container mrp_lite-testing-run-2cf8dafb8ac2 Creating 
+ Container mrp_lite-testing-run-2cf8dafb8ac2 Created 
+
+> restuix-testing@1.0.0 test
+> cucumber-js
+
+..F..F..F..F..F..F..F..F..F..F..F..F..F..F..F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F...F....F....F....F...F...F................F..F..F..F..F..........................F-..F-..F--..F-...F.............................F..F..F..F...
+
+Failures:
+
+1) Scenario: Nuevo tipo de equipo para asignar a talleres # features/01_tipoEquipo.feature:10
+   ✔ Dado que se ingresa el tipo de equipo con "amoladora" # features/step_definitions/tipoEquipoSteps.js:4
+   ✔ Cuando presiono el botón de guardar tipoEquipo # features/step_definitions/tipoEquipoSteps.js:9
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Tipo de equipo amoladora registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+2) Scenario: Nuevo tipo de equipo para asignar a talleres # features/01_tipoEquipo.feature:11
+   ✔ Dado que se ingresa el tipo de equipo con "soldadora" # features/step_definitions/tipoEquipoSteps.js:4
+   ✔ Cuando presiono el botón de guardar tipoEquipo # features/step_definitions/tipoEquipoSteps.js:9
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Tipo de equipo soldadora registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+3) Scenario: Nuevo tipo de equipo para asignar a talleres # features/01_tipoEquipo.feature:12
+   ✔ Dado que se ingresa el tipo de equipo con "taladro" # features/step_definitions/tipoEquipoSteps.js:4
+   ✔ Cuando presiono el botón de guardar tipoEquipo # features/step_definitions/tipoEquipoSteps.js:9
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Tipo de equipo taladro registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+4) Scenario: Nuevo tipo de equipo para asignar a talleres # features/01_tipoEquipo.feature:13
+   ✔ Dado que se ingresa el tipo de equipo con "pistola de pintura" # features/step_definitions/tipoEquipoSteps.js:4
+   ✔ Cuando presiono el botón de guardar tipoEquipo # features/step_definitions/tipoEquipoSteps.js:9
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Tipo de equipo pistola de pintura registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+5) Scenario: Nuevo tipo de equipo para asignar a talleres # features/01_tipoEquipo.feature:14
+   ✔ Dado que se ingresa el tipo de equipo con "sierra" # features/step_definitions/tipoEquipoSteps.js:4
+   ✔ Cuando presiono el botón de guardar tipoEquipo # features/step_definitions/tipoEquipoSteps.js:9
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Tipo de equipo sierra registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+6) Scenario: Nuevo cliente que encargan pedidos de fabricación de productos # features/02_cliente.feature:11
+   ✔ Dado que se ingresa el cliente con "prilidiano pueyrredon", 10000000013 y "" # features/step_definitions/clienteSteps.js:9
+   ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Cliente prilidiano pueyrredon 10000000013 registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+7) Scenario: Nuevo cliente que encargan pedidos de fabricación de productos # features/02_cliente.feature:12
+   ✔ Dado que se ingresa el cliente con "marcelo t. de alvear", 20000000022 y "" # features/step_definitions/clienteSteps.js:9
+   ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Cliente marcelo t. de alvear 20000000022 registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+8) Scenario: Nuevo cliente que encargan pedidos de fabricación de productos # features/02_cliente.feature:13
+   ✔ Dado que se ingresa el cliente con "domingo faustino sarmiento", 30000000033 y "" # features/step_definitions/clienteSteps.js:9
+   ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Cliente domingo faustino sarmiento 30000000033 registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+9) Scenario: Nuevo cliente que encargan pedidos de fabricación de productos # features/02_cliente.feature:14
+   ✔ Dado que se ingresa el cliente con "walter runciman", 40000000044 y "" # features/step_definitions/clienteSteps.js:9
+   ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+   ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Cliente walter runciman 40000000044 registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+       500 !== 200
+
+           + expected - actual
+
+           -500
+           +200
+
+           at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+10) Scenario: Nuevo cliente que encargan pedidos de fabricación de productos # features/02_cliente.feature:15
+    ✔ Dado que se ingresa el cliente con "julio argentino roca", 50000000055 y "" # features/step_definitions/clienteSteps.js:9
+    ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Cliente julio argentino roca 50000000055 registrado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+11) Scenario: Nuevo taller sin equipos # features/03_taller.feature:10
+    ✔ Dado que se ingresa el nuevo taller con "ALFA" y "Taller Alfa para lo básico" # features/step_definitions/tallerSteps.js:4
+    ✔ Cuando presiono el botón de guardar taller # features/step_definitions/tallerSteps.js:39
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA ingresado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+12) Scenario: Nuevo taller sin equipos # features/03_taller.feature:11
+    ✔ Dado que se ingresa el nuevo taller con "BETA" y "Taller Beta es muy rápido" # features/step_definitions/tallerSteps.js:4
+    ✔ Cuando presiono el botón de guardar taller # features/step_definitions/tallerSteps.js:39
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller BETA ingresado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+13) Scenario: Nuevo taller sin equipos # features/03_taller.feature:12
+    ✔ Dado que se ingresa el nuevo taller con "GAMA" y "Taller Gama puede con todo" # features/step_definitions/tallerSteps.js:4
+    ✔ Cuando presiono el botón de guardar taller # features/step_definitions/tallerSteps.js:39
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller GAMA ingresado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+14) Scenario: Nuevo taller sin equipos # features/03_taller.feature:13
+    ✔ Dado que se ingresa el nuevo taller con "DELTA" y "Taller Delta ensamble intermedio" # features/step_definitions/tallerSteps.js:4
+    ✔ Cuando presiono el botón de guardar taller # features/step_definitions/tallerSteps.js:39
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller DELTA ingresado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+15) Scenario: Nuevo taller sin equipos # features/03_taller.feature:14
+    ✔ Dado que se ingresa el nuevo taller con "ALFA-2" y "Taller Alfa 2 alta capacidad serie" # features/step_definitions/tallerSteps.js:4
+    ✔ Cuando presiono el botón de guardar taller # features/step_definitions/tallerSteps.js:39
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA-2 ingresado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+16) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:23
+    ✔ Dado que existe el taller "ALFA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "A01_amoladora" del tipo "amoladora" y 1 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+17) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:24
+    ✔ Dado que existe el taller "ALFA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "A02_soldadora" del tipo "soldadora" y 1 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+18) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:25
+    ✔ Dado que existe el taller "BETA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "B01_amoladora" del tipo "amoladora" y 4 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller BETA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+19) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:26
+    ✔ Dado que existe el taller "BETA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "B02_taladro" del tipo "taladro" y 4 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller BETA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+20) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:27
+    ✔ Dado que existe el taller "BETA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "B03_pistola" del tipo "pistola de pintura" y 4 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller BETA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+21) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:28
+    ✔ Dado que existe el taller "GAMA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "G01_amoladora" del tipo "amoladora" y 2 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller GAMA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+22) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:29
+    ✔ Dado que existe el taller "GAMA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "G02_soldadora" del tipo "soldadora" y 2 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller GAMA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+23) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:30
+    ✔ Dado que existe el taller "GAMA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "G03_taladro" del tipo "taladro" y 2 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller GAMA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+24) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:31
+    ✔ Dado que existe el taller "GAMA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "G04_pistola" del tipo "pistola de pintura" y 1 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller GAMA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+25) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:32
+    ✔ Dado que existe el taller "DELTA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "D01_amoladora" del tipo "amoladora" y 2 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller DELTA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+26) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:33
+    ✔ Dado que existe el taller "DELTA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "D02_soldadora" del tipo "soldadora" y 2 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller DELTA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+27) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:34
+    ✔ Dado que existe el taller "DELTA" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "D03_taladro" del tipo "taladro" y 1 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller DELTA actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+28) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:35
+    ✔ Dado que existe el taller "ALFA-2" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "A2_AMOLAD_01" del tipo "amoladora" y 3 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA-2 actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+29) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:36
+    ✔ Dado que existe el taller "ALFA-2" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "A2_AMOLAD_02" del tipo "amoladora" y 3 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA-2 actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+30) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:37
+    ✔ Dado que existe el taller "ALFA-2" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "A2_SOLDAD_01" del tipo "soldadora" y 4 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA-2 actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+31) Scenario: Agregar equipos a los talleres existentes # features/03_taller.feature:38
+    ✔ Dado que existe el taller "ALFA-2" # features/step_definitions/tallerSteps.js:10
+    ✔ Y se agrega el equipo "A2_PISTOL_01" del tipo "pistola de pintura" y 2 # features/step_definitions/tallerSteps.js:21
+    ✔ Cuando presiono el botón de actualizar taller # features/step_definitions/tallerSteps.js:77
+    ✖ Entonces se espera el siguiente status: 200 con la respuesta: "Taller ALFA-2 actualizado correctamente" # features/step_definitions/stepDefinitions.js:5
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/stepDefinitions.js:6:12)
+
+32) Scenario: Crear un producto con sus tareas que pueda fabricarse en el taller ALFA # features/04_producto.feature:4
+    ✔ Dado se ingresa un nuevo producto con nombre "Soporte metálico mediano" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea     | orden | tiempo | tipoEquipo |
+        | cortar planchas | 1     | 60     | amoladora  |
+        | cortar perfiles | 2     | 20     | amoladora  |
+        | armado          | 3     | 90     | soldadora  |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Soporte metálico mediano creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+33) Scenario: Crear un producto con sus tareas que pueda fabricarse en el taller BETA # features/04_producto.feature:14
+    ✔ Dado se ingresa un nuevo producto con nombre "Andamio básico 2x2x4" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea             | orden | tiempo | tipoEquipo         |
+        | cortar caños            | 1     | 20     | amoladora          |
+        | realizar perforaciones  | 2     | 40     | taladro            |
+        | aplicar capa protectora | 3     | 80     | pistola de pintura |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Andamio básico 2x2x4 creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+34) Scenario: Crear un producto con sus tareas que pueda fabricarse solo en el taller GAMA # features/04_producto.feature:24
+    ✔ Dado se ingresa un nuevo producto con nombre "Canasto de basura chico 1,5mts" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea         | orden | tiempo | tipoEquipo         |
+        | cortar perfiles     | 1     | 60     | amoladora          |
+        | cortar malla        | 2     | 20     | amoladora          |
+        | soldar canasto      | 3     | 30     | soldadora          |
+        | unir pie            | 4     | 20     | soldadora          |
+        | pintar antioxidante | 5     | 60     | pistola de pintura |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Canasto de basura chico 1,5mts creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+35) Scenario: Crear un producto con sus tareas que pueda fabricarse solo en el taller GAMA, diferente al anterior. # features/04_producto.feature:36
+    ✔ Dado se ingresa un nuevo producto con nombre "Pieza chica en U" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea            | orden | tiempo | tipoEquipo |
+        | unir ramas             | 1     | 30     | soldadora  |
+        | realizar perforaciones | 2     | 160    | taladro    |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Pieza chica en U creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+36) Scenario: Crear un producto con sus tareas que no pueda fabricarse en ningun taller (Falla Estructural). # features/04_producto.feature:45
+    ✔ Dado se ingresa un nuevo producto con nombre "Soporte en U para estantería" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea            | orden | tiempo | tipoEquipo |
+        | unir ramas             | 1     | 30     | soldadora  |
+        | realizar perforaciones | 2     | 160    | taladro    |
+        | cortar maderas         | 3     | 50     | sierra     |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Soporte en U para estantería creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+37) Scenario: Crear el Producto 6 que explote la redundancia de amoladoras en DELTA y ALFA-2 # features/04_producto.feature:55
+    ✔ Dado se ingresa un nuevo producto con nombre "Estanteria Pesada Industrial" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea                   | orden | tiempo | tipoEquipo |
+        | Cortar perfiles estructurales | 1     | 45     | amoladora  |
+        | Perforar anclajes de base     | 2     | 30     | taladro    |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Estanteria Pesada Industrial creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+38) Scenario: Crear el Producto 7 con alta demanda de pintura aplicable en BETA, GAMA y ALFA-2 # features/04_producto.feature:64
+    ✔ Dado se ingresa un nuevo producto con nombre "Gabinete Electrico Estanco" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea                    | orden | tiempo | tipoEquipo         |
+        | Dimensionar chapa plegada      | 1     | 50     | amoladora          |
+        | Soldar escuadras y bisagras    | 2     | 40     | soldadora          |
+        | Acabado con pintura poliuretan | 3     | 60     | pistola de pintura |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Gabinete Electrico Estanco creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+39) Scenario: Crear el Producto 8 de alta carga operativa para soldadura pesada # features/04_producto.feature:74
+    ✔ Dado se ingresa un nuevo producto con nombre "Contenedor de Residuos 1000L" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea                   | orden | tiempo | tipoEquipo |
+        | Cortar chapas de piso 1/4     | 1     | 90     | amoladora  |
+        | Soldadura perimetral reforzad | 2     | 120    | soldadora  |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Contenedor de Residuos 1000L creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+40) Scenario: Crear el Producto 9 que cruce operaciones ligeras entre talleres mecanizados # features/04_producto.feature:83
+    ✔ Dado se ingresa un nuevo producto con nombre "Carro de Carga de 4 Ruedas" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea                 | orden | tiempo | tipoEquipo |
+        | Estructurar chasis inferior | 1     | 35     | soldadora  |
+        | Perforar ejes de rodamiento | 2     | 25     | taladro    |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Carro de Carga de 4 Ruedas creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+41) Scenario: Crear el Producto 10 de maxima superposicion tecnologica # features/04_producto.feature:92
+    ✔ Dado se ingresa un nuevo producto con nombre "Brazo de Izaje Articulado" # features/step_definitions/productoSteps.js:6
+    ✔ Y se fabrica haciendo la siguiente lista de tareas # features/step_definitions/productoSteps.js:19
+        | nombreTarea                   | orden | tiempo | tipoEquipo |
+        | Cortar vigas doble T          | 1     | 60     | amoladora  |
+        | Mecanizar buje central        | 2     | 50     | taladro    |
+        | Union de costillas de refuerz | 3     | 80     | soldadora  |
+    ✔ Cuando presiono el botón de guardar producto # features/step_definitions/productoSteps.js:41
+    ✖ Entonces se espera el siguiente 200 con "Producto Brazo de Izaje Articulado creado exitosamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+42) Scenario: Planificación de un producto sobre un taller seleccionado vacío # features/05_planificacion.feature:6
+    ✔ Dado el producto con nombre "Soporte metálico mediano" # features/step_definitions/productoSteps.js:10
+    ✔ Y que existe el taller "ALFA" # features/step_definitions/tallerSteps.js:10
+    ✔ Cuando se solicita planificar el producto en el taller el día "01-01-2025" # features/step_definitions/planificacionSteps.js:9
+    ✔ Entonces se espera el siguiente 200 con "Producto planificado con éxito" # features/step_definitions/productoSteps.js:74
+    ✖ Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea           |
+        | 2025-01-01 00:00 | 2025-01-01 01:00 | A01_amoladora | cortar planchas |
+        | 2025-01-01 01:00 | 2025-01-01 01:20 | A01_amoladora | cortar perfiles |
+        | 2025-01-01 01:20 | 2025-01-01 02:50 | A02_soldadora | armado          |
+        AssertionError [ERR_ASSERTION]: Error en inicio (Fila 1)
+        + actual - expected
+
+        + '2025-01-01 05:20'
+        - '2025-01-01 00:00'
+                       ^
+
+            + expected - actual
+
+            -2025-01-01 05:20
+            +2025-01-01 00:00
+
+            at /home/node/features/step_definitions/planificacionSteps.js:130:16
+            at Array.forEach (<anonymous>)
+            at World.<anonymous> (/home/node/features/step_definitions/planificacionSteps.js:120:30)
+
+43) Scenario: Planificación de un producto sobre un taller seleccionado con planificaciones previas # features/05_planificacion.feature:18
+    ✔ Dado el producto con nombre "Soporte metálico mediano" # features/step_definitions/productoSteps.js:10
+    ✔ Y que existe el taller "ALFA" # features/step_definitions/tallerSteps.js:10
+    ✔ Cuando se solicita planificar el producto en el taller el día "01-01-2025" # features/step_definitions/planificacionSteps.js:9
+    ✔ Entonces se espera el siguiente 200 con "Producto planificado con éxito" # features/step_definitions/productoSteps.js:74
+    ✖ Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea           |
+        | 2025-01-01 01:20 | 2025-01-01 02:20 | A01_amoladora | cortar planchas |
+        | 2025-01-01 02:20 | 2025-01-01 02:40 | A01_amoladora | cortar perfiles |
+        | 2025-01-01 02:50 | 2025-01-01 04:20 | A02_soldadora | armado          |
+        AssertionError [ERR_ASSERTION]: Error en inicio (Fila 1)
+        + actual - expected
+
+        + '2025-01-01 06:40'
+        - '2025-01-01 01:20'
+                       ^
+
+            + expected - actual
+
+            -2025-01-01 06:40
+            +2025-01-01 01:20
+
+            at /home/node/features/step_definitions/planificacionSteps.js:130:16
+            at Array.forEach (<anonymous>)
+            at World.<anonymous> (/home/node/features/step_definitions/planificacionSteps.js:120:30)
+
+44) Scenario: Planificación de un producto sobre un taller seleccionado con mayor capacidad # features/05_planificacion.feature:30
+    ✔ Dado el producto con nombre "Andamio básico 2x2x4" # features/step_definitions/productoSteps.js:10
+    ✔ Dado que existe el taller "BETA" # features/step_definitions/tallerSteps.js:10
+    ✔ Cuando se solicita planificar el producto en el taller el día "01-01-2025" # features/step_definitions/planificacionSteps.js:9
+    ✔ Entonces se espera el siguiente 200 con "Producto planificado con éxito" # features/step_definitions/productoSteps.js:74
+    ✖ Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea                   |
+        | 2025-01-01 00:00 | 2025-01-01 00:05 | B01_amoladora | cortar caños            |
+        | 2025-01-01 00:05 | 2025-01-01 00:15 | B02_taladro   | realizar perforaciones  |
+        | 2025-01-01 00:15 | 2025-01-01 00:35 | B03_pistola   | aplicar capa protectora |
+        AssertionError [ERR_ASSERTION]: Error en inicio (Fila 1)
+        + actual - expected
+
+        + '2025-01-01 00:10'
+        - '2025-01-01 00:00'
+                         ^
+
+            + expected - actual
+
+            -2025-01-01 00:10
+            +2025-01-01 00:00
+
+            at /home/node/features/step_definitions/planificacionSteps.js:130:16
+            at Array.forEach (<anonymous>)
+            at World.<anonymous> (/home/node/features/step_definitions/planificacionSteps.js:120:30)
+
+45) Scenario: Planificación de un producto sin indicar el taller, pero solo uno puede hacerlo # features/05_planificacion.feature:42
+    ✔ Dado el producto con nombre "Canasto de basura chico 1,5mts" # features/step_definitions/productoSteps.js:10
+    ✔ Cuando se solicita planificar el producto el día "01-01-2025" # features/step_definitions/planificacionSteps.js:32
+    ✔ Entonces se espera el siguiente 200 con "Producto planificado con éxito" # features/step_definitions/productoSteps.js:74
+    ✖ Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea               |
+        | 2025-01-01 00:00 | 2025-01-01 00:30 | G01_amoladora | cortar perfiles     |
+        | 2025-01-01 00:30 | 2025-01-01 00:40 | G01_amoladora | cortar malla        |
+        | 2025-01-01 00:40 | 2025-01-01 00:55 | G02_soldadora | soldar canasto      |
+        | 2025-01-01 00:55 | 2025-01-01 01:05 | G02_soldadora | unir pie            |
+        | 2025-01-01 01:05 | 2025-01-01 02:05 | G04_pistola   | pintar antioxidante |
+        AssertionError [ERR_ASSERTION]: Error en inicio (Fila 1)
+        + actual - expected
+
+        + '2025-01-01 02:40'
+        - '2025-01-01 00:00'
+                       ^
+
+            + expected - actual
+
+            -2025-01-01 02:40
+            +2025-01-01 00:00
+
+            at /home/node/features/step_definitions/planificacionSteps.js:130:16
+            at Array.forEach (<anonymous>)
+            at World.<anonymous> (/home/node/features/step_definitions/planificacionSteps.js:120:30)
+
+46) Scenario: Planificación de un producto sin indicar el taller, pero solo uno puede hacerlo y con las planificaciones previas # features/05_planificacion.feature:55
+    ✔ Dado el producto con nombre "Canasto de basura chico 1,5mts" # features/step_definitions/productoSteps.js:10
+    ✔ Cuando se solicita planificar el producto el día "01-01-2025" # features/step_definitions/planificacionSteps.js:32
+    ✔ Entonces se espera el siguiente 200 con "Producto planificado con éxito" # features/step_definitions/productoSteps.js:74
+    ✖ Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea               |
+        | 2025-01-01 00:40 | 2025-01-01 01:10 | G01_amoladora | cortar perfiles     |
+        | 2025-01-01 01:10 | 2025-01-01 01:20 | G01_amoladora | cortar malla        |
+        | 2025-01-01 01:20 | 2025-01-01 01:35 | G02_soldadora | soldar canasto      |
+        | 2025-01-01 01:35 | 2025-01-01 01:45 | G02_soldadora | unir pie            |
+        | 2025-01-01 02:05 | 2025-01-01 03:05 | G04_pistola   | pintar antioxidante |
+        AssertionError [ERR_ASSERTION]: Error en inicio (Fila 1)
+        + actual - expected
+
+        + '2025-01-01 03:20'
+        - '2025-01-01 00:40'
+                       ^
+
+            + expected - actual
+
+            -2025-01-01 03:20
+            +2025-01-01 00:40
+
+            at /home/node/features/step_definitions/planificacionSteps.js:130:16
+            at Array.forEach (<anonymous>)
+            at World.<anonymous> (/home/node/features/step_definitions/planificacionSteps.js:120:30)
+
+47) Scenario: Carga de clientes para los pedidos de fabricación # features/06_pedido.feature:12
+    ✔ Dado que se ingresa el cliente con "Marty McFly" y 27123456781 # features/step_definitions/clienteSteps.js:4
+    ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+    ✖ Entonces se espera el siguiente 200 con "Cliente Marty McFly 27123456781 registrado correctamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+48) Scenario: Carga de clientes para los pedidos de fabricación # features/06_pedido.feature:13
+    ✔ Dado que se ingresa el cliente con "Sarah Connor" y 20304958722 # features/step_definitions/clienteSteps.js:4
+    ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+    ✖ Entonces se espera el siguiente 200 con "Cliente Sarah Connor 20304958722 registrado correctamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+49) Scenario: Carga de clientes para los pedidos de fabricación # features/06_pedido.feature:14
+    ✔ Dado que se ingresa el cliente con "Luke Skywalker" y 23176843593 # features/step_definitions/clienteSteps.js:4
+    ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+    ✖ Entonces se espera el siguiente 200 con "Cliente Luke Skywalker 23176843593 registrado correctamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+50) Scenario: Carga de clientes para los pedidos de fabricación # features/06_pedido.feature:15
+    ✔ Dado que se ingresa el cliente con "Ellen Ripley" y 27982145634 # features/step_definitions/clienteSteps.js:4
+    ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+    ✖ Entonces se espera el siguiente 200 con "Cliente Ellen Ripley 27982145634 registrado correctamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+51) Scenario: Carga de clientes para los pedidos de fabricación # features/06_pedido.feature:16
+    ✔ Dado que se ingresa el cliente con "Frodo Bolsón" y 20654239875 # features/step_definitions/clienteSteps.js:4
+    ✔ Cuando presiono el botón de guardar cliente # features/step_definitions/clienteSteps.js:22
+    ✖ Entonces se espera el siguiente 200 con "Cliente Frodo Bolsón 20654239875 registrado correctamente" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        500 !== 200
+
+            + expected - actual
+
+            -500
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+52) Scenario: Planificación de un pedido con un producto para estar terminado en la fecha de entrega. # features/07_planificacion_pedido.feature:6
+    ✔ Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-02-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "01-02-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "Pedido planificado con éxito" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+    - Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea           |
+        | 2025-02-02 22:35 | 2025-02-02 23:05 | G01_amoladora | cortar planchas |
+        | 2025-02-02 23:05 | 2025-02-02 23:15 | G01_amoladora | cortar perfiles |
+        | 2025-02-02 23:15 | 2025-02-03 00:00 | G02_soldadora | armado          |
+
+53) Scenario: Planificación de un pedido con varios productos para estar terminado en la fecha de entrega. # features/07_planificacion_pedido.feature:17
+    ✔ Dado que existe el pedido para el cliente "20304958722" con fecha de entrega "05-02-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "04-02-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "Pedido planificado con éxito" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+    - Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea           |
+        | 2025-02-04 21:05 | 2025-02-04 21:35 | G01_amoladora | cortar planchas |
+        | 2025-02-04 21:35 | 2025-02-04 21:45 | G01_amoladora | cortar perfiles |
+        | 2025-02-04 21:45 | 2025-02-04 22:30 | G02_soldadora | armado          |
+        | 2025-02-04 21:50 | 2025-02-04 22:20 | G01_amoladora | cortar planchas |
+        | 2025-02-04 22:20 | 2025-02-04 22:30 | G01_amoladora | cortar perfiles |
+        | 2025-02-04 22:30 | 2025-02-04 23:15 | G02_soldadora | armado          |
+        | 2025-02-04 22:35 | 2025-02-04 23:05 | G01_amoladora | cortar planchas |
+        | 2025-02-04 23:05 | 2025-02-04 23:15 | G01_amoladora | cortar perfiles |
+        | 2025-02-04 23:15 | 2025-02-05 00:00 | G02_soldadora | armado          |
+
+54) Scenario: Planificación de un pedido con muchos productos para estar terminado en la fecha de entrega. # features/07_planificacion_pedido.feature:34
+    ✔ Dado que existe el pedido para el cliente "23176843593" con fecha de entrega "10-02-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "08-02-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "Pedido planificado con éxito" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+    - Y se generaron 40 planificaciones para el equipo "G01_amoladora" # features/step_definitions/planificacionSteps.js:137
+    - Y se generaron 20 planificaciones para el equipo "G02_soldadora" # features/step_definitions/planificacionSteps.js:137
+
+55) Scenario: Planificación de un pedido con el taller primera opción completamente ocupado. # features/07_planificacion_pedido.feature:41
+    ✔ Dado que existe el pedido para el cliente "27982145634" con fecha de entrega "10-02-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "09-02-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "Pedido planificado con éxito" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+    - Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo       | tarea           |
+        | 2025-02-09 23:10 | 2025-02-09 23:30 | A2_AMOLAD_01 | cortar planchas |
+        | 2025-02-09 23:30 | 2025-02-09 23:37 | A2_AMOLAD_01 | cortar perfiles |
+        | 2025-02-09 23:37 | 2025-02-10 00:00 | A2_SOLDAD_01 | armado          |
+
+56) Scenario: Planificación de todos los pedidos pendientes. Y uso de huecos en equipos. # features/07_planificacion_pedido.feature:53
+    ✔ Dado que existen los pedidos pendientes de planificacion antes cargados # features/step_definitions/pedidoSteps.js:18
+    ✔ Cuando se solicita planificar todos los pedidos pendientes el día "02-03-2025" # features/step_definitions/planificacionSteps.js:74
+    ✔ Entonces se espera el siguiente 200 con "Pedidos pendientes planificados con éxito" # features/step_definitions/productoSteps.js:74
+    ✖ Y se generaron las siguientes planificaciones # features/step_definitions/planificacionSteps.js:94
+        | inicio           | fin              | equipo        | tarea                  |
+        | 2025-03-05 19:45 | 2025-03-05 20:00 | G02_soldadora | unir ramas             |
+        | 2025-03-05 20:00 | 2025-03-05 21:20 | G03_taladro   | realizar perforaciones |
+        | 2025-03-05 21:05 | 2025-03-05 21:20 | G02_soldadora | unir ramas             |
+        | 2025-03-05 21:20 | 2025-03-05 21:40 | A2_AMOLAD_01  | cortar perfiles        |
+        | 2025-03-05 21:20 | 2025-03-05 22:40 | G03_taladro   | realizar perforaciones |
+        | 2025-03-05 21:40 | 2025-03-05 21:47 | A2_AMOLAD_01  | cortar malla           |
+        | 2025-03-05 21:47 | 2025-03-05 21:55 | A2_SOLDAD_01  | soldar canasto         |
+        | 2025-03-05 21:50 | 2025-03-05 22:10 | A2_AMOLAD_01  | cortar perfiles        |
+        | 2025-03-05 21:55 | 2025-03-05 22:00 | A2_SOLDAD_01  | unir pie               |
+        | 2025-03-05 22:00 | 2025-03-05 22:30 | A2_PISTOL_01  | pintar antioxidante    |
+        | 2025-03-05 22:10 | 2025-03-05 22:17 | A2_AMOLAD_01  | cortar malla           |
+        | 2025-03-05 22:17 | 2025-03-05 22:25 | A2_SOLDAD_01  | soldar canasto         |
+        | 2025-03-05 22:20 | 2025-03-05 22:40 | A2_AMOLAD_01  | cortar perfiles        |
+        | 2025-03-05 22:25 | 2025-03-05 22:30 | A2_SOLDAD_01  | unir pie               |
+        | 2025-03-05 22:25 | 2025-03-05 22:40 | G02_soldadora | unir ramas             |
+        | 2025-03-05 22:30 | 2025-03-05 23:00 | A2_PISTOL_01  | pintar antioxidante    |
+        | 2025-03-05 22:40 | 2025-03-05 22:47 | A2_AMOLAD_01  | cortar malla           |
+        | 2025-03-05 22:40 | 2025-03-06 00:00 | G03_taladro   | realizar perforaciones |
+        | 2025-03-05 22:47 | 2025-03-05 22:55 | A2_SOLDAD_01  | soldar canasto         |
+        | 2025-03-05 22:50 | 2025-03-05 23:10 | A2_AMOLAD_01  | cortar perfiles        |
+        | 2025-03-05 22:55 | 2025-03-05 23:00 | A2_SOLDAD_01  | unir pie               |
+        | 2025-03-05 23:00 | 2025-03-05 23:30 | A2_PISTOL_01  | pintar antioxidante    |
+        | 2025-03-05 23:10 | 2025-03-05 23:17 | A2_AMOLAD_01  | cortar malla           |
+        | 2025-03-05 23:17 | 2025-03-05 23:25 | A2_SOLDAD_01  | soldar canasto         |
+        | 2025-03-05 23:25 | 2025-03-05 23:30 | A2_SOLDAD_01  | unir pie               |
+        | 2025-03-05 23:30 | 2025-03-06 00:00 | A2_PISTOL_01  | pintar antioxidante    |
+        AssertionError [ERR_ASSERTION]: Error en inicio (Fila 1)
+        + actual - expected
+
+        + '2025-03-05 11:45'
+        - '2025-03-05 19:45'
+                       ^
+
+            + expected - actual
+
+            -2025-03-05 11:45
+            +2025-03-05 19:45
+
+            at /home/node/features/step_definitions/planificacionSteps.js:130:16
+            at Array.forEach (<anonymous>)
+            at World.<anonymous> (/home/node/features/step_definitions/planificacionSteps.js:120:30)
+
+57) Scenario: Intentar planificar un pedido cuyo estado no admite replanificación # features/09_planificacion_negativa.feature:8
+    ✔ Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-02-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "01-02-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 409 con "El pedido ya se encuentra en estado planificado" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 409
+
+            + expected - actual
+
+            -400
+            +409
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+58) Scenario: El producto del pedido requiere un tipo de equipo que ningún taller posee # features/09_planificacion_negativa.feature:13
+    ✔ Dado que existe el pedido para el cliente "20654239875" con fecha de entrega "06-06-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "01-06-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+59) Scenario: La fecha de entrega coincide con la fecha de ejecución dejando margen de tiempo cero # features/09_planificacion_negativa.feature:18
+    ✔ Dado que existe el pedido para el cliente "27123456781" con fecha de entrega "03-06-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "03-06-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+60) Scenario: La cantidad de unidades supera la capacidad de todos los talleres en el plazo requerido # features/09_planificacion_negativa.feature:23
+    ✔ Dado que existe el pedido para el cliente "30000000033" con fecha de entrega "10-02-2025" # features/step_definitions/pedidoSteps.js:4
+    ✔ Cuando se solicita planificar el pedido el día "09-02-2025" # features/step_definitions/planificacionSteps.js:56
+    ✖ Entonces se espera el siguiente 200 con "El pedido no pudo planificarse en el plazo requerido" # features/step_definitions/productoSteps.js:74
+        AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+        400 !== 200
+
+            + expected - actual
+
+            -400
+            +200
+
+            at World.<anonymous> (/home/node/features/step_definitions/productoSteps.js:75:12)
+
+78 scenarios (60 failed, 18 passed)
+288 steps (60 failed, 5 skipped, 223 passed)
+0m02.725s
+npm notice
+npm notice New minor version of npm available! 11.13.0 -> 11.17.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.17.0
+npm notice To update run: npm install -g npm@11.17.0
+npm notice
+
