@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.business.taller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,33 +54,39 @@ public class TallerService {
     }
 
     public List<ProcesoPlanificacion> obtenerProcesosPlanificacion(Integer workshopId) {
-        findById(workshopId);
         return planificacionService.findAllByWorkshopId(workshopId);
     }
 
     @Transactional
     public Taller save(Taller workshop) {
         if (workshop.getId() != null) {
-            Taller existing = repository.findById(workshop.getId().intValue()).orElse(null);
-            if (existing != null) {
-                for (Equipo existingEquipo : existing.getEquipos()) {
-                    boolean stillExists = false;
-                    for (Equipo newEquipo : workshop.getEquipos()) {
-                        if (newEquipo.getId() != null && newEquipo.getId().equals(existingEquipo.getId())) {
-                            stillExists = true;
-                            break;
-                        }
-                    }
-                    if (!stillExists) {
-                        if (planificacionService.existsByEquipoId(existingEquipo.getId())) {
-                            throw new BusinessException("No se puede eliminar el equipo " + existingEquipo.getCodigo()
-                                    + " porque tiene planificaciones asociadas.");
-                        }
-                    }
-                }
-            }
+            Taller tallerExistente = repository.findById(workshop.getId().intValue()).orElse(null);
+            if (tallerExistente != null)
+                validarEliminacionDeEquipos(tallerExistente, workshop);
         }
         return repository.save(workshop);
+    }
+
+    private void validarEliminacionDeEquipos(Taller tallerExistente, Taller nuevo) {
+        for (Equipo equipoExistente : tallerExistente.getEquipos()) {
+            if (!sigueExistiendoEn(equipoExistente, nuevo.getEquipos()))
+                validarEquipoSinPlanificaciones(equipoExistente);
+        }
+    }
+
+    private boolean sigueExistiendoEn(Equipo equipo, Collection<Equipo> equipos) {
+        for (Equipo e : equipos) {
+            if (e.getId() != null && e.getId().equals(equipo.getId()))
+                return true;
+        }
+        return false;
+    }
+
+    private void validarEquipoSinPlanificaciones(Equipo equipo) {
+        if (planificacionService.existsByEquipoId(equipo.getId())) {
+            throw new BusinessException("No se puede eliminar el equipo " + equipo.getCodigo()
+                    + " porque tiene planificaciones asociadas.");
+        }
     }
 
     @Transactional

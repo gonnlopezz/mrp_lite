@@ -42,10 +42,10 @@ public class Agenda {
 
     private void inicializarAgenda(Collection<Equipo> equipos, List<Planificacion> planificaciones,
             LocalDateTime inicio, LocalDateTime fin) {
-        Map<Long, List<Planificacion>> agrupadasPorEquipo = agruparPorEquipo(planificaciones);
+        Map<Long, List<Planificacion>> planificacionesPorEquipo = agruparPorEquipo(planificaciones);
 
         for (Equipo equipo : equipos) {
-            List<Planificacion> planificacionesDelEquipo = agrupadasPorEquipo.getOrDefault(equipo.getId(),
+            List<Planificacion> planificacionesDelEquipo = planificacionesPorEquipo.getOrDefault(equipo.getId(),
                     List.of());
             List<Periodo> huecos = calcularHuecosParaEquipo(planificacionesDelEquipo, inicio, fin);
             huecosPorEquipo.put(equipo.getId(), huecos);
