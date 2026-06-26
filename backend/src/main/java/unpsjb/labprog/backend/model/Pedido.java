@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,6 +51,10 @@ public class Pedido {
     private Integer cantidadPlanificable;
 
     // Métodos
+
+    public LocalDateTime getDeadline() {
+        return this.fechaEntrega.atStartOfDay();
+    }
 
     public void marcarComoPlanificado() {
         this.estado = EstadoPedido.PLANIFICADO;

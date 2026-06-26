@@ -47,7 +47,7 @@ public class PlanificacionCoordinador {
 
     @Transactional
     public ProcesoPlanificacion planificarProducto(PlanningRequestDTO request) {
-        LocalDateTime inicio = request.getStartDate().toLocalDate().atStartOfDay();
+        LocalDateTime inicio = normalizarInicio(request.getStartDate());
         Producto producto = productoService.findByName(request.getProductName());
 
         Taller taller = tallerService.obtenerTaller(
@@ -56,11 +56,14 @@ public class PlanificacionCoordinador {
         if (taller == null)
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
 
-        LocalDateTime finHorizonte = inicio.plusDays(HORIZONTE_PLANIFICACION_DIAS);
-        Agenda agenda = agendaFactory.crearParaTaller(taller, inicio, finHorizonte);
+        Agenda agenda = agendaFactory.crearParaTaller(taller, inicio, calcularFinHorizonte(inicio));
 
         ProcesoPlanificacion result = planificador.planificarHaciaAdelante(producto, taller, agenda, inicio);
         return planificacionService.save(result);
+    }
+
+    private LocalDateTime calcularFinHorizonte(LocalDateTime inicio) {
+        return inicio.plusDays(HORIZONTE_PLANIFICACION_DIAS);
     }
 
     @Transactional
@@ -68,8 +71,7 @@ public class PlanificacionCoordinador {
         Pedido pedido = pedidoService.findById(request.getOrder().getId());
         pedido.validarPlanificable();
 
-        LocalDateTime inicioLimite = request.getStartDate().toLocalDate().atStartOfDay();
-        LocalDateTime deadline = pedido.getFechaEntrega().atStartOfDay();
+        LocalDateTime inicioLimite = normalizarInicio(request.getStartDate());
 
         List<Taller> talleres = tallerService
                 .obtenerPosiblesTalleres(pedido.getProducto().tiposDeEquipoRequeridos());
@@ -80,7 +82,8 @@ public class PlanificacionCoordinador {
             return List.of();
         }
 
-        Map<Long, Agenda> agendasTaller = agendaFactory.crearParaTalleres(talleres, inicioLimite, deadline);
+        Map<Long, Agenda> agendasTaller = agendaFactory.crearParaTalleres(talleres, inicioLimite,
+                pedido.getDeadline());
 
         List<ProcesoPlanificacion> resultado = planificador.planificarPedido(pedido, inicioLimite,
                 talleres,
@@ -114,6 +117,10 @@ public class PlanificacionCoordinador {
         }
 
         return resultado;
+    }
+
+    private LocalDateTime normalizarInicio(LocalDateTime inicio) {
+        return inicio.toLocalDate().atStartOfDay();
     }
 
     private LocalDateTime calcularDeadlineMaximo(List<Pedido> pedidos) {
