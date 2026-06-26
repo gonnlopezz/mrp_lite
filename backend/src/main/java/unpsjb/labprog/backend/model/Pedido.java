@@ -51,17 +51,17 @@ public class Pedido {
 
     // Métodos
 
-    public void markAsPlanned() {
+    public void marcarComoPlanificado() {
         this.estado = EstadoPedido.PLANIFICADO;
     }
 
-    public void markAsUnschedulable(String reason, Integer schedulableQuantity) {
+    public void marcarComoNoPlanificable(String razon, Integer cantidadPlanificable) {
         this.estado = EstadoPedido.NO_PLANIFICABLE;
-        this.motivoFalloPlanning = reason;
-        this.cantidadPlanificable = schedulableQuantity;
+        this.motivoFalloPlanning = razon;
+        this.cantidadPlanificable = cantidadPlanificable;
     }
 
-    public void validatePlannable() {
+    public void validarPlanificable() {
         if (this.estado == EstadoPedido.PLANIFICADO)
             throw new BusinessException("El pedido ya se encuentra en estado planificado");
         if (this.estado == EstadoPedido.FINALIZADO)

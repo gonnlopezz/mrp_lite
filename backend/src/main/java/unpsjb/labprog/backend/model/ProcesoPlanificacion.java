@@ -22,10 +22,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ProcesoPlanificacion {
 
-    public ProcesoPlanificacion(List<Planificacion> plannings, LocalDateTime start, LocalDateTime end) {
-        this.planificaciones = plannings;
-        this.inicio = start;
-        this.fin = end;
+    public ProcesoPlanificacion(List<Planificacion> planificaciones, LocalDateTime inicio, LocalDateTime fin) {
+        this.planificaciones = planificaciones;
+        this.inicio = inicio;
+        this.fin = fin;
     }
 
     @Id

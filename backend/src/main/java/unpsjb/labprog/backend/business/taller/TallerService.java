@@ -104,27 +104,27 @@ public class TallerService {
 
     public Taller obtenerTaller(String workshopCode, List<TipoEquipo> requiredTypes) {
         if (workshopCode != null) {
-            Taller result = this.findByCode(workshopCode);
+            Taller resultado = this.findByCode(workshopCode);
             this.validarSoporteEquipo(workshopCode, requiredTypes);
-            return result;
+            return resultado;
         }
 
-        List<Taller> result = this.obtenerPosiblesTalleres(requiredTypes);
-        if (result.isEmpty()) {
+        List<Taller> resultado = this.obtenerPosiblesTalleres(requiredTypes);
+        if (resultado.isEmpty()) {
             return null;
         }
 
-        return result.get(0);
+        return resultado.get(0);
     }
 
     public List<Taller> filtrarTalleresPor(Pedido pedido, List<Taller> talleres) {
-        List<Taller> result = new ArrayList<>();
+        List<Taller> resultado = new ArrayList<>();
         for (Taller t : talleres) {
-            if (t.soportaEquipamiento(pedido.getProducto().requiredEquipmentTypes())) {
-                result.add(t);
+            if (t.soportaEquipamiento(pedido.getProducto().tiposDeEquipoRequeridos())) {
+                resultado.add(t);
             }
         }
-        return result;
+        return resultado;
     }
 
 }

@@ -13,11 +13,11 @@ import unpsjb.labprog.backend.model.*;
 public class PlanificacionBackward implements EstrategiaPlanificacion {
 
     @Override
-    public ProcesoPlanificacion ejecutar(Producto producto, Taller taller, Agenda agenda, LocalDateTime deadline) {
+    public ProcesoPlanificacion planificar(Producto producto, Taller taller, Agenda agenda, LocalDateTime deadline) {
         LinkedList<Planificacion> planificaciones = new LinkedList<>();
         LocalDateTime finActual = deadline;
 
-        for (Tarea tarea : producto.getReverseTasks()) {
+        for (Tarea tarea : producto.tareasEnOrdenInverso()) {
             Equipo equipo = taller.encontrarEquipamientoPara(tarea.getTipo());
 
             Periodo periodo = agenda.ocuparEspacioBackward(tarea, equipo, finActual);

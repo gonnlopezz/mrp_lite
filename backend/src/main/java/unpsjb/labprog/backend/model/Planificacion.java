@@ -18,10 +18,10 @@ import lombok.Setter;
 @Setter
 public class Planificacion {
 
-    public Planificacion(Tarea aTask, Equipo aEquipment, Periodo aPeriod) {
-        this.tarea = aTask;
-        this.equipo = aEquipment;
-        this.periodo = aPeriod;
+    public Planificacion(Tarea aTarea, Equipo aEquipo, Periodo aPeriodo) {
+        this.tarea = aTarea;
+        this.equipo = aEquipo;
+        this.periodo = aPeriodo;
     }
 
     @Id

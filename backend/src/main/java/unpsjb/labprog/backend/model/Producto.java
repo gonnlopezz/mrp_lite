@@ -28,26 +28,25 @@ public class Producto {
     @Column(unique = true, nullable = false)
     private String nombre;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE } , orphanRemoval = true)
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
     private Collection<Tarea> tareas;
-
 
     // Métodos
 
-    public List<TipoEquipo> requiredEquipmentTypes() {
-        List<TipoEquipo> result = new ArrayList<>();
-        for (Tarea task : this.getTareas()) {
-            TipoEquipo type = task.getTipo();
-            if (type != null && !result.contains(type))
-                result.add(type);
+    public List<TipoEquipo> tiposDeEquipoRequeridos() {
+        List<TipoEquipo> resultado = new ArrayList<>();
+        for (Tarea tarea : this.getTareas()) {
+            TipoEquipo tipo = tarea.getTipo();
+            if (tipo != null && !resultado.contains(tipo))
+                resultado.add(tipo);
         }
-        return result;
+        return resultado;
     }
 
-        public List<Tarea> getReverseTasks() {
-        List<Tarea> result = new ArrayList<>(this.getTareas());
-        Collections.reverse(result);
-        return result;
+    public List<Tarea> tareasEnOrdenInverso() {
+        List<Tarea> resultado = new ArrayList<>(this.getTareas());
+        Collections.reverse(resultado);
+        return resultado;
     }
 
 }

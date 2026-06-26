@@ -31,9 +31,10 @@ public class AgendaFactory {
         if (talleres.isEmpty())
             return Map.of();
 
-        List<Planificacion> todas = planificacionRepository.planificacionesPorTalleres(extraerTallerIds(talleres), inicio);
+        List<Planificacion> planificacionesExistentes = planificacionRepository
+                .planificacionesPorTalleres(extraerTallerIds(talleres), inicio);
 
-        return construirAgendas(talleres, todas, inicio, fin);
+        return construirAgendas(talleres, planificacionesExistentes, inicio, fin);
     }
 
     private List<Long> extraerTallerIds(List<Taller> talleres) {
@@ -73,10 +74,10 @@ public class AgendaFactory {
     private Map<Long, List<Planificacion>> agruparPorTaller(List<Planificacion> planificaciones,
             Map<Long, Long> indiceEquipoATaller) {
         Map<Long, List<Planificacion>> agrupadasPorTaller = new HashMap<>();
-        for (Planificacion p : planificaciones) {
-            Long tallerId = indiceEquipoATaller.get(p.getEquipo().getId());
+        for (Planificacion planificacion : planificaciones) {
+            Long tallerId = indiceEquipoATaller.get(planificacion.getEquipo().getId());
             if (tallerId != null) {
-                agrupadasPorTaller.computeIfAbsent(tallerId, k -> new ArrayList<>()).add(p);
+                agrupadasPorTaller.computeIfAbsent(tallerId, k -> new ArrayList<>()).add(planificacion);
             }
         }
         return agrupadasPorTaller;

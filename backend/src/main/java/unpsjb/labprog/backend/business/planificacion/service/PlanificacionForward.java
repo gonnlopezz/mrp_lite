@@ -14,7 +14,7 @@ import unpsjb.labprog.backend.model.*;
 public class PlanificacionForward implements EstrategiaPlanificacion {
 
     @Override
-    public ProcesoPlanificacion ejecutar(Producto producto, Taller taller, Agenda agenda, LocalDateTime inicio) {
+    public ProcesoPlanificacion planificar(Producto producto, Taller taller, Agenda agenda, LocalDateTime inicio) {
         List<Planificacion> planificaciones = new ArrayList<>();
         LocalDateTime tiempoActual = inicio;
 

@@ -20,10 +20,10 @@ public class Planificador {
         this.estrategias = estrategias;
     }
 
-    public ProcesoPlanificacion planificarHaciaAdelanteEspecífico(Producto producto, Taller taller, Agenda agenda,
+    public ProcesoPlanificacion planificarHaciaAdelante(Producto producto, Taller taller, Agenda agenda,
             LocalDateTime inicio) {
         EstrategiaPlanificacion estrategia = estrategias.get("FORWARD");
-        return estrategia.ejecutar(producto, taller, agenda, inicio);
+        return estrategia.planificar(producto, taller, agenda, inicio);
     }
 
     public List<ProcesoPlanificacion> planificarPedido(
@@ -41,14 +41,14 @@ public class Planificador {
                 List<ProcesoPlanificacion> procesos = planificarUnidades(pedido, taller, agendaSimulacion, deadline,
                         inicioLimite);
                 agendas.put(taller.getId(), agendaSimulacion);
-                pedido.markAsPlanned();
+                pedido.marcarComoPlanificado();
                 return procesos;
             } catch (SchedulingException e) {
                 mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
             }
         }
 
-        pedido.markAsUnschedulable(
+        pedido.marcarComoNoPlanificable(
                 "El pedido no pudo planificarse en el plazo requerido",
                 mejorCantidadPlanificable > 0 ? mejorCantidadPlanificable : null);
 
@@ -62,7 +62,7 @@ public class Planificador {
 
         for (int i = 0; i < pedido.getCantidad(); i++) {
             try {
-                ProcesoPlanificacion proceso = estrategia.ejecutar(pedido.getProducto(), taller, agenda, deadline);
+                ProcesoPlanificacion proceso = estrategia.planificar(pedido.getProducto(), taller, agenda, deadline);
 
                 if (proceso.getInicio().isBefore(inicioLimite)) {
                     throw new SchedulingException("Excede el tiempo límite de inicio", resultado.size());

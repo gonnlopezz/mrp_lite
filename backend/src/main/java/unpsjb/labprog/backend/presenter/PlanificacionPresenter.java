@@ -30,7 +30,7 @@ public class PlanificacionPresenter {
     @Autowired
     PlanificacionService service;
     @Autowired
-    PlanificacionCoordinador facade;
+    PlanificacionCoordinador coordinador;
     @Autowired
     PedidoService pedidoService;
 
@@ -65,7 +65,7 @@ public class PlanificacionPresenter {
             request.setWorkshopCode(null);
         }
         try {
-            return Response.ok(facade.planificarProducto(request), "Producto planificado con éxito");
+            return Response.ok(coordinador.planificarProducto(request), "Producto planificado con éxito");
         } catch (BusinessException e) {
             return Response.conflict(e.getMessage());
         } catch (EntityNotFoundException e) {
@@ -79,7 +79,7 @@ public class PlanificacionPresenter {
     @PostMapping("/order")
     public ResponseEntity<Object> planFromOrder(@RequestBody PlanningFromOrderRequestDTO request) {
         try {
-            List<ProcesoPlanificacion> result = facade.planificarPedido(request);
+            List<ProcesoPlanificacion> result = coordinador.planificarPedido(request);
 
             if (result.isEmpty()) {
                 Pedido failedOrder = pedidoService.findById(request.getOrder().getId());
@@ -105,7 +105,7 @@ public class PlanificacionPresenter {
                 return Response.error("La fecha de inicio (startDate) es obligatoria.");
             }
 
-            List<ProcesoPlanificacion> processes = facade.planificarBatch(request.getStartDate());
+            List<ProcesoPlanificacion> processes = coordinador.planificarBatch(request.getStartDate());
 
             return Response.ok(processes, "Pedidos pendientes planificados con éxito");
         } catch (Exception e) {

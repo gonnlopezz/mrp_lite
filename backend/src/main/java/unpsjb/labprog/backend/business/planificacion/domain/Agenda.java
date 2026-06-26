@@ -33,8 +33,9 @@ public class Agenda {
 
     private Map<Long, List<Planificacion>> agruparPorEquipo(List<Planificacion> planificaciones) {
         Map<Long, List<Planificacion>> agrupadasPorEquipo = new HashMap<>();
-        for (Planificacion p : planificaciones) {
-            agrupadasPorEquipo.computeIfAbsent(p.getEquipo().getId(), k -> new ArrayList<>()).add(p);
+        for (Planificacion planificacion : planificaciones) {
+            agrupadasPorEquipo.computeIfAbsent(planificacion.getEquipo().getId(), k -> new ArrayList<>())
+                    .add(planificacion);
         }
         return agrupadasPorEquipo;
     }
