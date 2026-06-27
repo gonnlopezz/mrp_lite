@@ -92,7 +92,6 @@ public class PlanificacionPresenter {
         } catch (BusinessException e) {
             return Response.conflict(e.getMessage());
         } catch (Exception e) {
-            System.err.println("🚨 ERROR CRÍTICO EN TEST DE PLANIFICACIÓN: " + e.getMessage());
             e.printStackTrace();
             return Response.error(e.getMessage());
         }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.business.planificacion.domain.OrdenadorTaller;
+import unpsjb.labprog.backend.business.planificacion.domain.ResultadoPlanificacion;
 import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
 
@@ -34,18 +35,19 @@ public class Planificador {
             List<Taller> talleres, Map<Long, Agenda> agendas) {
         int mejorCantidadPlanificable = 0;
 
-        List<Taller> talleresOrdenados = ordenadorTaller.ordenarPorDisponibilidad(talleres, agendas, pedido.getDeadline());
+        List<Taller> talleresOrdenados = ordenadorTaller.ordenarPorDisponibilidad(talleres, agendas,
+                pedido.getDeadline());
 
         for (Taller taller : talleresOrdenados) {
             Agenda agendaSimulacion = agendas.get(taller.getId()).copiar();
-            try {
-                List<ProcesoPlanificacion> procesos = planificarUnidades(pedido, taller, agendaSimulacion,
-                        inicioLimite);
+            ResultadoPlanificacion resultado = planificarUnidades(pedido, taller, agendaSimulacion, inicioLimite);
+
+            if (resultado.isExitoso()) {
                 agendas.put(taller.getId(), agendaSimulacion);
                 pedido.marcarComoPlanificado();
-                return procesos;
-            } catch (SchedulingException e) {
-                mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, e.getSchedulableQuantity());
+                return resultado.getProcesos();
+            } else {
+                mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, resultado.getCantidadPlanificada());
             }
         }
 
@@ -56,7 +58,7 @@ public class Planificador {
         return List.of();
     }
 
-    private List<ProcesoPlanificacion> planificarUnidades(Pedido pedido, Taller taller, Agenda agenda,
+    private ResultadoPlanificacion planificarUnidades(Pedido pedido, Taller taller, Agenda agenda,
             LocalDateTime inicioLimite) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
         EstrategiaPlanificacion estrategia = estrategias.get("BACKWARD");
@@ -67,16 +69,16 @@ public class Planificador {
                         pedido.getDeadline());
 
                 if (proceso.getInicio().isBefore(inicioLimite)) {
-                    throw new SchedulingException("Excede el tiempo límite de inicio", resultado.size());
+                    return ResultadoPlanificacion.parcial(resultado.size());
                 }
 
                 proceso.setPedido(pedido);
                 resultado.add(proceso);
             } catch (SchedulingException e) {
-                throw new SchedulingException(e.getMessage(), resultado.size());
+                return ResultadoPlanificacion.parcial(resultado.size());
             }
         }
-        return resultado;
+        return ResultadoPlanificacion.exitoso(resultado);
     }
 
 }
