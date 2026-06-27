@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 
 import unpsjb.labprog.backend.business.pedido.PedidoService;
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
-import unpsjb.labprog.backend.business.planificacion.domain.AgendaFactory;
 import unpsjb.labprog.backend.business.producto.ProductoService;
 import unpsjb.labprog.backend.business.taller.TallerService;
 import unpsjb.labprog.backend.dto.PlanningFromOrderRequestDTO;

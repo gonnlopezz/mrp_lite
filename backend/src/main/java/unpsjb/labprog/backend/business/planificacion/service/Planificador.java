@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
+import unpsjb.labprog.backend.business.planificacion.domain.OrdenadorTaller;
 import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
 
@@ -15,9 +16,11 @@ import unpsjb.labprog.backend.model.*;
 public class Planificador {
 
     private final Map<String, EstrategiaPlanificacion> estrategias;
+    private final OrdenadorTaller ordenadorTaller;
 
-    public Planificador(Map<String, EstrategiaPlanificacion> estrategias) {
+    public Planificador(Map<String, EstrategiaPlanificacion> estrategias, OrdenadorTaller ordenadorTaller) {
         this.estrategias = estrategias;
+        this.ordenadorTaller = ordenadorTaller;
     }
 
     public ProcesoPlanificacion planificarHaciaAdelante(Producto producto, Taller taller, Agenda agenda,
@@ -31,7 +34,7 @@ public class Planificador {
             List<Taller> talleres, Map<Long, Agenda> agendas) {
         int mejorCantidadPlanificable = 0;
 
-        List<Taller> talleresOrdenados = ordenarPorDisponibilidad(talleres, agendas, pedido.getDeadline());
+        List<Taller> talleresOrdenados = ordenadorTaller.ordenarPorDisponibilidad(talleres, agendas, pedido.getDeadline());
 
         for (Taller taller : talleresOrdenados) {
             Agenda agendaSimulacion = agendas.get(taller.getId()).copiar();
@@ -73,18 +76,6 @@ public class Planificador {
                 throw new SchedulingException(e.getMessage(), resultado.size());
             }
         }
-        return resultado;
-    }
-
-    private List<Taller> ordenarPorDisponibilidad(List<Taller> talleres,
-            Map<Long, Agenda> agendas, LocalDateTime deadline) {
-
-        List<Taller> resultado = new ArrayList<>(talleres);
-
-        resultado.sort((a, b) -> Long.compare(
-                agendas.get(b.getId()).calcularTiempoLibreHasta(deadline),
-                agendas.get(a.getId()).calcularTiempoLibreHasta(deadline)));
-
         return resultado;
     }
 

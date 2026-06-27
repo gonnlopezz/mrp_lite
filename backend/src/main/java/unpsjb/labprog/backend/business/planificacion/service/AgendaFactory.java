@@ -1,4 +1,4 @@
-package unpsjb.labprog.backend.business.planificacion.domain;
+package unpsjb.labprog.backend.business.planificacion.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import unpsjb.labprog.backend.business.planificacion.PlanificacionRepository;
+import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.model.Equipo;
 import unpsjb.labprog.backend.model.Planificacion;
 import unpsjb.labprog.backend.model.Taller;
