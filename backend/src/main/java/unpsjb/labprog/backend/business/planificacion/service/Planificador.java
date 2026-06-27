@@ -68,9 +68,8 @@ public class Planificador {
                 ProcesoPlanificacion proceso = estrategia.planificar(pedido.getProducto(), taller, agenda,
                         pedido.getDeadline());
 
-                if (proceso.getInicio().isBefore(inicioLimite)) {
+                if (proceso.getInicio().isBefore(inicioLimite))
                     return ResultadoPlanificacion.parcial(resultado.size());
-                }
 
                 proceso.setPedido(pedido);
                 resultado.add(proceso);
