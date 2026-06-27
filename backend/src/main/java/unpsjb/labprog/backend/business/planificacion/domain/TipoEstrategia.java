@@ -6,5 +6,6 @@ public final class TipoEstrategia {
     public static final String BACKWARD = "BACKWARD";
 
     private TipoEstrategia() {
+
     }
 }
