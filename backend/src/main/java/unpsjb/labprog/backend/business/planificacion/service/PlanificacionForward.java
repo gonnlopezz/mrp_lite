@@ -7,10 +7,11 @@ import org.springframework.stereotype.Component;
 
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
+import unpsjb.labprog.backend.business.planificacion.domain.TipoEstrategia;
 import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
 
-@Component("FORWARD")
+@Component(TipoEstrategia.FORWARD)
 public class PlanificacionForward implements EstrategiaPlanificacion {
 
     @Override

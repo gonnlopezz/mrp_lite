@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.business.planificacion.domain.OrdenadorTaller;
+import unpsjb.labprog.backend.business.planificacion.domain.TipoEstrategia;
 import unpsjb.labprog.backend.business.planificacion.domain.ResultadoPlanificacion;
 import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
@@ -26,7 +27,7 @@ public class Planificador {
 
     public ProcesoPlanificacion planificarHaciaAdelante(Producto producto, Taller taller, Agenda agenda,
             LocalDateTime inicio) {
-        EstrategiaPlanificacion estrategia = estrategias.get("FORWARD");
+        EstrategiaPlanificacion estrategia = estrategias.get(TipoEstrategia.FORWARD);
         return estrategia.planificar(producto, taller, agenda, inicio);
     }
 
@@ -61,7 +62,7 @@ public class Planificador {
     private ResultadoPlanificacion planificarUnidades(Pedido pedido, Taller taller, Agenda agenda,
             LocalDateTime inicioLimite) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
-        EstrategiaPlanificacion estrategia = estrategias.get("BACKWARD");
+        EstrategiaPlanificacion estrategia = estrategias.get(TipoEstrategia.BACKWARD);
 
         for (int i = 0; i < pedido.getCantidad(); i++) {
             try {
