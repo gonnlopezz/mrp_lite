@@ -24,7 +24,7 @@ public class PlanificacionBackward implements EstrategiaPlanificacion {
             Periodo periodo = agenda.ocuparEspacioBackward(tarea, equipo, finActual);
 
             if (periodo == null)
-                throw new SchedulingException("El pedido no pudo planificarse en el plazo requerido",
+                throw new SchedulingException("No se encontró hueco hacia atrás para la tarea: " + tarea.getNombre(),
                         planificaciones.size());
 
             planificaciones.addFirst(new Planificacion(tarea, equipo, periodo));
