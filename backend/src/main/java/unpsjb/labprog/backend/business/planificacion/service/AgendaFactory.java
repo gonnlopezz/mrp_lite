@@ -43,7 +43,7 @@ public class AgendaFactory {
 
     private Map<Long, Agenda> construirAgendas(List<Taller> talleres, List<Planificacion> planificaciones,
             LocalDateTime inicio, LocalDateTime fin) {
-        Map<Long, List<Planificacion>> planificacionesPorTaller = agruparPorTaller(planificaciones,
+        Map<Long, List<Planificacion>> planificacionesPorTaller = agruparPlanificacionesPorTaller(planificaciones,
                 indexarEquiposTaller(talleres));
 
         Map<Long, Agenda> agendas = new HashMap<>();
@@ -65,7 +65,7 @@ public class AgendaFactory {
         return indice;
     }
 
-    private Map<Long, List<Planificacion>> agruparPorTaller(List<Planificacion> planificaciones,
+    private Map<Long, List<Planificacion>> agruparPlanificacionesPorTaller(List<Planificacion> planificaciones,
             Map<Long, Long> indiceEquipoATaller) {
         Map<Long, List<Planificacion>> agrupadasPorTaller = new HashMap<>();
         for (Planificacion planificacion : planificaciones) {

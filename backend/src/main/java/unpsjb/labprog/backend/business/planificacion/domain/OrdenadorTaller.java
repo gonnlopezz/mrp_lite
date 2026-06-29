@@ -17,8 +17,8 @@ public class OrdenadorTaller {
         List<Taller> resultado = new ArrayList<>(talleres);
 
         resultado.sort((a, b) -> Long.compare(
-                agendas.get(b.getId()).calcularTiempoLibreHasta(deadline),
-                agendas.get(a.getId()).calcularTiempoLibreHasta(deadline)));
+                agendas.get(b.getId()).calcularMinutosLibresHasta(deadline),
+                agendas.get(a.getId()).calcularMinutosLibresHasta(deadline)));
 
         return resultado;
     }

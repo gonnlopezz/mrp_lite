@@ -21,9 +21,7 @@ public class Agenda {
             LocalDateTime fin) {
         this.huecosPorEquipo = new HashMap<>();
 
-        List<Planificacion> planificaciones = new ArrayList<>(planificacionesExistentes);
-
-        inicializarAgenda(equipos, planificaciones, inicio, fin);
+        inicializarAgenda(equipos, new ArrayList<>(planificacionesExistentes), inicio, fin);
     }
 
     private Agenda(Map<Long, List<Periodo>> huecos) {
@@ -57,14 +55,14 @@ public class Agenda {
         List<Periodo> huecos = new ArrayList<>();
         LocalDateTime cursor = inicio;
 
-        for (Planificacion plan : planificaciones) {
-            Periodo ocupado = plan.getPeriodo();
-            if (ocupado.getInicio().isAfter(cursor)) {
-                huecos.add(new Periodo(cursor, ocupado.getInicio(), 0));
+        for (Planificacion planificacion : planificaciones) {
+            Periodo periodoReservado = planificacion.getPeriodo();
+            if (periodoReservado.getInicio().isAfter(cursor)) {
+                huecos.add(new Periodo(cursor, periodoReservado.getInicio(), 0));
             }
 
-            if (ocupado.getFin().isAfter(cursor)) {
-                cursor = ocupado.getFin();
+            if (periodoReservado.getFin().isAfter(cursor)) {
+                cursor = periodoReservado.getFin();
             }
         }
 
@@ -80,14 +78,12 @@ public class Agenda {
         if (huecos == null)
             return null;
 
-        long duracionEfectivaMinutos = tarea.calcularDuracionPara(equipo);
-
         for (int i = 0; i < huecos.size(); i++) {
             Periodo hueco = huecos.get(i);
             if (!hueco.getFin().isBefore(tiempoActual)) {
                 LocalDateTime inicioEfectivo = hueco.getInicio().isAfter(tiempoActual) ? hueco.getInicio()
                         : tiempoActual;
-                LocalDateTime finEstimado = inicioEfectivo.plusMinutes(duracionEfectivaMinutos);
+                LocalDateTime finEstimado = inicioEfectivo.plusMinutes(tarea.calcularDuracionPara(equipo));
 
                 if (!finEstimado.isAfter(hueco.getFin())) {
                     Periodo nuevoPeriodoOcupado = new Periodo(inicioEfectivo, finEstimado, tarea.getTiempo());
@@ -104,12 +100,10 @@ public class Agenda {
         if (huecos == null)
             return null;
 
-        long duracionTarea = tarea.calcularDuracionPara(equipo);
-
         for (int i = huecos.size() - 1; i >= 0; i--) {
             Periodo hueco = huecos.get(i);
             LocalDateTime fin = hueco.getFin().isBefore(deadline) ? hueco.getFin() : deadline;
-            LocalDateTime inicio = fin.minusMinutes(duracionTarea);
+            LocalDateTime inicio = fin.minusMinutes(tarea.calcularDuracionPara(equipo));
 
             if (!inicio.isBefore(hueco.getInicio())) {
                 Periodo nuevoPeriodoOcupado = new Periodo(inicio, fin, tarea.getTiempo());
@@ -132,7 +126,7 @@ public class Agenda {
             huecos.add(indiceHuecoAfectado, new Periodo(ocupado.getFin(), huecoOriginal.getFin(), 0));
     }
 
-    public long calcularTiempoLibreHasta(LocalDateTime deadline) {
+    public long calcularMinutosLibresHasta(LocalDateTime deadline) {
         long resultado = 0;
 
         for (List<Periodo> huecos : huecosPorEquipo.values()) {
