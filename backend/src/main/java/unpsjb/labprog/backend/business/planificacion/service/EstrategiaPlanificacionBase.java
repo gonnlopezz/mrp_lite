@@ -23,13 +23,13 @@ public abstract class EstrategiaPlanificacionBase implements EstrategiaPlanifica
 
         for (Tarea tarea : obtenerTareas(producto)) {
             Equipo equipo = taller.encontrarEquipamientoPara(tarea.getTipo());
-            Periodo periodoReservado = ocuparHueco(agenda, tarea, equipo, cursor);
+            Optional<Periodo> periodoReservado = ocuparHueco(agenda, tarea, equipo, cursor);
 
-            if (periodoReservado == null)
+            if (periodoReservado.isEmpty())
                 return Optional.empty();
 
-            agregarPlanificacion(planificaciones, new Planificacion(tarea, equipo, periodoReservado));
-            cursor = avanzarCursor(periodoReservado);
+            agregarPlanificacion(planificaciones, new Planificacion(tarea, equipo, periodoReservado.get()));
+            cursor = avanzarCursor(periodoReservado.get());
 
         }
         return Optional.of(new ProcesoPlanificacion(planificaciones, obtenerInicio(planificaciones),
@@ -42,7 +42,7 @@ public abstract class EstrategiaPlanificacionBase implements EstrategiaPlanifica
 
     protected abstract List<Tarea> obtenerTareas(Producto producto);
 
-    protected abstract Periodo ocuparHueco(Agenda agenda, Tarea tarea, Equipo equipo, LocalDateTime cursor);
+    protected abstract Optional<Periodo> ocuparHueco(Agenda agenda, Tarea tarea, Equipo equipo, LocalDateTime cursor);
 
     protected abstract void agregarPlanificacion(LinkedList<Planificacion> planificaciones,
             Planificacion planificacion);

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import unpsjb.labprog.backend.model.Equipo;
 import unpsjb.labprog.backend.model.Periodo;
@@ -73,10 +74,10 @@ public class Agenda {
         return huecos;
     }
 
-    public Periodo ocuparEspacioForward(Tarea tarea, Equipo equipo, LocalDateTime tiempoActual) {
+    public Optional<Periodo> ocuparEspacioForward(Tarea tarea, Equipo equipo, LocalDateTime tiempoActual) {
         List<Periodo> huecos = huecosPorEquipo.get(equipo.getId());
         if (huecos == null)
-            return null;
+            return Optional.empty();
 
         for (int i = 0; i < huecos.size(); i++) {
             Periodo hueco = huecos.get(i);
@@ -88,17 +89,17 @@ public class Agenda {
                 if (!finEstimado.isAfter(hueco.getFin())) {
                     Periodo nuevoPeriodoOcupado = new Periodo(inicioEfectivo, finEstimado, tarea.getTiempo());
                     actualizarHuecos(huecos, i, nuevoPeriodoOcupado);
-                    return nuevoPeriodoOcupado;
+                    return Optional.of(nuevoPeriodoOcupado);
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public Periodo ocuparEspacioBackward(Tarea tarea, Equipo equipo, LocalDateTime deadline) {
+    public Optional<Periodo> ocuparEspacioBackward(Tarea tarea, Equipo equipo, LocalDateTime deadline) {
         List<Periodo> huecos = huecosPorEquipo.get(equipo.getId());
         if (huecos == null)
-            return null;
+            return Optional.empty();
 
         for (int i = huecos.size() - 1; i >= 0; i--) {
             Periodo hueco = huecos.get(i);
@@ -108,10 +109,10 @@ public class Agenda {
             if (!inicio.isBefore(hueco.getInicio())) {
                 Periodo nuevoPeriodoOcupado = new Periodo(inicio, fin, tarea.getTiempo());
                 actualizarHuecos(huecos, i, nuevoPeriodoOcupado);
-                return nuevoPeriodoOcupado;
+                return Optional.of(nuevoPeriodoOcupado);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private void actualizarHuecos(List<Periodo> huecos, int indiceHuecoAfectado, Periodo ocupado) {

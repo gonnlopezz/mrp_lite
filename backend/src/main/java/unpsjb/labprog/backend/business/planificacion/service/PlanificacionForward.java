@@ -3,6 +3,8 @@ package unpsjb.labprog.backend.business.planificacion.service;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.TipoEstrategia;
@@ -16,7 +18,7 @@ public class PlanificacionForward extends EstrategiaPlanificacionBase {
     }
 
     @Override
-    protected Periodo ocuparHueco(Agenda agenda, Tarea tarea, Equipo equipo, LocalDateTime cursor) {
+    protected Optional<Periodo> ocuparHueco(Agenda agenda, Tarea tarea, Equipo equipo, LocalDateTime cursor) {
         return agenda.ocuparEspacioForward(tarea, equipo, cursor);
     }
 
