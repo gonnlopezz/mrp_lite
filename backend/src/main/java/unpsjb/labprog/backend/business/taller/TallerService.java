@@ -121,13 +121,8 @@ public class TallerService {
     }
 
     public List<Taller> filtrarTalleresPor(Pedido pedido, List<Taller> talleres) {
-        List<Taller> resultado = new ArrayList<>();
-        for (Taller t : talleres) {
-            if (t.soportaEquipamiento(pedido.getProducto().tiposDeEquipoRequeridos())) {
-                resultado.add(t);
-            }
-        }
-        return resultado;
+        return talleres.stream().filter(t -> t.soportaEquipamiento(pedido.getProducto().tiposDeEquipoRequeridos()))
+                .toList();
     }
 
 }
