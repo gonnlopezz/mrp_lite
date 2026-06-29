@@ -35,10 +35,7 @@ public class AgendaFactory {
     }
 
     private List<Long> obtenerIds(List<Taller> talleres) {
-        List<Long> resultado = new ArrayList<>();
-        for (Taller taller : talleres)
-            resultado.add(taller.getId());
-        return resultado;
+        return talleres.stream().map(Taller::getId).toList();
     }
 
     private Map<Long, Agenda> construirAgendas(List<Taller> talleres, List<Planificacion> planificaciones,

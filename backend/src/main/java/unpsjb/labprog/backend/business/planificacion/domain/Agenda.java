@@ -58,18 +58,15 @@ public class Agenda {
 
         for (Planificacion planificacion : planificaciones) {
             Periodo periodoReservado = planificacion.getPeriodo();
-            if (periodoReservado.getInicio().isAfter(cursor)) {
+            if (periodoReservado.getInicio().isAfter(cursor))
                 huecos.add(new Periodo(cursor, periodoReservado.getInicio(), 0));
-            }
 
-            if (periodoReservado.getFin().isAfter(cursor)) {
+            if (periodoReservado.getFin().isAfter(cursor))
                 cursor = periodoReservado.getFin();
-            }
         }
 
-        if (cursor.isBefore(fin)) {
+        if (cursor.isBefore(fin))
             huecos.add(new Periodo(cursor, fin, 0));
-        }
 
         return huecos;
     }
