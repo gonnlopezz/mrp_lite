@@ -29,9 +29,8 @@ public class Planificador {
     public ProcesoPlanificacion planificarHaciaAdelante(Producto producto, Taller taller, Agenda agenda,
             LocalDateTime inicio) {
         EstrategiaPlanificacion estrategia = estrategias.get(TipoEstrategia.FORWARD);
-        return estrategia.planificar(producto, taller, agenda, inicio)
-                .orElseThrow(() -> new BusinessException(
-                        "No se pudo planificar el producto: no hay disponibilidad en el taller"));
+        return estrategia.planificar(producto, taller, agenda, inicio).orElseThrow(() -> new BusinessException(
+                "No se pudo planificar el producto: no hay disponibilidad en el taller"));
     }
 
     public List<ProcesoPlanificacion> planificarPedido(
@@ -51,15 +50,19 @@ public class Planificador {
                 pedido.marcarComoPlanificado();
                 return resultado.getProcesos();
             } else {
-                mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, resultado.getCantidadPlanificada());
+                mejorCantidadPlanificable = calcularMejorCantidadPlanificable(mejorCantidadPlanificable,
+                        resultado.getCantidadPlanificada());
             }
         }
 
-        pedido.marcarComoNoPlanificable(
-                "El pedido no pudo planificarse en el plazo requerido",
+        pedido.marcarComoNoPlanificable("El pedido no pudo planificarse en el plazo requerido",
                 mejorCantidadPlanificable > 0 ? mejorCantidadPlanificable : null);
 
         return List.of();
+    }
+
+    private int calcularMejorCantidadPlanificable(int mejorCantidadPlanificable, int cantidadPlanificada) {
+        return Math.max(mejorCantidadPlanificable, cantidadPlanificada);
     }
 
     private ResultadoPlanificacion planificarUnidades(Pedido pedido, Taller taller, Agenda agenda,
