@@ -55,10 +55,6 @@ public class PlanificacionService {
         return repository.existsByEquipoId(equipoId);
     }
 
-    public List<ProcesoPlanificacion> findAllByWorkshopId(int workshopId) {
-        return repository.findAllByWorkshopId(workshopId);
-    }
-
     @Transactional
     public ProcesoPlanificacion save(ProcesoPlanificacion proceso) {
         return repository.save(proceso);

@@ -54,7 +54,7 @@ public class TallerService {
     }
 
     public List<ProcesoPlanificacion> obtenerProcesosPlanificacion(Integer workshopId) {
-        return planificacionService.findAllByWorkshopId(workshopId);
+        return planificacionService.findByWorkshop(workshopId);
     }
 
     @Transactional
@@ -91,7 +91,7 @@ public class TallerService {
 
     @Transactional
     public void delete(int id) {
-        if (!planificacionService.findAllByWorkshopId(id).isEmpty()) {
+        if (!planificacionService.findByWorkshop(id).isEmpty()) {
             throw new BusinessException("No se puede eliminar el taller porque tiene planificaciones asociadas.");
         }
         repository.deleteById(id);

@@ -51,18 +51,13 @@ public class Planificador {
                 return resultado.getProcesos();
             }
 
-            mejorCantidadPlanificable = calcularMejorCantidadPlanificable(mejorCantidadPlanificable,
-                    resultado.getCantidadPlanificada());
+            mejorCantidadPlanificable = Math.max(mejorCantidadPlanificable, resultado.getCantidadPlanificada());
         }
 
         pedido.marcarComoNoPlanificable("El pedido no pudo planificarse en el plazo requerido",
                 mejorCantidadPlanificable > 0 ? mejorCantidadPlanificable : null);
 
         return List.of();
-    }
-
-    private int calcularMejorCantidadPlanificable(int mejorCantidadPlanificable, int cantidadPlanificada) {
-        return Math.max(mejorCantidadPlanificable, cantidadPlanificada);
     }
 
     private ResultadoPlanificacion planificarUnidades(Pedido pedido, Taller taller, Agenda agenda,

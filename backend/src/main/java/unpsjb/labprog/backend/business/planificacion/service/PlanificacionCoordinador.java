@@ -57,8 +57,7 @@ public class PlanificacionCoordinador {
 
         Agenda agenda = agendaFactory.crearParaTaller(taller, inicio, calcularFinHorizonte(inicio));
 
-        ProcesoPlanificacion result = planificador.planificarHaciaAdelante(producto, taller, agenda, inicio);
-        return planificacionService.save(result);
+        return planificacionService.save(planificador.planificarHaciaAdelante(producto, taller, agenda, inicio));
     }
 
     private LocalDateTime calcularFinHorizonte(LocalDateTime inicio) {

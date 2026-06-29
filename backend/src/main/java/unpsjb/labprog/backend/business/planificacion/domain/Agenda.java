@@ -139,9 +139,11 @@ public class Agenda {
     private long minutosLibresEn(Periodo hueco, LocalDateTime deadline) {
         if (hueco.getInicio().isAfter(deadline))
             return 0;
+        return Math.max(0, ChronoUnit.MINUTES.between(hueco.getInicio(), calcularFinEfectivo(hueco, deadline)));
+    }
 
-        LocalDateTime finEfectivo = hueco.getFin().isAfter(deadline) ? deadline : hueco.getFin();
-        return Math.max(0, ChronoUnit.MINUTES.between(hueco.getInicio(), finEfectivo));
+    private LocalDateTime calcularFinEfectivo(Periodo hueco, LocalDateTime deadline) {
+        return hueco.getFin().isAfter(deadline) ? deadline : hueco.getFin();
     }
 
     public Agenda copiar() {
