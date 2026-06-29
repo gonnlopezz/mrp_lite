@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,15 +50,15 @@ public class PlanificacionCoordinador {
         LocalDateTime inicio = normalizarInicio(request.getStartDate());
         Producto producto = productoService.findByName(request.getProductName());
 
-        Taller taller = tallerService.obtenerTaller(
+        Optional<Taller> taller = tallerService.obtenerTaller(
                 request.getWorkshopCode(), producto.tiposDeEquipoRequeridos());
 
-        if (taller == null)
+        if (taller.isEmpty())
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
 
-        Agenda agenda = agendaFactory.crearParaTaller(taller, inicio, calcularFinHorizonte(inicio));
+        Agenda agenda = agendaFactory.crearParaTaller(taller.get(), inicio, calcularFinHorizonte(inicio));
 
-        return planificacionService.save(planificador.planificarHaciaAdelante(producto, taller, agenda, inicio));
+        return planificacionService.save(planificador.planificarHaciaAdelante(producto, taller.get(), agenda, inicio));
     }
 
     private LocalDateTime calcularFinHorizonte(LocalDateTime inicio) {

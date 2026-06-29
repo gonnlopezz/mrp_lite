@@ -3,6 +3,7 @@ package unpsjb.labprog.backend.business.taller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -105,19 +106,19 @@ public class TallerService {
         }
     }
 
-    public Taller obtenerTaller(String workshopCode, List<TipoEquipo> requiredTypes) {
+    public Optional<Taller> obtenerTaller(String workshopCode, List<TipoEquipo> requiredTypes) {
         if (workshopCode != null) {
             Taller resultado = this.findByCode(workshopCode);
             this.validarSoporteEquipo(workshopCode, requiredTypes);
-            return resultado;
+            return Optional.of(resultado);
         }
 
         List<Taller> resultado = this.obtenerPosiblesTalleres(requiredTypes);
         if (resultado.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
-        return resultado.get(0);
+        return Optional.of(resultado.get(0));
     }
 
     public List<Taller> filtrarTalleresPor(Pedido pedido, List<Taller> talleres) {
