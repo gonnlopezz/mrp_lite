@@ -24,10 +24,9 @@ public class PlanificacionForward implements EstrategiaPlanificacion {
 
             Periodo periodo = agenda.ocuparEspacioForward(tarea, equipo, tiempoActual);
 
-            if (periodo == null) {
+            if (periodo == null)
                 throw new SchedulingException("No se encontró hueco hacia adelante para la tarea: " + tarea.getNombre(),
                         planificaciones.size());
-            }
 
             planificaciones.add(new Planificacion(tarea, equipo, periodo));
 

@@ -26,36 +26,29 @@ public class AgendaFactory {
         return new Agenda(taller.getEquipos(), planificaciones, inicio, fin);
     }
 
-    public Map<Long, Agenda> crearParaTalleres(List<Taller> talleres,
-            LocalDateTime inicio,
-            LocalDateTime fin) {
+    public Map<Long, Agenda> crearParaTalleres(List<Taller> talleres, LocalDateTime inicio, LocalDateTime fin) {
         if (talleres.isEmpty())
             return Map.of();
 
-        List<Planificacion> planificacionesExistentes = planificacionRepository
-                .planificacionesPorTalleres(extraerTallerIds(talleres), inicio);
-
-        return construirAgendas(talleres, planificacionesExistentes, inicio, fin);
+        return construirAgendas(talleres,
+                planificacionRepository.planificacionesPorTalleres(obtenerIds(talleres), inicio), inicio, fin);
     }
 
-    private List<Long> extraerTallerIds(List<Taller> talleres) {
-        List<Long> tallerIds = new ArrayList<>();
-        for (Taller taller : talleres) {
-            tallerIds.add(taller.getId());
-        }
-        return tallerIds;
+    private List<Long> obtenerIds(List<Taller> talleres) {
+        List<Long> resultado = new ArrayList<>();
+        for (Taller taller : talleres)
+            resultado.add(taller.getId());
+        return resultado;
     }
 
-    private Map<Long, Agenda> construirAgendas(List<Taller> talleres,
-            List<Planificacion> planificaciones,
-            LocalDateTime inicio,
-            LocalDateTime fin) {
-        Map<Long, Long> indiceEquipoATaller = indexarEquiposTaller(talleres);
-        Map<Long, List<Planificacion>> porTaller = agruparPorTaller(planificaciones, indiceEquipoATaller);
+    private Map<Long, Agenda> construirAgendas(List<Taller> talleres, List<Planificacion> planificaciones,
+            LocalDateTime inicio, LocalDateTime fin) {
+        Map<Long, List<Planificacion>> planificacionesPorTaller = agruparPorTaller(planificaciones,
+                indexarEquiposTaller(talleres));
 
         Map<Long, Agenda> agendas = new HashMap<>();
         for (Taller taller : talleres) {
-            List<Planificacion> delTaller = porTaller.getOrDefault(taller.getId(), List.of());
+            List<Planificacion> delTaller = planificacionesPorTaller.getOrDefault(taller.getId(), List.of());
             agendas.put(taller.getId(), new Agenda(taller.getEquipos(), delTaller, inicio, fin));
         }
 
