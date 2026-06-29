@@ -36,11 +36,9 @@ public class Taller {
     private Collection<Equipo> equipos;
 
     public Equipo encontrarEquipamientoPara(TipoEquipo tipo) {
-        for (Equipo eq : equipos) {
-            if (eq.getTipo().equals(tipo))
-                return eq;
-        }
-        throw new BusinessException("El taller no cuenta con el tipo de equipo requerido: " + tipo.getNombre());
+        return equipos.stream().filter(e -> e.getTipo().equals(tipo)).findFirst()
+                .orElseThrow(() -> new BusinessException(
+                        "El taller no cuenta con el tipo de equipo requerido: " + tipo.getNombre()));
     }
 
     public boolean soportaEquipamiento(List<TipoEquipo> tiposRequeridos) {

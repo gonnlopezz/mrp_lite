@@ -34,13 +34,7 @@ public class Producto {
     // Métodos
 
     public List<TipoEquipo> tiposDeEquipoRequeridos() {
-        List<TipoEquipo> resultado = new ArrayList<>();
-        for (Tarea tarea : this.getTareas()) {
-            TipoEquipo tipo = tarea.getTipo();
-            if (tipo != null && !resultado.contains(tipo))
-                resultado.add(tipo);
-        }
-        return resultado;
+        return this.getTareas().stream().map(Tarea::getTipo).filter(t -> t != null).distinct().toList();
     }
 
     public List<Tarea> tareasEnOrdenInverso() {
