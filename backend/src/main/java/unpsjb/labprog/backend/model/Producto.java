@@ -29,7 +29,7 @@ public class Producto {
     private String nombre;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
-    private Collection<Tarea> tareas;
+    private List<Tarea> tareas;
 
     // Métodos
 

@@ -1,38 +1,38 @@
 package unpsjb.labprog.backend.business.planificacion.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.springframework.stereotype.Component;
-
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
-import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
 import unpsjb.labprog.backend.business.planificacion.domain.TipoEstrategia;
-import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.*;
 
 @Component(TipoEstrategia.FORWARD)
-public class PlanificacionForward implements EstrategiaPlanificacion {
+public class PlanificacionForward extends EstrategiaPlanificacionBase {
+    @Override
+    protected List<Tarea> obtenerTareas(Producto producto) {
+        return producto.getTareas();
+    }
 
     @Override
-    public ProcesoPlanificacion planificar(Producto producto, Taller taller, Agenda agenda, LocalDateTime inicio) {
-        List<Planificacion> planificaciones = new ArrayList<>();
-        LocalDateTime tiempoActual = inicio;
-
-        for (Tarea tarea : producto.getTareas()) {
-            Equipo equipo = taller.encontrarEquipamientoPara(tarea.getTipo());
-
-            Periodo periodo = agenda.ocuparEspacioForward(tarea, equipo, tiempoActual);
-
-            if (periodo == null)
-                throw new SchedulingException("No se encontró hueco hacia adelante para la tarea: " + tarea.getNombre(),
-                        planificaciones.size());
-
-            planificaciones.add(new Planificacion(tarea, equipo, periodo));
-
-            tiempoActual = periodo.getFin();
-        }
-
-        return new ProcesoPlanificacion(planificaciones, planificaciones.get(0).getPeriodo().getInicio(), tiempoActual);
+    protected Periodo ocuparHueco(Agenda agenda, Tarea tarea, Equipo equipo, LocalDateTime cursor) {
+        return agenda.ocuparEspacioForward(tarea, equipo, cursor);
     }
+
+    @Override
+    protected void agregarPlanificacion(LinkedList<Planificacion> planificaciones, Planificacion planificacion) {
+        planificaciones.addLast(planificacion);
+    }
+
+    @Override
+    protected LocalDateTime avanzarCursor(Periodo periodo) {
+        return periodo.getFin();
+    }
+
+    @Override
+    protected LocalDateTime calcularFin(LocalDateTime fechaReferencia, LocalDateTime cursor) {
+        return cursor;
+    }
+
 }
