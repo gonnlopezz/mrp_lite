@@ -3,10 +3,10 @@ package unpsjb.labprog.backend.business.planificacion.service;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import unpsjb.labprog.backend.business.planificacion.domain.Agenda;
 import unpsjb.labprog.backend.business.planificacion.domain.EstrategiaPlanificacion;
-import unpsjb.labprog.backend.exception.SchedulingException;
 import unpsjb.labprog.backend.model.ProcesoPlanificacion;
 import unpsjb.labprog.backend.model.Equipo;
 import unpsjb.labprog.backend.model.Periodo;
@@ -16,7 +16,7 @@ import unpsjb.labprog.backend.model.Taller;
 import unpsjb.labprog.backend.model.Tarea;
 
 public abstract class EstrategiaPlanificacionBase implements EstrategiaPlanificacion {
-    public ProcesoPlanificacion planificar(Producto producto, Taller taller, Agenda agenda,
+    public Optional<ProcesoPlanificacion> planificar(Producto producto, Taller taller, Agenda agenda,
             LocalDateTime fechaReferencia) {
         LinkedList<Planificacion> planificaciones = new LinkedList<>();
         LocalDateTime cursor = fechaReferencia;
@@ -26,15 +26,14 @@ public abstract class EstrategiaPlanificacionBase implements EstrategiaPlanifica
             Periodo periodoReservado = ocuparHueco(agenda, tarea, equipo, cursor);
 
             if (periodoReservado == null)
-                throw new SchedulingException("No se encontró hueco para la tarea: " + tarea.getNombre(),
-                        planificaciones.size());
+                return Optional.empty();
 
             agregarPlanificacion(planificaciones, new Planificacion(tarea, equipo, periodoReservado));
             cursor = avanzarCursor(periodoReservado);
 
         }
-        return new ProcesoPlanificacion(planificaciones, obtenerInicio(planificaciones),
-                calcularFin(fechaReferencia, cursor));
+        return Optional.of(new ProcesoPlanificacion(planificaciones, obtenerInicio(planificaciones),
+                calcularFin(fechaReferencia, cursor)));
     }
 
     private LocalDateTime obtenerInicio(LinkedList<Planificacion> planificaciones) {
@@ -48,7 +47,7 @@ public abstract class EstrategiaPlanificacionBase implements EstrategiaPlanifica
     protected abstract void agregarPlanificacion(LinkedList<Planificacion> planificaciones,
             Planificacion planificacion);
 
-    protected abstract LocalDateTime avanzarCursor(Periodo periodoReservado);
+    protected abstract LocalDateTime avanzarCursor(Periodo periodo);
 
     protected abstract LocalDateTime calcularFin(LocalDateTime fechaReferencia, LocalDateTime cursorFinal);
 
