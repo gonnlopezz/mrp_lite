@@ -49,10 +49,10 @@ public class Planificador {
                 agendas.put(taller.getId(), agendaSimulacion);
                 pedido.marcarComoPlanificado();
                 return resultado.getProcesos();
-            } else {
-                mejorCantidadPlanificable = calcularMejorCantidadPlanificable(mejorCantidadPlanificable,
-                        resultado.getCantidadPlanificada());
             }
+
+            mejorCantidadPlanificable = calcularMejorCantidadPlanificable(mejorCantidadPlanificable,
+                    resultado.getCantidadPlanificada());
         }
 
         pedido.marcarComoNoPlanificable("El pedido no pudo planificarse en el plazo requerido",
