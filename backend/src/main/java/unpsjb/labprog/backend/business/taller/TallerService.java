@@ -75,11 +75,7 @@ public class TallerService {
     }
 
     private boolean sigueExistiendoEn(Equipo equipo, Collection<Equipo> equipos) {
-        for (Equipo e : equipos) {
-            if (e.getId() != null && e.getId().equals(equipo.getId()))
-                return true;
-        }
-        return false;
+        return equipos.stream().anyMatch(e -> e.getId() != null && e.getId().equals(equipo.getId()));
     }
 
     private void validarEquipoSinPlanificaciones(Equipo equipo) {
