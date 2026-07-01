@@ -77,20 +77,31 @@ public class Agenda {
             return Optional.empty();
 
         for (int i = 0; i < huecos.size(); i++) {
-            Periodo hueco = huecos.get(i);
-            if (!hueco.getFin().isBefore(tiempoActual)) {
-                LocalDateTime inicioEfectivo = hueco.getInicio().isAfter(tiempoActual) ? hueco.getInicio()
-                        : tiempoActual;
-                LocalDateTime finEstimado = inicioEfectivo.plusMinutes(tarea.calcularDuracionPara(equipo));
+            Optional<Periodo> periodoOcupado = evaluarHuecoForward(huecos.get(i), tarea, equipo, tiempoActual);
 
-                if (!finEstimado.isAfter(hueco.getFin())) {
-                    Periodo nuevoPeriodoOcupado = new Periodo(inicioEfectivo, finEstimado, tarea.getTiempo());
-                    actualizarHuecos(huecos, i, nuevoPeriodoOcupado);
-                    return Optional.of(nuevoPeriodoOcupado);
-                }
+            if (periodoOcupado.isPresent()) {
+                actualizarHuecos(huecos, i, periodoOcupado.get());
+                return periodoOcupado;
             }
         }
         return Optional.empty();
+    }
+
+    private Optional<Periodo> evaluarHuecoForward(Periodo hueco, Tarea tarea, Equipo equipo,
+            LocalDateTime tiempoActual) {
+        if (!hueco.getFin().isBefore(tiempoActual)) {
+            LocalDateTime inicio = calcularInicioForward(hueco, tiempoActual);
+            LocalDateTime fin = inicio.plusMinutes(tarea.calcularDuracionPara(equipo));
+
+            if (!fin.isAfter(hueco.getFin())) {
+                return Optional.of(new Periodo(inicio, fin, tarea.getTiempo()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private LocalDateTime calcularInicioForward(Periodo hueco, LocalDateTime tiempoActual) {
+        return hueco.getInicio().isAfter(tiempoActual) ? hueco.getInicio() : tiempoActual;
     }
 
     public Optional<Periodo> ocuparEspacioBackward(Tarea tarea, Equipo equipo, LocalDateTime deadline) {
@@ -99,17 +110,26 @@ public class Agenda {
             return Optional.empty();
 
         for (int i = huecos.size() - 1; i >= 0; i--) {
-            Periodo hueco = huecos.get(i);
-            LocalDateTime fin = hueco.getFin().isBefore(deadline) ? hueco.getFin() : deadline;
-            LocalDateTime inicio = fin.minusMinutes(tarea.calcularDuracionPara(equipo));
-
-            if (!inicio.isBefore(hueco.getInicio())) {
-                Periodo nuevoPeriodoOcupado = new Periodo(inicio, fin, tarea.getTiempo());
-                actualizarHuecos(huecos, i, nuevoPeriodoOcupado);
-                return Optional.of(nuevoPeriodoOcupado);
+            Optional<Periodo> periodoOcupado = evaluarHuecoBackward(huecos.get(i), tarea, equipo, deadline);
+            if (periodoOcupado.isPresent()) {
+                actualizarHuecos(huecos, i, periodoOcupado.get());
+                return periodoOcupado;
             }
         }
         return Optional.empty();
+    }
+
+    private Optional<Periodo> evaluarHuecoBackward(Periodo hueco, Tarea tarea, Equipo equipo, LocalDateTime deadline) {
+        LocalDateTime fin = calcularFinBackward(hueco, deadline);
+        LocalDateTime inicio = fin.minusMinutes(tarea.calcularDuracionPara(equipo));
+        if (!inicio.isBefore(hueco.getInicio()))
+            return Optional.of(new Periodo(inicio, fin, tarea.getTiempo()));
+
+        return Optional.empty();
+    }
+
+    private LocalDateTime calcularFinBackward(Periodo hueco, LocalDateTime deadline) {
+        return hueco.getFin().isBefore(deadline) ? hueco.getFin() : deadline;
     }
 
     private void actualizarHuecos(List<Periodo> huecos, int indiceHuecoAfectado, Periodo ocupado) {
