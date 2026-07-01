@@ -88,8 +88,9 @@ public class PlanificacionCoordinador {
                 talleres, agendasTaller);
 
         pedidoService.save(pedido);
+        guardarProcesos(resultado);
 
-        return guardarProcesos(resultado);
+        return resultado;
     }
 
     @Transactional
@@ -106,14 +107,15 @@ public class PlanificacionCoordinador {
         List<ProcesoPlanificacion> resultado = ejecutarPlanificacionBatch(pedidosPendientes, talleres, agendasTaller,
                 tiempoEjecucion);
 
-        return guardarProcesos(resultado);
+        pedidoService.saveAll(pedidosPendientes);
+        guardarProcesos(resultado);
+
+        return resultado;
     }
 
-    private List<ProcesoPlanificacion> guardarProcesos(List<ProcesoPlanificacion> procesos) {
+    private void guardarProcesos(List<ProcesoPlanificacion> procesos) {
         if (!procesos.isEmpty())
             planificacionService.saveAll(procesos);
-
-        return procesos;
     }
 
     private LocalDateTime normalizarInicio(LocalDateTime inicio) {
