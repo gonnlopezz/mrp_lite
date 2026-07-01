@@ -85,15 +85,11 @@ public class PlanificacionCoordinador {
                 pedido.getDeadline());
 
         List<ProcesoPlanificacion> resultado = planificador.planificarPedido(pedido, inicioLimite,
-                talleres,
-                agendasTaller);
+                talleres, agendasTaller);
 
         pedidoService.save(pedido);
-        if (!resultado.isEmpty()) {
-            planificacionService.saveAll(resultado);
-        }
 
-        return resultado;
+        return guardarProcesos(resultado);
     }
 
     @Transactional
@@ -110,12 +106,14 @@ public class PlanificacionCoordinador {
         List<ProcesoPlanificacion> resultado = ejecutarPlanificacionBatch(pedidosPendientes, talleres, agendasTaller,
                 tiempoEjecucion);
 
-        pedidoService.saveAll(pedidosPendientes);
-        if (!resultado.isEmpty()) {
-            planificacionService.saveAll(resultado);
-        }
+        return guardarProcesos(resultado);
+    }
 
-        return resultado;
+    private List<ProcesoPlanificacion> guardarProcesos(List<ProcesoPlanificacion> procesos) {
+        if (!procesos.isEmpty())
+            planificacionService.saveAll(procesos);
+
+        return procesos;
     }
 
     private LocalDateTime normalizarInicio(LocalDateTime inicio) {
