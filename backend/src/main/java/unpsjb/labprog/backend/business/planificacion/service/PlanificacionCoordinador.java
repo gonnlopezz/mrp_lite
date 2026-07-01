@@ -50,15 +50,14 @@ public class PlanificacionCoordinador {
         LocalDateTime inicio = normalizarInicio(request.getStartDate());
         Producto producto = productoService.findByName(request.getProductName());
 
-        Optional<Taller> taller = tallerService.obtenerTaller(
-                request.getWorkshopCode(), producto.tiposDeEquipoRequeridos());
+        Optional<Taller> taller = tallerService.obtenerTaller(request.getWorkshopCode(),
+                producto.tiposDeEquipoRequeridos());
 
         if (taller.isEmpty())
             throw new BusinessException("No se encontró un taller con el equipamiento requerido para el producto");
 
-        Agenda agenda = agendaFactory.crearParaTaller(taller.get(), inicio, calcularFinHorizonte(inicio));
-
-        return planificacionService.save(planificador.planificarHaciaAdelante(producto, taller.get(), agenda, inicio));
+        return planificacionService.save(planificador.planificarHaciaAdelante(producto, taller.get(),
+                agendaFactory.crearParaTaller(taller.get(), inicio, calcularFinHorizonte(inicio)), inicio));
     }
 
     private LocalDateTime calcularFinHorizonte(LocalDateTime inicio) {
@@ -72,8 +71,7 @@ public class PlanificacionCoordinador {
 
         LocalDateTime inicioLimite = normalizarInicio(request.getStartDate());
 
-        List<Taller> talleres = tallerService
-                .obtenerPosiblesTalleres(pedido.getProducto().tiposDeEquipoRequeridos());
+        List<Taller> talleres = tallerService.obtenerPosiblesTalleres(pedido.getProducto().tiposDeEquipoRequeridos());
 
         if (talleres.isEmpty()) {
             pedido.marcarComoNoPlanificable("No existen talleres con el equipamiento requerido", null);
@@ -81,11 +79,8 @@ public class PlanificacionCoordinador {
             return List.of();
         }
 
-        Map<Long, Agenda> agendasTaller = agendaFactory.crearParaTalleres(talleres, inicioLimite,
-                pedido.getDeadline());
-
         List<ProcesoPlanificacion> resultado = planificador.planificarPedido(pedido, inicioLimite,
-                talleres, agendasTaller);
+                talleres, agendaFactory.crearParaTalleres(talleres, inicioLimite, pedido.getDeadline()));
 
         pedidoService.save(pedido);
         guardarProcesos(resultado);
@@ -101,10 +96,8 @@ public class PlanificacionCoordinador {
 
         List<Taller> talleres = tallerService.findAllConEquipos();
 
-        Map<Long, Agenda> agendasTaller = agendaFactory.crearParaTalleres(talleres, tiempoEjecucion,
-                calcularDeadlineMaximo(pedidosPendientes));
-
-        List<ProcesoPlanificacion> resultado = ejecutarPlanificacionBatch(pedidosPendientes, talleres, agendasTaller,
+        List<ProcesoPlanificacion> resultado = ejecutarPlanificacionBatch(pedidosPendientes, talleres,
+                agendaFactory.crearParaTalleres(talleres, tiempoEjecucion, calcularDeadlineMaximo(pedidosPendientes)),
                 tiempoEjecucion);
 
         pedidoService.saveAll(pedidosPendientes);
@@ -126,16 +119,15 @@ public class PlanificacionCoordinador {
         return pedidos.get(pedidos.size() - 1).getFechaEntrega().atStartOfDay();
     }
 
-    private List<ProcesoPlanificacion> ejecutarPlanificacionBatch(
-            List<Pedido> pedidosPendientes, List<Taller> talleres, Map<Long, Agenda> agendasTaller,
-            LocalDateTime tiempoEjecucion) {
+    private List<ProcesoPlanificacion> ejecutarPlanificacionBatch(List<Pedido> pedidosPendientes, List<Taller> talleres,
+            Map<Long, Agenda> agendasTaller, LocalDateTime tiempoEjecucion) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
         for (Pedido pedido : pedidosPendientes) {
             List<Taller> talleresAptos = tallerService.filtrarTalleresPor(pedido, talleres);
 
             if (!talleresAptos.isEmpty()) {
-                List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedido(
-                        pedido, tiempoEjecucion, talleresAptos, agendasTaller);
+                List<ProcesoPlanificacion> procesosPedido = planificador.planificarPedido(pedido, tiempoEjecucion,
+                        talleresAptos, agendasTaller);
                 resultado.addAll(procesosPedido);
             } else {
                 pedido.marcarComoNoPlanificable("No existen talleres con el equipamiento requerido", null);

@@ -28,13 +28,11 @@ public class Planificador {
 
     public ProcesoPlanificacion planificarHaciaAdelante(Producto producto, Taller taller, Agenda agenda,
             LocalDateTime inicio) {
-        EstrategiaPlanificacion estrategia = estrategias.get(TipoEstrategia.FORWARD);
-        return estrategia.planificar(producto, taller, agenda, inicio).orElseThrow(() -> new BusinessException(
-                "No se pudo planificar el producto: no hay disponibilidad en el taller"));
+        return estrategias.get(TipoEstrategia.FORWARD).planificar(producto, taller, agenda, inicio).orElseThrow(
+                () -> new BusinessException("No se pudo planificar el producto: no hay disponibilidad en el taller"));
     }
 
-    public List<ProcesoPlanificacion> planificarPedido(
-            Pedido pedido, LocalDateTime inicioLimite,
+    public List<ProcesoPlanificacion> planificarPedido(Pedido pedido, LocalDateTime inicioLimite,
             List<Taller> talleres, Map<Long, Agenda> agendas) {
         int mejorCantidadPlanificable = 0;
 
@@ -55,7 +53,7 @@ public class Planificador {
         }
 
         pedido.marcarComoNoPlanificable("El pedido no pudo planificarse en el plazo requerido",
-                mejorCantidadPlanificable > 0 ? mejorCantidadPlanificable : null);
+                mejorCantidadPlanificable);
 
         return List.of();
     }
@@ -63,11 +61,10 @@ public class Planificador {
     private ResultadoPlanificacion planificarUnidades(Pedido pedido, Taller taller, Agenda agenda,
             LocalDateTime inicioLimite) {
         List<ProcesoPlanificacion> resultado = new ArrayList<>();
-        EstrategiaPlanificacion estrategia = estrategias.get(TipoEstrategia.BACKWARD);
 
         for (int i = 0; i < pedido.getCantidad(); i++) {
-            Optional<ProcesoPlanificacion> proceso = estrategia.planificar(pedido.getProducto(), taller, agenda,
-                    pedido.getDeadline());
+            Optional<ProcesoPlanificacion> proceso = estrategias.get(TipoEstrategia.BACKWARD).planificar(
+                    pedido.getProducto(), taller, agenda, pedido.getDeadline());
 
             if (proceso.isEmpty() || proceso.get().getInicio().isBefore(inicioLimite))
                 return ResultadoPlanificacion.parcial(resultado.size());
